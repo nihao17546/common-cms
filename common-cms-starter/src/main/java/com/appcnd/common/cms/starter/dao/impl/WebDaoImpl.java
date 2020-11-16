@@ -29,8 +29,8 @@ public class WebDaoImpl implements IWebDao {
     public Long selectOneToOneCount(ListParam param) {
         List<Object> params = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        sb.append("select count(1) from ")
-                .append(param.getSchema()).append(".").append(param.getTable()).append(" ").append(param.getAlias());
+        sb.append("select count(1) from `")
+                .append(param.getSchema()).append("`.`").append(param.getTable()).append("` ").append(param.getAlias());
         fillOneToOne(params, sb, param);
         String sql = sb.toString();
         return dbUtil.selectCount(sql, params);
@@ -39,8 +39,9 @@ public class WebDaoImpl implements IWebDao {
     private void fillOneToOne(List<Object> params, StringBuilder sb, ListParam param) {
         if (param.getLeftJoins() != null && !param.getLeftJoins().isEmpty()) {
             for (SelectLeftJoin selectLeftJoin : param.getLeftJoins()) {
-                sb.append(" left join ").append(selectLeftJoin.getSchema()).append(".").append(selectLeftJoin.getTable()).append(" ").append(selectLeftJoin.getAlias())
-                        .append(" on ").append(selectLeftJoin.getAlias()).append(".").append(selectLeftJoin.getRelateKey()).append(" = ").append(param.getAlias()).append(".").append(selectLeftJoin.getParentKey());
+                sb.append(" left join `").append(selectLeftJoin.getSchema()).append("`.`").append(selectLeftJoin.getTable()).append("` ").append(selectLeftJoin.getAlias())
+                        .append(" on ").append(selectLeftJoin.getAlias()).append(".`").append(selectLeftJoin.getRelateKey())
+                        .append("` = ").append(param.getAlias()).append(".`").append(selectLeftJoin.getParentKey()).append("`");
                 if (selectLeftJoin.getWheres() != null && !selectLeftJoin.getWheres().isEmpty()) {
                     for (Where where : selectLeftJoin.getWheres()) {
                         sb.append(" and ").append(selectLeftJoin.getAlias()).append(".").append(where.getKey());
@@ -136,7 +137,7 @@ public class WebDaoImpl implements IWebDao {
     public List<Map<String, Object>> selectOneToOneList(ListParam param, Integer curPage, Integer pageSize) {
         List<Object> params = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        sb.append("select ").append(param.getAlias()).append(".").append(param.getPrimaryKey());
+        sb.append("select ").append(param.getAlias()).append(".`").append(param.getPrimaryKey()).append("`");
         if (param.getColumns() != null && !param.getColumns().isEmpty()) {
             for (String column : param.getColumns()) {
                 sb.append(",").append(param.getAlias()).append(".").append(column);
@@ -151,10 +152,10 @@ public class WebDaoImpl implements IWebDao {
                 }
             }
         }
-        sb.append(" from ").append(param.getSchema()).append(".").append(param.getTable()).append(" ").append(param.getAlias());
+        sb.append(" from `").append(param.getSchema()).append("`.`").append(param.getTable()).append("` ").append(param.getAlias());
         fillOneToOne(params, sb, param);
         if (param.getSortColumn() != null) {
-            sb.append(" order by ").append(param.getSortColumn());
+            sb.append(" order by `").append(param.getSortColumn()).append("`");
             if (param.getOrder() != null) {
                 sb.append(" ").append(param.getOrder());
             }
@@ -171,7 +172,7 @@ public class WebDaoImpl implements IWebDao {
     @Override
     public List<Map<String, Object>> selectKeyValue(String schema, String table, String key, String value) {
         StringBuilder sb = new StringBuilder();
-        sb.append("select ").append(key).append(",").append(value).append(" from ").append(schema).append(".").append(table);
+        sb.append("select `").append(key).append("`,`").append(value).append("` from `").append(schema).append("`.`").append(table).append("`");
         String sql = sb.toString();
         return dbUtil.selectList(sql, null);
     }
@@ -179,10 +180,10 @@ public class WebDaoImpl implements IWebDao {
     @Override
     public int insert(String schema, String table, String pramaryKey, Map<String, Object> params) {
         StringBuilder sb = new StringBuilder();
-        sb.append("insert into ").append(schema).append(".").append(table).append("(");
+        sb.append("insert into `").append(schema).append("`.`").append(table).append("`(");
         List<Object> paramValues = new ArrayList<>(params.size());
         for (String key : params.keySet()) {
-            sb.append(key).append(",");
+            sb.append("`").append(key).append("`,");
             paramValues.add(params.get(key));
         }
         sb.deleteCharAt(sb.length() - 1);
@@ -199,14 +200,14 @@ public class WebDaoImpl implements IWebDao {
     @Override
     public Map<String, Object> selectByPrimaryKey(String schema, String table, String primaryKey, Object primaryKeyValue, List<String> columns) {
         StringBuilder sb = new StringBuilder();
-        sb.append("select ").append(primaryKey);
+        sb.append("select `").append(primaryKey).append("`");
         if (columns != null && !columns.isEmpty()) {
             for (String column : columns) {
-                sb.append(",").append(column);
+                sb.append(",`").append(column).append("`");
             }
         }
-        sb.append(" from ").append(schema).append(".").append(table)
-                .append(" where ").append(primaryKey).append("=?");
+        sb.append(" from `").append(schema).append("`.`").append(table)
+                .append("` where `").append(primaryKey).append("`=?");
         String sql = sb.toString();
         return dbUtil.selectOne(sql, Arrays.asList(primaryKeyValue));
     }
@@ -214,15 +215,15 @@ public class WebDaoImpl implements IWebDao {
     @Override
     public int update(String schema, String table, String primaryKey, Object primaryKeyValue, Map<String, Object> param) {
         StringBuilder sb = new StringBuilder();
-        sb.append("update ").append(schema).append(".").append(table)
-                .append(" set ");
+        sb.append("update `").append(schema).append("`.`").append(table)
+                .append("` set ");
         List<Object> paramValues = new ArrayList<>(param.size());
         for (String key : param.keySet()) {
-            sb.append(key).append("=?,");
+            sb.append("`").append(key).append("`=?,");
             paramValues.add(param.get(key));
         }
         sb.deleteCharAt(sb.length() - 1);
-        sb.append(" where ").append(primaryKey).append("=?");
+        sb.append(" where `").append(primaryKey).append("`=?");
         paramValues.add(primaryKeyValue);
         String sql = sb.toString();
         return dbUtil.update(sql, paramValues);
@@ -231,7 +232,7 @@ public class WebDaoImpl implements IWebDao {
     @Override
     public int delete(String schema, String table, String primaryKey, List<Object> primaryKeyValues) {
         StringBuilder sb = new StringBuilder();
-        sb.append("delete from ").append(schema).append(".").append(table).append(" where ").append(primaryKey).append(" in (");
+        sb.append("delete from `").append(schema).append("`.`").append(table).append("` where `").append(primaryKey).append("` in (");
         for (Object primaryKeyValue : primaryKeyValues) {
             sb.append("?,");
         }
@@ -244,7 +245,7 @@ public class WebDaoImpl implements IWebDao {
     @Override
     public List<Map<String, Object>> selectUnique(String schema, String table, String primaryKey, Map<String, Object> uniqueParams) {
         StringBuilder sb = new StringBuilder();
-        sb.append("select ").append(primaryKey).append(",");
+        sb.append("select `").append(primaryKey).append("`,");
         List<Object> paramValues = new ArrayList<>(uniqueParams.size());
         List<String> paramKeys = new ArrayList<>(uniqueParams.size());
         for (String key : uniqueParams.keySet()) {
@@ -256,7 +257,7 @@ public class WebDaoImpl implements IWebDao {
         sb.deleteCharAt(sb.length() - 1);
         sb.deleteCharAt(sb.length() - 1);
         sb.deleteCharAt(sb.length() - 1);
-        sb.append(" from ").append(schema).append(".").append(table).append(" where ");
+        sb.append(" from `").append(schema).append("`.`").append(table).append("` where ");
         for (String key : paramKeys) {
             sb.append(key).append("=? and ");
         }
