@@ -3,9 +3,13 @@ package com.appcnd.common.cms.starter.util;
 import com.appcnd.common.cms.starter.properties.DbProperties;
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
@@ -14,61 +18,86 @@ import java.util.Map;
  * created by nihao 2020/07/09
  */
 @Slf4j
-public class DBUtil {
+public class DBUtil implements ApplicationContextAware {
+    private ApplicationContext applicationContext;
 
     @Autowired
     private DbProperties dbProperties;
 
-    DruidDataSource druidDataSource;
+    DataSource dataSource;
 
     @PostConstruct
     public void init() {
-        druidDataSource = new DruidDataSource();
-        druidDataSource.setUrl(dbProperties.getUrl());
-        druidDataSource.setUsername(dbProperties.getUsername());
-        druidDataSource.setPassword(dbProperties.getPassword());
-        if (dbProperties.getInitialSize() != null) {
-            druidDataSource.setInitialSize(dbProperties.getInitialSize());
+        if ("auto".equals(dbProperties.getDatasourceType())) {
+            try {
+                dataSource = applicationContext.getAutowireCapableBeanFactory().getBean(DataSource.class);
+                log.info("Common Cms auto datasource initialized");
+            } catch (Exception e) {
+                log.error("自动装配数据源异常", e);
+                throw e;
+            }
+        } else if ("target".equals(dbProperties.getDatasourceType())) {
+            if (dbProperties.getDatasourceName() == null || dbProperties.getDatasourceName().isEmpty()) {
+                throw new IllegalArgumentException("Common Cms datasource name undefined");
+            }
+            try {
+                dataSource = applicationContext.getAutowireCapableBeanFactory().getBean(dbProperties.getDatasourceName(), DataSource.class);
+                log.info("Common Cms target datasource initialized");
+            } catch (Exception e) {
+                log.error("装配指导数据源异常", e);
+                throw e;
+            }
+        } else if ("self".equals(dbProperties.getDatasourceType())) {
+            DruidDataSource druidDataSource = new DruidDataSource();
+            druidDataSource.setUrl(dbProperties.getUrl());
+            druidDataSource.setUsername(dbProperties.getUsername());
+            druidDataSource.setPassword(dbProperties.getPassword());
+            if (dbProperties.getInitialSize() != null) {
+                druidDataSource.setInitialSize(dbProperties.getInitialSize());
+            }
+            if (dbProperties.getMinIdle() != null) {
+                druidDataSource.setMinIdle(dbProperties.getMinIdle());
+            }
+            if (dbProperties.getMaxActive() != null) {
+                druidDataSource.setMaxActive(dbProperties.getMaxActive());
+            }
+            if (dbProperties.getMaxWait() != null) {
+                druidDataSource.setMaxWait(dbProperties.getMaxWait());
+            }
+            if (dbProperties.getTimeBetweenEvictionRunsMillis() != null) {
+                druidDataSource.setTimeBetweenEvictionRunsMillis(dbProperties.getTimeBetweenEvictionRunsMillis());
+            }
+            if (dbProperties.getMinEvictableIdleTimeMillis() != null) {
+                druidDataSource.setMinEvictableIdleTimeMillis(dbProperties.getMinEvictableIdleTimeMillis());
+            }
+            if (dbProperties.getValidationQuery() != null) {
+                druidDataSource.setValidationQuery(dbProperties.getValidationQuery());
+            }
+            if (dbProperties.getTestWhileIdle() != null) {
+                druidDataSource.setTestWhileIdle(dbProperties.getTestWhileIdle());
+            }
+            if (dbProperties.getTestOnBorrow() != null) {
+                druidDataSource.setTestOnBorrow(dbProperties.getTestOnBorrow());
+            }
+            if (dbProperties.getTestOnReturn() != null) {
+                druidDataSource.setTestOnReturn(dbProperties.getTestOnReturn());
+            }
+            if (dbProperties.getPoolPreparedStatements() != null) {
+                druidDataSource.setPoolPreparedStatements(dbProperties.getPoolPreparedStatements());
+            }
+            if (dbProperties.getMaxPoolPreparedStatementPerConnectionSize() != null) {
+                druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(dbProperties.getMaxPoolPreparedStatementPerConnectionSize());
+            }
+            dataSource = druidDataSource;
+            log.info("Common Cms self datasource initialized");
+        } else {
+            throw new IllegalArgumentException("Common Cms datasource type error,only auto|target|self are supported");
         }
-        if (dbProperties.getMinIdle() != null) {
-            druidDataSource.setMinIdle(dbProperties.getMinIdle());
-        }
-        if (dbProperties.getMaxActive() != null) {
-            druidDataSource.setMaxActive(dbProperties.getMaxActive());
-        }
-        if (dbProperties.getMaxWait() != null) {
-            druidDataSource.setMaxWait(dbProperties.getMaxWait());
-        }
-        if (dbProperties.getTimeBetweenEvictionRunsMillis() != null) {
-            druidDataSource.setTimeBetweenEvictionRunsMillis(dbProperties.getTimeBetweenEvictionRunsMillis());
-        }
-        if (dbProperties.getMinEvictableIdleTimeMillis() != null) {
-            druidDataSource.setMinEvictableIdleTimeMillis(dbProperties.getMinEvictableIdleTimeMillis());
-        }
-        if (dbProperties.getValidationQuery() != null) {
-            druidDataSource.setValidationQuery(dbProperties.getValidationQuery());
-        }
-        if (dbProperties.getTestWhileIdle() != null) {
-            druidDataSource.setTestWhileIdle(dbProperties.getTestWhileIdle());
-        }
-        if (dbProperties.getTestOnBorrow() != null) {
-            druidDataSource.setTestOnBorrow(dbProperties.getTestOnBorrow());
-        }
-        if (dbProperties.getTestOnReturn() != null) {
-            druidDataSource.setTestOnReturn(dbProperties.getTestOnReturn());
-        }
-        if (dbProperties.getPoolPreparedStatements() != null) {
-            druidDataSource.setPoolPreparedStatements(dbProperties.getPoolPreparedStatements());
-        }
-        if (dbProperties.getMaxPoolPreparedStatementPerConnectionSize() != null) {
-            druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(dbProperties.getMaxPoolPreparedStatementPerConnectionSize());
-        }
-        log.info("Common Cms datasource initialized");
     }
 
     private Connection getConnection() {
         try {
-            return druidDataSource.getConnection();
+            return dataSource.getConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -227,5 +256,10 @@ public class DBUtil {
 
     public int delete(String sql, List<Object> params) {
         return update(sql, params);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

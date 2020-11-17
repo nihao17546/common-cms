@@ -7,6 +7,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("common.cms.db")
 public class DbProperties {
+    /**
+     * auto/self/target
+     */
+    private String datasourceType = "auto";
+    private String datasourceName;
+
     private String url;
     private String username;
     private String password;
@@ -22,6 +28,22 @@ public class DbProperties {
     private Boolean testOnReturn;
     private Boolean poolPreparedStatements;
     private Integer maxPoolPreparedStatementPerConnectionSize;
+
+    public String getDatasourceType() {
+        return datasourceType;
+    }
+
+    public void setDatasourceType(String datasourceType) {
+        this.datasourceType = datasourceType;
+    }
+
+    public String getDatasourceName() {
+        return datasourceName;
+    }
+
+    public void setDatasourceName(String datasourceName) {
+        this.datasourceName = datasourceName;
+    }
 
     public String getUrl() {
         if (url == null) {
