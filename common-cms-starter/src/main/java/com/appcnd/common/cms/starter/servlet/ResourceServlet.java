@@ -25,6 +25,7 @@ public class ResourceServlet extends HttpServlet {
 
     private ResourceCache<String,String> textCache = null;
     private ResourceCache<String,byte[]> byteCache = null;
+    private final long expireTime = 1000L * 60 * 60 * 24;
 
     public ResourceServlet(String resourcePath, String contextPath) {
         this.resourcePath = resourcePath;
@@ -56,6 +57,8 @@ public class ResourceServlet extends HttpServlet {
     protected void returnResourceFile(String fileName, String uri, HttpServletRequest request, HttpServletResponse response)
             throws ServletException,
             IOException {
+        // 控制浏览器缓存
+        response.setDateHeader("expires",System.currentTimeMillis() + expireTime);
         boolean isByte = false;
         if (fileName.endsWith(".html")) {
             response.setContentType("text/html; charset=utf-8");
