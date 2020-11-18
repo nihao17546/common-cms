@@ -28,26 +28,17 @@ public class DBUtil implements ApplicationContextAware {
 
     @PostConstruct
     public void init() {
-        if ("auto".equals(dbProperties.getDatasourceType())) {
+        if (dbProperties.getUrl() == null || dbProperties.getUrl().isEmpty()) {
+            log.info("使用自带数据源");
             try {
                 dataSource = applicationContext.getAutowireCapableBeanFactory().getBean(DataSource.class);
-                log.info("Common Cms auto datasource initialized");
+                log.info("自带数据源装配成功");
             } catch (Exception e) {
                 log.error("自动装配数据源异常", e);
                 throw e;
             }
-        } else if ("target".equals(dbProperties.getDatasourceType())) {
-            if (dbProperties.getDatasourceName() == null || dbProperties.getDatasourceName().isEmpty()) {
-                throw new IllegalArgumentException("Common Cms datasource name undefined");
-            }
-            try {
-                dataSource = applicationContext.getAutowireCapableBeanFactory().getBean(dbProperties.getDatasourceName(), DataSource.class);
-                log.info("Common Cms target datasource initialized");
-            } catch (Exception e) {
-                log.error("装配指导数据源异常", e);
-                throw e;
-            }
-        } else if ("self".equals(dbProperties.getDatasourceType())) {
+        } else {
+            log.info("创建数据源");
             DruidDataSource druidDataSource = new DruidDataSource();
             druidDataSource.setUrl(dbProperties.getUrl());
             druidDataSource.setUsername(dbProperties.getUsername());
@@ -89,9 +80,7 @@ public class DBUtil implements ApplicationContextAware {
                 druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(dbProperties.getMaxPoolPreparedStatementPerConnectionSize());
             }
             dataSource = druidDataSource;
-            log.info("Common Cms self datasource initialized");
-        } else {
-            throw new IllegalArgumentException("Common Cms datasource type error,only auto|target|self are supported");
+            log.info("数据源创建成功");
         }
     }
 
