@@ -599,8 +599,8 @@ function addForm(systemConfig) {
     }
 }
 function btn(systemConfig) {
+    let btns = ''
     if (systemConfig) {
-        let btns = ''
         if (systemConfig.add_btn === true) {
             let vIf = ''
             if (systemConfig.limit_size) {
@@ -621,15 +621,39 @@ function btn(systemConfig) {
                     '@click="showFollow(\'' + follow.bottomName + '\',\'' + follow.relateKey + '\')">' + follow.bottomName + '</el-button>'
             })
         }
-        if (btns.length > 0) {
-            let add_opt = $('<el-card shadow="never" class="c-card">' +
-                '<el-row :gutter="12">' +
-                '<el-col :span="12">' +
-                btns +
-                ' </el-col>' +
-                '</el-row>' +
-                '</el-card>');
-            $('#btn-card').append(add_opt)
+        if (systemConfig.table && systemConfig.table.bottoms && systemConfig.table.bottoms.length > 0) {
+            systemConfig.table.bottoms.forEach(bottom => {
+                if (bottom.type == 'EXTERNAL_LINKS') {
+                    let p = '[]';
+                    let disabled = '';
+                    let style = 'primary';
+                    let paramFormDb = false;
+                    if (typeof bottom.paramFormDb != 'undefined') {
+                        paramFormDb = bottom.paramFormDb;
+                    }
+                    if (bottom.style) {
+                        style = bottom.style;
+                    }
+                    if (bottom.params && bottom.params.length > 0) {
+                        p = JSON.stringify(bottom.params);
+                        disabled = 'loading || selections.length != 1';
+                    } else {
+                        disabled = 'loading';
+                    }
+                    p = encodeURI(p);
+                    btns = btns + '<el-button size="small" type="' + style + '" :disabled="' + disabled + '" @click="jump(' + paramFormDb + ',\'' + p + '\',\'' + bottom.url + '\')">' + bottom.name + '</el-button>'
+                }
+            })
         }
+    }
+    if (btns.length > 0) {
+        let add_opt = $('<el-card shadow="never" class="c-card">' +
+            '<el-row :gutter="12">' +
+            '<el-col :span="12">' +
+            btns +
+            ' </el-col>' +
+            '</el-row>' +
+            '</el-card>');
+        $('#btn-card').append(add_opt)
     }
 }

@@ -1,5 +1,6 @@
 package com.appcnd.common.cms.entity.table;
 
+import com.appcnd.common.cms.entity.bottom.Bottom;
 import com.appcnd.common.cms.entity.db.Select;
 import com.appcnd.common.cms.entity.db.SelectLeftJoin;
 import com.appcnd.common.cms.entity.util.CommonAssert;
@@ -7,10 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * created by nihao 2020/1/2
@@ -23,13 +21,15 @@ public class Table implements Serializable {
     private String defaultOrder;
     private Select select;
     private List<TableColumn> columns;
+    private List<Bottom> bottoms;
 
-    public Table(Boolean pagination, String defaultSortColumn, String defaultOrder, Select select) {
+    public Table(Boolean pagination, String defaultSortColumn, String defaultOrder, Select select, List<Bottom> bottoms) {
         CommonAssert.notNull(select, "select 不能为空");
         this.pagination = pagination == null ? false : pagination;
         this.defaultSortColumn = defaultSortColumn;
         this.defaultOrder = defaultOrder;
         this.select = select;
+        this.bottoms = bottoms;
         this.columns = new ArrayList<>();
         this.columns.addAll(select.getTableColumns());
         if (select.getLeftJoins() != null) {
@@ -54,6 +54,7 @@ public class Table implements Serializable {
         private String defaultSortColumn;
         private String defaultOrder;
         private Select select;
+        private List<Bottom> bottoms;
 
         public TableBuilder pagination(Boolean pagination) {
             this.pagination = pagination;
@@ -75,8 +76,15 @@ public class Table implements Serializable {
             return this;
         }
 
+        public TableBuilder bottom(Bottom... bottoms) {
+            if (bottoms != null && bottoms.length > 0) {
+                this.bottoms = Arrays.asList(bottoms);
+            }
+            return this;
+        }
+
         public Table build() {
-            return new Table(pagination, defaultSortColumn, defaultOrder, select);
+            return new Table(pagination, defaultSortColumn, defaultOrder, select, bottoms);
         }
     }
 }

@@ -4,24 +4,24 @@ import com.appcnd.common.cms.starter.aop.ExceptionHandlerAop;
 import com.appcnd.common.cms.starter.controller.ConfigController;
 import com.appcnd.common.cms.starter.controller.UploadController;
 import com.appcnd.common.cms.starter.controller.WebController;
+import com.appcnd.common.cms.starter.dao.IMetaConfigDao;
+import com.appcnd.common.cms.starter.dao.IWebDao;
 import com.appcnd.common.cms.starter.dao.impl.MetaConfigDaoImpl;
 import com.appcnd.common.cms.starter.dao.impl.WebDaoImpl;
 import com.appcnd.common.cms.starter.pojo.constant.BasicConstant;
 import com.appcnd.common.cms.starter.properties.DbProperties;
 import com.appcnd.common.cms.starter.properties.QiniuProperties;
 import com.appcnd.common.cms.starter.properties.ServletProperties;
+import com.appcnd.common.cms.starter.service.IWebService;
 import com.appcnd.common.cms.starter.service.impl.WebServiceImpl;
+import com.appcnd.common.cms.starter.servlet.ResourceServlet;
 import com.appcnd.common.cms.starter.util.ConfigJsonUtil;
 import com.appcnd.common.cms.starter.util.DBUtil;
 import com.appcnd.common.cms.starter.util.SpringContextUtil;
-import com.appcnd.common.cms.starter.aop.ExceptionHandlerAop;
-import com.appcnd.common.cms.starter.controller.UploadController;
-import com.appcnd.common.cms.starter.controller.WebController;
-import com.appcnd.common.cms.starter.pojo.constant.BasicConstant;
-import com.appcnd.common.cms.starter.util.ConfigJsonUtil;
-import com.appcnd.common.cms.starter.util.DBUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * created by nihao 2020/07/07
  */
-@EnableConfigurationProperties({QiniuProperties.class, DbProperties.class})
+@EnableConfigurationProperties({ServletProperties.class, QiniuProperties.class, DbProperties.class})
 @Import({SpringContextUtil.class, ExceptionHandlerAop.class})
 public class BeanConfig {
     @Autowired
@@ -42,18 +42,38 @@ public class BeanConfig {
     @Autowired
     private ServletProperties servletProperties;
 
+    @Bean(BasicConstant.beanNamePrefix + "servletRegistrationBean")
+    public ServletRegistrationBean registrationBean(@Autowired ServletProperties servletProperties) {
+        return new ServletRegistrationBean(new ResourceServlet(BasicConstant.resourcePath, servletProperties.getUrl()), servletProperties.getUrl() + "/static/*");
+    }
+
+    @Bean(name = BasicConstant.beanNamePrefix + "dBUtil")
+    public DBUtil dbUtil() {
+        return new DBUtil();
+    }
+
+    @Bean(name = BasicConstant.beanNamePrefix + "metaConfigDao")
+    public IMetaConfigDao metaConfigDao() {
+        return new MetaConfigDaoImpl();
+    }
+
+    @Bean(name = BasicConstant.beanNamePrefix + "webDao")
+    public IWebDao webDao() {
+        return new WebDaoImpl();
+    }
+
+    @Bean(name = BasicConstant.beanNamePrefix + "configJsonUtil")
+    public ConfigJsonUtil configJsonUtil() {
+        return new ConfigJsonUtil();
+    }
+
+    @Bean(name = BasicConstant.beanNamePrefix + "webService")
+    public IWebService webService() {
+        return new WebServiceImpl();
+    }
+
     @PostConstruct
     public void init() throws Exception {
-        springContextUtil.addBean(DBUtil.class, BasicConstant.beanNamePrefix + "dBUtil");
-
-        springContextUtil.addBean(MetaConfigDaoImpl.class, BasicConstant.beanNamePrefix + "metaConfigDao");
-
-        springContextUtil.addBean(WebDaoImpl.class, BasicConstant.beanNamePrefix + "webDao");
-
-        springContextUtil.addBean(ConfigJsonUtil.class, BasicConstant.beanNamePrefix + "configJsonUtil");
-
-        springContextUtil.addBean(WebServiceImpl.class, BasicConstant.beanNamePrefix + "webService");
-
         modify(ConfigController.class);
         springContextUtil.addBean(ConfigController.class, BasicConstant.beanNamePrefix + "configController");
         springContextUtil.registerController(BasicConstant.beanNamePrefix + "configController");
@@ -71,7 +91,7 @@ public class BeanConfig {
                 "|  /  | / \\|| |\\/||| |\\/||| / \\|| |\\ ||_____ |  /  | |\\/|||    \\\n" +
                 "|  \\__| \\_/|| |  ||| |  ||| \\_/|| | \\||\\____\\|  \\__| |  ||\\___ |\n" +
                 "\\____/\\____/\\_/  \\|\\_/  \\|\\____/\\_/  \\|      \\____/\\_/  \\|\\____/\n" +
-                "                                                 0.0.2-SNAPSHOT");
+                "                                                 0.0.4-SNAPSHOT");
     }
 
     /**

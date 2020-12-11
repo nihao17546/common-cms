@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>common-cms-starter</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -54,7 +54,7 @@
         <dependency>
             <groupId>com.appcnd</groupId>
             <artifactId>common-cms-entity</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

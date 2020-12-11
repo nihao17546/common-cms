@@ -100,7 +100,8 @@
         return "";
     }
 </script>
-<script src="${contextPath}/static/form-create/main.js?v=999"></script>
+<script src="${contextPath}/static/form-create/main.js?v=888"></script>
+<script src="${contextPath}/static/form-create/method.js?v=888"></script>
 <script>
     var loadSuccess = false;
     let bottomName = getParam('bottomName')
@@ -164,6 +165,14 @@
         mounted: function() {
         },
         methods: {
+            jump(paramFormDb, p, url) {
+                $.jump({
+                    paramFormDb: paramFormDb,
+                    p: p,
+                    url: url,
+                    vue: this
+                })
+            },
             handleSelectionChange(val) {
                 this.selections = val
             },
@@ -203,7 +212,7 @@
                     order: order,
                     params: params
                 }
-                axios.post('${contextPath}/web/api/table/list', listForm, {
+                axios.post(window.contextPath + '/web/api/table/list', listForm, {
                     headers: {
                     }
                 }).then(res => {
@@ -249,7 +258,7 @@
                             addJson: JSON.stringify(window.config.addForm),
                             primaryKeyValues: primaryKeyValues
                         }
-                        axios.post('${contextPath}/web/api/delete', form, {
+                        axios.post(window.contextPath + '/web/api/delete', form, {
                             headers: {
                             }
                         }).then(res => {
@@ -286,9 +295,9 @@
                             specialColumnParams: window.config.otherColumnTypeColumns
                         }
                         form.params[window.config.key] = window.config.value
-                        let url = '${contextPath}/web/api/update';
+                        let url = window.contextPath + '/web/api/update';
                         if (this.edit === false) {
-                            url = '${contextPath}/web/api/add';
+                            url = window.contextPath + '/web/api/add';
                         }
                         axios.post(url, form, {
                             headers: {
@@ -341,7 +350,7 @@
                     addJson: JSON.stringify(window.config.addForm),
                     columns: window.config.addColumns
                 }
-                axios.post('${contextPath}/web/api/info', form, {
+                axios.post(window.contextPath + '/web/api/info', form, {
                     headers: {
                     }
                 }).then(res => {
@@ -383,7 +392,7 @@
                         }
                     }
                     let name = $(ele).val();
-                    axios.get('${contextPath}/upload/api/token',{
+                    axios.get(window.contextPath + '/upload/api/token',{
                         params: {
                             file_name: name,
                             type: 'img'
@@ -471,7 +480,7 @@
                     primaryKeyValue: row[window.config.addForm.primaryKey],
                     specialColumnParams: window.config.otherColumnTypeColumns
                 }
-                axios.post('${contextPath}/web/api/updateSwitch', form, {
+                axios.post(window.contextPath + '/web/api/updateSwitch', form, {
                     headers: {
                     }
                 }).then(res => {

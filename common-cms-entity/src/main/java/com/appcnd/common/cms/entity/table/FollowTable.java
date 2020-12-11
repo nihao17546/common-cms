@@ -1,5 +1,6 @@
 package com.appcnd.common.cms.entity.table;
 
+import com.appcnd.common.cms.entity.bottom.Bottom;
 import com.appcnd.common.cms.entity.db.Select;
 import com.appcnd.common.cms.entity.db.SelectLeftJoin;
 import com.appcnd.common.cms.entity.form.add.AddElement;
@@ -11,10 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * created by nihao 2020/1/15
@@ -49,8 +47,10 @@ public class FollowTable implements Serializable {
     @JSONField(name = "limit_size")
     private Integer limitSize;
 
+    private List<Bottom> bottoms;
+
     public FollowTable(Boolean pagination, String defaultSortColumn, String defaultOrder, Select select, String relateKey, String parentKey,
-                       String bottomName, AddForm addForm, Boolean deleteBtn, Boolean addBtn, Boolean editBtn, Integer limitSize) {
+                       String bottomName, AddForm addForm, Boolean deleteBtn, Boolean addBtn, Boolean editBtn, Integer limitSize, List<Bottom> bottoms) {
         CommonAssert.notNull(select, "select 不能为空");
         CommonAssert.notNull(relateKey, "relateKey 不能为空");
         CommonAssert.notNull(parentKey, "parentKey 不能为空");
@@ -63,6 +63,7 @@ public class FollowTable implements Serializable {
         this.defaultSortColumn = defaultSortColumn;
         this.defaultOrder = defaultOrder;
         this.select = select;
+        this.bottoms = bottoms;
         this.relateKey = relateKey;
         this.parentKey = parentKey;
         this.bottomName = bottomName;
@@ -136,6 +137,7 @@ public class FollowTable implements Serializable {
         private Boolean addBtn;
         private Boolean editBtn;
         private Integer limitSize;
+        private List<Bottom> bottoms;
 
         public FollowTableBuilder pagination(Boolean pagination) {
             this.pagination = pagination;
@@ -197,9 +199,16 @@ public class FollowTable implements Serializable {
             return this;
         }
 
+        public FollowTableBuilder bottom(Bottom... bottoms) {
+            if (bottoms != null && bottoms.length > 0) {
+                this.bottoms = Arrays.asList(bottoms);
+            }
+            return this;
+        }
+
         public FollowTable build() {
             return new FollowTable(pagination, defaultSortColumn, defaultOrder, select, relateKey, parentKey, bottomName,
-                    addForm, deleteBtn, addBtn, editBtn, limitSize);
+                    addForm, deleteBtn, addBtn, editBtn, limitSize, bottoms);
         }
     }
 

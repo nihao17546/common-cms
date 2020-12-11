@@ -1,6 +1,7 @@
 package com.appcnd.common.cms.starter.util;
 
 import com.appcnd.common.cms.entity.ConfigEntity;
+import com.appcnd.common.cms.entity.bottom.ExternalLinksBottom;
 import com.appcnd.common.cms.entity.db.Select;
 import com.appcnd.common.cms.entity.db.Where;
 import com.appcnd.common.cms.entity.form.Option;
@@ -17,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +60,22 @@ public class ConfigJsonUtil {
                     }
                 }
             }
+            if (table.containsKey("bottoms")) {
+                JSONArray jsonArray = table.getJSONArray("bottoms");
+                if (jsonArray.size() > 0) {
+                    entity.getTable().setBottoms(new ArrayList<>());
+                    for (int i = 0; i < jsonArray.size(); i ++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        String className = obj.getString("className");
+                        Class clazz = Class.forName(className);
+                        Object bottomObj = JSON.parseObject(obj.toString(), clazz);
+                        if (bottomObj instanceof ExternalLinksBottom) {
+                            ExternalLinksBottom externalLinksBottom = (ExternalLinksBottom) bottomObj;
+                            entity.getTable().getBottoms().add(externalLinksBottom);
+                        }
+                    }
+                }
+            }
         }
 
         if (jsonObject.containsKey("follow_tables")) {
@@ -65,6 +83,24 @@ public class ConfigJsonUtil {
             if (follow_tables != null) {
                 for (int i = 0; i < follow_tables.size(); i ++) {
                     JSONObject table = (JSONObject) follow_tables.get(i);
+
+                    if (table.containsKey("bottoms")) {
+                        JSONArray jsonArray = table.getJSONArray("bottoms");
+                        if (jsonArray.size() > 0) {
+                            entity.getFollowTables().get(i).setBottoms(new ArrayList<>());
+                            for (int j = 0; j < jsonArray.size(); j ++) {
+                                JSONObject obj = jsonArray.getJSONObject(j);
+                                String className = obj.getString("className");
+                                Class clazz = Class.forName(className);
+                                Object bottomObj = JSON.parseObject(obj.toString(), clazz);
+                                if (bottomObj instanceof ExternalLinksBottom) {
+                                    ExternalLinksBottom externalLinksBottom = (ExternalLinksBottom) bottomObj;
+                                    entity.getFollowTables().get(i).getBottoms().add(externalLinksBottom);
+                                }
+                            }
+                        }
+                    }
+
                     if (table.containsKey("select")) {
                         Select select = parseSelect(table.getJSONObject("select").toJSONString());
                         entity.getFollowTables().get(i).setSelect(select);
