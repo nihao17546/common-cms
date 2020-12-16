@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.appcnd.common.cms.manager.dao.DbDao" >
+    <resultMap id="column_info" type="com.appcnd.common.cms.manager.pojo.po.ColumnInfo">
+        <result property="COLUMN_NAME" column="COLUMN_NAME"/>
+        <result property="ORDINAL_POSITION" column="ORDINAL_POSITION"/>
+        <result property="COLUMN_DEFAULT" column="COLUMN_DEFAULT"/>
+        <result property="IS_NULLABLE" column="IS_NULLABLE"/>
+        <result property="DATA_TYPE" column="DATA_TYPE"/>
+        <result property="COLUMN_TYPE" column="COLUMN_TYPE"/>
+        <result property="COLUMN_KEY" column="COLUMN_KEY"/>
+        <result property="EXTRA" column="EXTRA"/>
+        <result property="COLUMN_COMMENT" column="COLUMN_COMMENT"/>
+    </resultMap>
+
+    <select id="showTable" resultType="java.util.Map">
+        show create table ${tableSchema}.${tableName}
+    </select>
+    <select id="getTableInfo" resultMap="column_info">
+        select *
+        from INFORMATION_SCHEMA.columns
+        where table_name = #{tableName}
+        and table_schema = #{tableSchema}
+    </select>
+</mapper>
