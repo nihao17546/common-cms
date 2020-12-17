@@ -166,7 +166,7 @@ public class ApiController {
         list.add(new WhereTypeModel("<=", WhereLteq.class, JudgeType.lteq)
                 .addShows("value")
                 .addRule("value", true, "请输入", "change"));
-        list.add(new WhereTypeModel("<=", WhereBt.class, JudgeType.bt)
+        list.add(new WhereTypeModel("between", WhereBt.class, JudgeType.bt)
                 .addShows("begin","end")
                 .addRule("begin", true, "请输入", "change")
                 .addRule("end", true, "请输入", "change"));
@@ -190,6 +190,7 @@ public class ApiController {
             this.className = clazz.getName();
             this.type = type;
             this.shows = new ArrayList<>();
+            this.rules = new HashMap<>();
         }
 
         public WhereTypeModel addShows(String... keys) {

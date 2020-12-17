@@ -33,12 +33,14 @@
             <el-row :gutter="24" v-if="basic.checked">
                 <el-col :span="8">
                     <el-form-item label="主键:" prop="primaryKey" :label-width="formLabelWidth">
-                        <el-input v-model.trim="basic.form.primaryKey" readOnly="true" placeholder="必须int且自增类型" autocomplete="off" size="small"></el-input>
+                        <el-input v-model.trim="basic.form.primaryKey" readOnly="true" placeholder="必须int且自增类型"
+                                  autocomplete="off" size="small"></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="8">
                     <el-form-item label="页面标题:" prop="title" :label-width="formLabelWidth">
-                        <el-input v-model.trim="basic.form.title" autocomplete="off" size="small" maxlength="200"></el-input>
+                        <el-input v-model.trim="basic.form.title" autocomplete="off" size="small"
+                                  maxlength="200"></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="8">
@@ -75,7 +77,8 @@
                 </el-col>
                 <el-col :span="8">
                     <el-form-item label="默认排序字段:" prop="defaultSortColumn" :label-width="formLabelWidth">
-                        <el-input v-model.trim="basic.form.defaultSortColumn" autocomplete="off" size="small"></el-input>
+                        <el-input v-model.trim="basic.form.defaultSortColumn" autocomplete="off"
+                                  size="small"></el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :span="8" v-if="basic.form.defaultSortColumn">
@@ -91,7 +94,7 @@
 
         <el-collapse v-model="activeNames" v-if="basic.checked">
             <el-collapse-item title="主表查询列配置" name="1">
-                <el-card style="margin-top: 10px;" shadow="hover"  v-if="basic.checked">
+                <el-card style="margin-top: 10px;" shadow="hover" v-if="basic.checked">
                     <el-form :model="mainTable.form" :rules="mainTable.rules" ref="mainTableForm" size="small">
                         <el-row :gutter="24">
                             <el-col :span="24" style="margin-bottom: 8px;">
@@ -103,86 +106,134 @@
                                 <el-card shadow="hover" style="margin-top: 8px;">
                                     <el-row style="border: 0px solid gray;" :gutter="24">
                                         <el-col :span="8">
-                                    <el-form-item label="sql查询字段:" :label-width="formLabelWidth"
-                                                  :prop="'columns.' + index + '.key'" :rules="mainTable.rules.columnRules.key">
-                                        <el-input v-model.trim="item.key" placeholder="" readOnly="true" autocomplete="off" size="small"></el-input>
-                                    </el-form-item>
-                                </el-col>
+                                            <el-form-item label="sql查询字段:" :label-width="formLabelWidth"
+                                                          :prop="'columns.' + index + '.key'"
+                                                          :rules="mainTable.rules.columnRules.key">
+                                                <el-input v-model.trim="item.key" placeholder="" readOnly="true"
+                                                          autocomplete="off" size="small"></el-input>
+                                            </el-form-item>
+                                        </el-col>
                                         <el-col :span="8">
-                                    <el-form-item label="sql查询别名:" :label-width="formLabelWidth"
-                                                  :prop="'columns.' + index + '.prop'" :rules="mainTable.rules.columnRules.prop">
-                                        <el-input v-model.trim="item.prop" placeholder="默认等于“sql查询字段”" maxlength="50" autocomplete="off" size="small"></el-input>
-                                    </el-form-item>
-                                </el-col>
+                                            <el-form-item label="sql查询别名:" :label-width="formLabelWidth"
+                                                          :prop="'columns.' + index + '.prop'"
+                                                          :rules="mainTable.rules.columnRules.prop">
+                                                <el-input v-model.trim="item.prop" placeholder="默认等于“sql查询字段”"
+                                                          maxlength="50" autocomplete="off" size="small"></el-input>
+                                            </el-form-item>
+                                        </el-col>
                                         <el-col :span="8">
-                                    <el-form-item label="前端列头文案:" :label-width="formLabelWidth"
-                                                  :prop="'columns.' + index + '.label'" :rules="mainTable.rules.columnRules.label">
-                                        <el-input v-model.trim="item.label" placeholder="" maxlength="50" autocomplete="off" size="small"></el-input>
-                                    </el-form-item>
-                                </el-col>
+                                            <el-form-item label="前端列头文案:" :label-width="formLabelWidth"
+                                                          :prop="'columns.' + index + '.label'"
+                                                          :rules="mainTable.rules.columnRules.label">
+                                                <el-input v-model.trim="item.label" placeholder="" maxlength="50"
+                                                          autocomplete="off" size="small"></el-input>
+                                            </el-form-item>
+                                        </el-col>
                                         <el-col :span="8">
-                                    <el-form-item label="前端列宽度（px）:" :label-width="formLabelWidth"
-                                                  :prop="'columns.' + index + '.width'" :rules="mainTable.rules.columnRules.width">
-                                        <el-input v-model.trim="item.width" placeholder="" maxlength="50" autocomplete="off" size="small"></el-input>
-                                    </el-form-item>
-                                </el-col>
+                                            <el-form-item label="前端列宽度（px）:" :label-width="formLabelWidth"
+                                                          :prop="'columns.' + index + '.width'"
+                                                          :rules="mainTable.rules.columnRules.width">
+                                                <el-input v-model.trim="item.width" placeholder="" maxlength="50"
+                                                          autocomplete="off" size="small"></el-input>
+                                            </el-form-item>
+                                        </el-col>
                                         <el-col :span="8">
-                                    <el-form-item label="是否可以排序:" :label-width="formLabelWidth">
-                                        <el-select style="width: 100%" v-model="item.sortable" placeholder="默认否">
-                                            <el-option :key="true" label="是" :value="true"></el-option>
-                                            <el-option :key="false" label="否" :value="false"></el-option>
-                                        </el-select>
-                                    </el-form-item>
-                                </el-col>
+                                            <el-form-item label="是否可以排序:" :label-width="formLabelWidth">
+                                                <el-select style="width: 100%" v-model="item.sortable"
+                                                           placeholder="默认否">
+                                                    <el-option :key="true" label="是" :value="true"></el-option>
+                                                    <el-option :key="false" label="否" :value="false"></el-option>
+                                                </el-select>
+                                            </el-form-item>
+                                        </el-col>
                                     </el-row>
                                     <el-row style="border: 0px solid gray;" :gutter="24">
                                         <el-col :span="8">
                                             <el-form-item label="格式化类型:" :label-width="formLabelWidth">
-                                                <el-select style="width: 100%" clearable v-model="item.formatterTypeIndex" @change="formatterTypeChange(index)">
+                                                <el-select style="width: 100%" clearable
+                                                           v-model="item.formatterTypeIndex"
+                                                           @change="formatterTypeChange(index)">
                                                     <el-option v-for="(type,aIndex) in formatterTypes" :key="aIndex"
-                                                       :label="type.name" :value="aIndex">
+                                                               :label="type.name" :value="aIndex">
                                                     </el-option>
                                                 </el-select>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('formatterPicWidth') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
-                                    <el-form-item label="图片展示宽度（px）:" :prop="'columns.' + index + '.formatterPicWidth'" :rules="mainTable.rules.columnRules.width" :label-width="formLabelWidth">
-                                        <el-input v-model.trim="item.formatterPicWidth" placeholder="默认50" autocomplete="off" size="small" maxlength="50"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('formatterPicWidth') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
+                                    <el-form-item label="图片展示宽度（px）:" :prop="'columns.' + index + '.formatterPicWidth'"
+                                                  :rules="mainTable.rules.columnRules.width"
+                                                  :label-width="formLabelWidth">
+                                        <el-input v-model.trim="item.formatterPicWidth" placeholder="默认50"
+                                                  autocomplete="off" size="small" maxlength="50"></el-input>
                                     </el-form-item>
                                 </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('formatterPicHeight') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
-                                    <el-form-item label="图片展示高度（px）:" :prop="'columns.' + index + '.formatterPicHeight'" :rules="mainTable.rules.columnRules.width" :label-width="formLabelWidth">
-                                        <el-input v-model.trim="item.formatterPicHeight" placeholder="默认50" autocomplete="off" size="small" maxlength="50"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('formatterPicHeight') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
+                                    <el-form-item label="图片展示高度（px）:" :prop="'columns.' + index + '.formatterPicHeight'"
+                                                  :rules="mainTable.rules.columnRules.width"
+                                                  :label-width="formLabelWidth">
+                                        <el-input v-model.trim="item.formatterPicHeight" placeholder="默认50"
+                                                  autocomplete="off" size="small" maxlength="50"></el-input>
                                     </el-form-item>
                                 </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('formatterSwitchActiveValue') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
-                                    <el-form-item label="选中选项的值:" :prop="'columns.' + index + '.formatterSwitchActiveValue'" :rules="mainTable.rules.columnRules.formatterSwitchValue" :label-width="formLabelWidth">
-                                        <el-input v-model.trim="item.formatterSwitchActiveValue" placeholder="" autocomplete="off" size="small" maxlength="50"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('formatterSwitchActiveValue') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
+                                    <el-form-item label="选中选项的值:"
+                                                  :prop="'columns.' + index + '.formatterSwitchActiveValue'"
+                                                  :rules="mainTable.rules.columnRules.formatterSwitchValue"
+                                                  :label-width="formLabelWidth">
+                                        <el-input v-model.trim="item.formatterSwitchActiveValue" placeholder=""
+                                                  autocomplete="off" size="small" maxlength="50"></el-input>
                                     </el-form-item>
                                 </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('formatterSwitchActiveLabel') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
-                                    <el-form-item label="选中选项的标签:" :prop="'columns.' + index + '.formatterSwitchActiveLabel'" :rules="mainTable.rules.columnRules.formatterSwitchValue" :label-width="formLabelWidth">
-                                        <el-input v-model.trim="item.formatterSwitchActiveLabel" placeholder="" autocomplete="off" size="small" maxlength="50"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('formatterSwitchActiveLabel') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
+                                    <el-form-item label="选中选项的标签:"
+                                                  :prop="'columns.' + index + '.formatterSwitchActiveLabel'"
+                                                  :rules="mainTable.rules.columnRules.formatterSwitchValue"
+                                                  :label-width="formLabelWidth">
+                                        <el-input v-model.trim="item.formatterSwitchActiveLabel" placeholder=""
+                                                  autocomplete="off" size="small" maxlength="50"></el-input>
                                     </el-form-item>
                                 </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('formatterSwitchInactiveValue') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
-                                    <el-form-item label="未选中选项的值:" :prop="'columns.' + index + '.formatterSwitchInactiveValue'" :rules="mainTable.rules.columnRules.formatterSwitchValue" :label-width="formLabelWidth">
-                                        <el-input v-model.trim="item.formatterSwitchInactiveValue" placeholder="" autocomplete="off" size="small" maxlength="50"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('formatterSwitchInactiveValue') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
+                                    <el-form-item label="未选中选项的值:"
+                                                  :prop="'columns.' + index + '.formatterSwitchInactiveValue'"
+                                                  :rules="mainTable.rules.columnRules.formatterSwitchValue"
+                                                  :label-width="formLabelWidth">
+                                        <el-input v-model.trim="item.formatterSwitchInactiveValue" placeholder=""
+                                                  autocomplete="off" size="small" maxlength="50"></el-input>
                                     </el-form-item>
                                 </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('formatterSwitchInactiveLabel') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
-                                    <el-form-item label="未选中选项的标签:" :prop="'columns.' + index + '.formatterSwitchInactiveLabel'" :rules="mainTable.rules.columnRules.formatterSwitchValue" :label-width="formLabelWidth">
-                                        <el-input v-model.trim="item.formatterSwitchInactiveLabel" placeholder="" autocomplete="off" size="small" maxlength="50"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('formatterSwitchInactiveLabel') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
+                                    <el-form-item label="未选中选项的标签:"
+                                                  :prop="'columns.' + index + '.formatterSwitchInactiveLabel'"
+                                                  :rules="mainTable.rules.columnRules.formatterSwitchValue"
+                                                  :label-width="formLabelWidth">
+                                        <el-input v-model.trim="item.formatterSwitchInactiveLabel" placeholder=""
+                                                  autocomplete="off" size="small" maxlength="50"></el-input>
                                     </el-form-item>
                                 </el-col>
-                                        <el-col :span="16" v-if="item.hides.indexOf('formatterTextMap') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
-                                    <el-form-item label="文本格式化JSON:" :prop="'columns.' + index + '.formatterTextMap'" :rules="mainTable.rules.columnRules.formatterTextMap" :label-width="formLabelWidth">
-                                        <el-input v-model.trim="item.formatterTextMap" placeholder="格式要求对象类型的json,key value都必须为string" autocomplete="off" size="small" maxlength="1000"></el-input>
+                                        <el-col :span="16"
+                                                v-if="item.hides.indexOf('formatterTextMap') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
+                                    <el-form-item label="文本格式化JSON:" :prop="'columns.' + index + '.formatterTextMap'"
+                                                  :rules="mainTable.rules.columnRules.formatterTextMap"
+                                                  :label-width="formLabelWidth">
+                                        <el-input v-model.trim="item.formatterTextMap"
+                                                  placeholder="格式要求对象类型的json,key value都必须为string" autocomplete="off"
+                                                  size="small" maxlength="1000"></el-input>
                                     </el-form-item>
                                 </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('formatterUrlTarget') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
-                                    <el-form-item label="链接打开方式:" :prop="'columns.' + index + '.formatterUrlTarget'" :rules="mainTable.rules.columnRules.formatterUrlTarget" :label-width="formLabelWidth">
-                                        <el-select style="width: 100%" v-model="item.formatterUrlTarget" placeholder="默认新窗口">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('formatterUrlTarget') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
+                                    <el-form-item label="链接打开方式:" :prop="'columns.' + index + '.formatterUrlTarget'"
+                                                  :rules="mainTable.rules.columnRules.formatterUrlTarget"
+                                                  :label-width="formLabelWidth">
+                                        <el-select style="width: 100%" v-model="item.formatterUrlTarget"
+                                                   placeholder="默认新窗口">
                                             <el-option key="_blank" label="新开窗口" value="_blank"></el-option>
                                             <el-option key="_self" label="当前窗口" value="_self"></el-option>
                                             <el-option key="_parent" label="父级窗口" value="_parent"></el-option>
@@ -190,17 +241,25 @@
                                         </el-select>
                                     </el-form-item>
                                 </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('formatterUrlText') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
-                                    <el-form-item label="链接文案:" :prop="'columns.' + index + '.formatterUrlText'" :rules="mainTable.rules.columnRules.formatterUrlText" :label-width="formLabelWidth">
-                                        <el-input v-model.trim="item.formatterUrlText" placeholder="默认链接本身" autocomplete="off" size="small" maxlength="100"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('formatterUrlText') == -1 && (item.formatterTypeIndex || item.formatterTypeIndex == 0)">
+                                    <el-form-item label="链接文案:" :prop="'columns.' + index + '.formatterUrlText'"
+                                                  :rules="mainTable.rules.columnRules.formatterUrlText"
+                                                  :label-width="formLabelWidth">
+                                        <el-input v-model.trim="item.formatterUrlText" placeholder="默认链接本身"
+                                                  autocomplete="off" size="small" maxlength="100"></el-input>
                                     </el-form-item>
                                 </el-col>
                                         <el-col :span="24" style="text-align: right;">
                                     <el-button-group>
-                                        <el-button type="primary" size="mini" icon="el-icon-arrow-up" v-if="index != 0" @click="upAddColumn(item, index)">上移</el-button>
-                                        <el-button type="primary" size="mini" icon="el-icon-arrow-down" v-if="index != mainTable.form.columns.length - 1" @click="downAddColumn(item, index)">下移</el-button>
+                                        <el-button type="primary" size="mini" icon="el-icon-arrow-up" v-if="index != 0"
+                                                   @click="up(item, index, mainTable.form.columns)">上移</el-button>
+                                        <el-button type="primary" size="mini" icon="el-icon-arrow-down"
+                                                   v-if="index != mainTable.form.columns.length - 1"
+                                                   @click="down(item, index, mainTable.form.columns)">下移</el-button>
                                     </el-button-group>
-                                    <el-button type="danger" plain size="mini" @click="removeAddColumn(item, index)">移除</el-button>
+                                    <el-button type="danger" plain size="mini"
+                                               @click="remove(item, index, mainTable.form.columns, mainColumns)">移除</el-button>
                                 </el-col>
                                     </el-row>
                                 </el-card>
@@ -211,7 +270,7 @@
             </el-collapse-item>
 
             <el-collapse-item title="主表默认查询配置" name="2">
-                <el-card style="margin-top: 10px;" shadow="hover"  v-if="basic.checked">
+                <el-card style="margin-top: 10px;" shadow="hover" v-if="basic.checked">
                     <el-form :model="mainWhere.form" :rules="mainTable.rules" ref="mainWhereForm" size="small">
                         <el-row :gutter="24">
                             <el-col :span="24" style="margin-bottom: 8px;">
@@ -221,7 +280,68 @@
                             </el-col>
                             <span v-for="(item,index) in mainWhere.form.wheres">
                                 <el-card shadow="hover" style="margin-top: 8px;">
-
+                                    <el-row style="border: 0px solid gray;" :gutter="24">
+                                        <el-col :span="8">
+                                            <el-form-item label="sql查询字段:" :label-width="formLabelWidth"
+                                                          :prop="'wheres.' + index + '.key'" :rules="mainTable.rules.key">
+                                                <el-input v-model.trim="item.key" placeholder="" readOnly="true"
+                                                          autocomplete="off" size="small"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="8">
+                                            <el-form-item label="判断类型:" :label-width="formLabelWidth"
+                                                          :prop="'wheres.' + index + '.typeIndex'"
+                                                          :rules="mainWhere.rules.typeIndex">
+                                                <el-select style="width: 100%" clearable v-model="item.typeIndex"
+                                                           @change="whereJudgeTypeChange(index)">
+                                                    <el-option v-for="(type,aIndex) in whereTypes" :key="aIndex"
+                                                           :label="type.name" :value="aIndex">
+                                                    </el-option>
+                                                </el-select>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="8" v-if="item.shows.indexOf('value') != -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-form-item label="判断值:" :prop="'list.' + index + '.value'"
+                                                          :rules="item.rules.value" :label-width="formLabelWidth">
+                                                <el-input v-model.trim="item.value" placeholder="" autocomplete="off"
+                                                          size="small" maxlength="1000"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="8" v-if="item.shows.indexOf('begin') != -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-form-item label="最小值:" :prop="'list.' + index + '.begin'"
+                                                          :rules="item.rules.begin" :label-width="formLabelWidth">
+                                                <el-input v-model.trim="item.begin" placeholder="" autocomplete="off"
+                                                          size="small" maxlength="1000"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="8" v-if="item.shows.indexOf('end') != -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-form-item label="最大值:" :prop="'list.' + index + '.end'"
+                                                          :rules="item.rules.end" :label-width="formLabelWidth">
+                                                <el-input v-model.trim="item.end" placeholder="" autocomplete="off"
+                                                          size="small" maxlength="1000"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="8"
+                                                v-if="item.shows.indexOf('values') != -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-form-item label="值集合:" :prop="'list.' + index + '.values'"
+                                                          :rules="item.rules.values" :label-width="formLabelWidth">
+                                                <el-input v-model.trim="item.values" placeholder="多个之间使用英文逗号分隔"
+                                                          autocomplete="off" size="small" maxlength="1000"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="24" style="text-align: right;">
+                                            <el-button-group>
+                                                <el-button type="primary" size="mini" icon="el-icon-arrow-up"
+                                                           v-if="index != 0"
+                                                           @click="up(item, index, mainWhere.form.wheres)">上移</el-button>
+                                                <el-button type="primary" size="mini" icon="el-icon-arrow-down"
+                                                           v-if="index != mainWhere.form.wheres.length - 1"
+                                                           @click="down(item, index, mainWhere.form.wheres)">下移</el-button>
+                                            </el-button-group>
+                                            <el-button type="danger" plain size="mini"
+                                                       @click="remove(item, index, mainWhere.form.wheres)">移除</el-button>
+                                        </el-col>
+                                    </el-row>
                                 </el-card>
                             </span>
                         </el-row>
@@ -230,7 +350,7 @@
             </el-collapse-item>
 
             <el-collapse-item title="主表按钮配置" name="3">
-                <el-card style="margin-top: 10px;" shadow="hover"  v-if="basic.checked">
+                <el-card style="margin-top: 10px;" shadow="hover" v-if="basic.checked">
                     <el-form :model="mainBottom.form" :rules="mainBottom.rules" ref="mainBottomForm" size="small">
                         <el-row :gutter="24">
                             <el-col :span="24" style="margin-bottom: 8px;">
@@ -241,33 +361,52 @@
                                     <el-row style="border: 0px solid gray;" :gutter="24">
                                         <el-col :span="8">
                                             <el-form-item label="按钮文案:" :label-width="formLabelWidth"
-                                                          :prop="'list.' + index + '.name'" :rules="mainBottom.rules.name">
-                                                <el-input v-model.trim="item.name" placeholder="" autocomplete="off" size="small" maxlength="50"></el-input>
+                                                          :prop="'list.' + index + '.name'"
+                                                          :rules="mainBottom.rules.name">
+                                                <el-input v-model.trim="item.name" placeholder="" autocomplete="off"
+                                                          size="small" maxlength="50"></el-input>
                                             </el-form-item>
                                         </el-col>
                                         <el-col :span="8">
                                             <el-form-item label="按钮类型类型:" :label-width="formLabelWidth">
-                                                <el-select style="width: 100%" clearable v-model="item.typeIndex" @change="bottomTypeChange(index)">
+                                                <el-select style="width: 100%" clearable v-model="item.typeIndex"
+                                                           @change="bottomTypeChange(index)">
                                                     <el-option v-for="(type,aIndex) in bottomTypes" :key="aIndex"
                                                                :label="type.name" :value="aIndex">
                                                     </el-option>
                                                 </el-select>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.shows.indexOf('externalLinksBottomUrl') != -1 && (item.typeIndex || item.typeIndex == 0)">
-                                            <el-form-item label="跳转链接:" :prop="'list.' + index + '.externalLinksBottomUrl'" :rules="mainBottom.rules.externalLinksBottomUrl" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.externalLinksBottomUrl" placeholder="" autocomplete="off" size="small" maxlength="1000"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.shows.indexOf('externalLinksBottomUrl') != -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-form-item label="跳转链接:"
+                                                          :prop="'list.' + index + '.externalLinksBottomUrl'"
+                                                          :rules="mainBottom.rules.externalLinksBottomUrl"
+                                                          :label-width="formLabelWidth">
+                                                <el-input v-model.trim="item.externalLinksBottomUrl" placeholder=""
+                                                          autocomplete="off" size="small" maxlength="1000"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.shows.indexOf('externalLinksBottomParams') != -1 && (item.typeIndex || item.typeIndex == 0)">
-                                            <el-form-item label="跳转参数:" :prop="'list.' + index + '.externalLinksBottomParams'"
-                                                          :rules="mainBottom.rules.externalLinksBottomParams" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.externalLinksBottomParams" placeholder="多个直接使用英文逗号分隔" autocomplete="off" size="small" maxlength="1000"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.shows.indexOf('externalLinksBottomParams') != -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-form-item label="跳转参数:"
+                                                          :prop="'list.' + index + '.externalLinksBottomParams'"
+                                                          :rules="mainBottom.rules.externalLinksBottomParams"
+                                                          :label-width="formLabelWidth">
+                                                <el-input v-model.trim="item.externalLinksBottomParams"
+                                                          placeholder="多个直接使用英文逗号分隔" autocomplete="off" size="small"
+                                                          maxlength="1000"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.shows.indexOf('externalLinksBottomParamFormDb') != -1 && (item.typeIndex || item.typeIndex == 0)">
-                                            <el-form-item label="跳转参数获取方式:" :prop="'list.' + index + '.externalLinksBottomParamFormDb'" :rules="mainBottom.rules.externalLinksBottomParamFormDb" :label-width="formLabelWidth">
-                                                <el-select style="width: 100%" v-model="item.externalLinksBottomParamFormDb" placeholder="默认当前行数据">
+                                        <el-col :span="8"
+                                                v-if="item.shows.indexOf('externalLinksBottomParamFormDb') != -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-form-item label="跳转参数获取方式:"
+                                                          :prop="'list.' + index + '.externalLinksBottomParamFormDb'"
+                                                          :rules="mainBottom.rules.externalLinksBottomParamFormDb"
+                                                          :label-width="formLabelWidth">
+                                                <el-select style="width: 100%"
+                                                           v-model="item.externalLinksBottomParamFormDb"
+                                                           placeholder="默认当前行数据">
                                                     <el-option :key="true" label="查询数据库" :value="true"></el-option>
                                                     <el-option :key="false" label="当前行数据" :value="false"></el-option>
                                                 </el-select>
@@ -275,10 +414,15 @@
                                         </el-col>
                                         <el-col :span="24" style="text-align: right;">
                                             <el-button-group>
-                                                <el-button type="primary" size="mini" icon="el-icon-arrow-up" v-if="index != 0" @click="upAddBottom(item, index)">上移</el-button>
-                                                <el-button type="primary" size="mini" icon="el-icon-arrow-down" v-if="index != mainBottom.form.list.length - 1" @click="downAddBottom(item, index)">下移</el-button>
+                                                <el-button type="primary" size="mini" icon="el-icon-arrow-up"
+                                                           v-if="index != 0"
+                                                           @click="up(item, index, mainBottom.form.list)">上移</el-button>
+                                                <el-button type="primary" size="mini" icon="el-icon-arrow-down"
+                                                           v-if="index != mainBottom.form.list.length - 1"
+                                                           @click="down(item, index, mainBottom.form.list)">下移</el-button>
                                             </el-button-group>
-                                            <el-button type="danger" plain size="mini" @click="removeAddBottom(item, index)">移除</el-button>
+                                            <el-button type="danger" plain size="mini"
+                                                       @click="remove(item, index, mainBottom.form.list)">移除</el-button>
                                         </el-col>
                                     </el-row>
                                 </el-card>
@@ -288,93 +432,122 @@
                 </el-card>
             </el-collapse-item>
 
-            <el-collapse-item title="主表新增/编辑表单配置" name="4">
-                <el-card style="margin-top: 10px;" shadow="hover"  v-if="basic.checked">
+            <el-collapse-item title="主表新增/编辑表单配置" name="4" v-if="basic.checked && basic.form && (basic.form.addBtn || basic.form.editBtn)">
+                <el-card style="margin-top: 10px;" shadow="hover" v-if="basic.checked">
                     <el-form :model="mainAdd.form" :rules="mainAdd.rules" ref="mainAddForm" size="small">
                         <el-row :gutter="24">
                             <el-col :span="24" style="margin-bottom: 8px;">
-                                <el-form-item label="表单项" prop="elements" :label-width="formLabelWidth">
-                                    <el-button type="primary" plain size="mini" @click="showAddFormColumn">添加</el-button>
-                                </el-form-item>
+                                <el-col :span="8">
+                                    <el-form-item label="弹窗宽度（%）:" prop="width" placeholder="默认100%" :label-width="formLabelWidth">
+                                        <el-input-number size="small" v-model="mainAdd.form.width" style="width: 100%" :min="1" :max="100"></el-input-number>
+                                    </el-form-item>
+                                </el-col>
                             </el-col>
-                            <span v-for="(item,index) in mainAdd.form.elements">
-                                <el-card shadow="hover" style="margin-top: 8px;">
-                                    <el-row style="border: 0px solid gray;" :gutter="24">
-                                        <el-col :span="8">
+                            <el-card shadow="hover" style="margin-top: 8px;">
+                                <el-col :span="24" style="margin-bottom: 8px;">
+                                    <el-form-item label="表单项" prop="elements" :label-width="formLabelWidth">
+                                        <el-button type="primary" plain size="mini" @click="showAddFormColumn">添加
+                                        </el-button>
+                                    </el-form-item>
+                                </el-col>
+                                <span v-for="(item,index) in mainAdd.form.elements">
+                                    <el-card shadow="hover" style="margin-top: 8px;">
+                                        <el-row style="border: 0px solid gray;" :gutter="24">
+                                            <el-col :span="8">
                                             <el-form-item label="数据库字段:" :label-width="formLabelWidth"
-                                                  :prop="'elements.' + index + '.key'" :rules="mainAdd.rules.key">
-                                                <el-input v-model.trim="item.key" placeholder="" readOnly="true" autocomplete="off" size="small"></el-input>
+                                                          :prop="'elements.' + index + '.key'"
+                                                          :rules="mainAdd.rules.key">
+                                                <el-input v-model.trim="item.key" placeholder="" readOnly="true"
+                                                          autocomplete="off" size="small"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8">
-                                            <el-form-item label="表单类型:" :label-width="formLabelWidth" :prop="'elements.' + index + '.typeIndex'"
+                                            <el-col :span="8">
+                                            <el-form-item label="表单类型:" :label-width="formLabelWidth"
+                                                          :prop="'elements.' + index + '.typeIndex'"
                                                           :rules="mainAdd.rules.typeIndex">
-                                                <el-select style="width: 100%" clearable v-model="item.typeIndex" @change="addElementTypeChange(index)">
+                                                <el-select style="width: 100%" clearable v-model="item.typeIndex"
+                                                           @change="addElementTypeChange(index)">
                                                     <el-option v-for="(type,aIndex) in addElementTypes" :key="aIndex"
                                                                :label="type.name" :value="aIndex">
                                                     </el-option>
                                                 </el-select>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('label') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-col :span="8"
+                                                v-if="item.hides.indexOf('label') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="表单文案:" :prop="'elements.' + index + '.label'"
                                                           :rules="item.rules.label" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.label" placeholder="" autocomplete="off" size="small" maxlength="50"></el-input>
+                                                <el-input v-model.trim="item.label" placeholder="" autocomplete="off"
+                                                          size="small" maxlength="50"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('type') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-col :span="8"
+                                                v-if="item.hides.indexOf('type') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="普通文本框样式:" :prop="'elements.' + index + '.type'"
                                                           :rules="item.rules.type" :label-width="formLabelWidth">
-                                                <el-select style="width: 100%" v-model="item.type" placeholder="默认普通单行" clearable>
+                                                <el-select style="width: 100%" v-model="item.type" placeholder="默认普通单行"
+                                                           clearable>
                                                     <el-option key="text" label="普通单行" value="text"></el-option>
                                                     <el-option key="textarea" label="多行" value="textarea"></el-option>
                                                 </el-select>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('placeholder') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-col :span="8"
+                                                v-if="item.hides.indexOf('placeholder') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="提示文案:" :prop="'elements.' + index + '.placeholder'"
                                                           :rules="item.rules.placeholder" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.placeholder" autocomplete="off" size="small" maxlength="300"></el-input>
+                                                <el-input v-model.trim="item.placeholder" autocomplete="off"
+                                                          size="small" maxlength="300"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('clearable') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-col :span="8"
+                                                v-if="item.hides.indexOf('clearable') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="是否可清空:" :prop="'elements.' + index + '.clearable'"
                                                           :rules="item.rules.clearable" :label-width="formLabelWidth">
-                                                <el-select style="width: 100%" v-model="item.clearable" placeholder="默认是">
+                                                <el-select style="width: 100%" v-model="item.clearable"
+                                                           placeholder="默认是">
                                                     <el-option :key="true" label="是" :value="true"></el-option>
                                                     <el-option :key="false" label="否" :value="false"></el-option>
                                                 </el-select>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('size') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-col :span="8"
+                                                v-if="item.hides.indexOf('size') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="输入框尺寸:" :prop="'elements.' + index + '.size'"
                                                           :rules="item.rules.size" :label-width="formLabelWidth">
-                                                <el-select style="width: 100%" v-model="item.size" placeholder="默认small">
+                                                <el-select style="width: 100%" v-model="item.size"
+                                                           placeholder="默认small">
                                                     <el-option key="medium" label="medium" value="medium"></el-option>
                                                     <el-option key="small" label="small" value="small"></el-option>
                                                     <el-option key="mini" label="mini" value="mini"></el-option>
                                                 </el-select>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('width') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-col :span="8" v-if="item.hides.indexOf('width') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="指定宽度（px）:" :prop="'elements.' + index + '.width'"
-                                                          placeholder="默认100%" :rules="item.rules.width" :label-width="formLabelWidth">
+                                                          placeholder="默认100%" :rules="item.rules.width"
+                                                          :label-width="formLabelWidth">
                                                 <el-input-number size="small" v-model="item.width" style="width: 100%" :min="1"></el-input-number>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('maxlength') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-col :span="8"
+                                                v-if="item.hides.indexOf('maxlength') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="最大输入字符数:" :prop="'elements.' + index + '.maxlength'"
                                                           :rules="item.rules.maxlength" :label-width="formLabelWidth">
-                                                <el-input-number size="small" v-model="item.maxlength" style="width: 100%" :min="1"></el-input-number>
+                                                <el-input-number size="small" v-model="item.maxlength"
+                                                                 style="width: 100%" :min="1"></el-input-number>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('minlength') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('minlength') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="最小输入字符数:" :prop="'elements.' + index + '.minlength'"
                                                           :rules="item.rules.minlength" :label-width="formLabelWidth">
-                                                <el-input-number size="small" v-model="item.minlength" style="width: 100%" :min="1"></el-input-number>
+                                                <el-input-number size="small" v-model="item.minlength"
+                                                                 style="width: 100%" :min="1"></el-input-number>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('canEdit') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('canEdit') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="是否允许编辑:" :prop="'elements.' + index + '.canEdit'"
                                                           :rules="item.rules.canEdit" :label-width="formLabelWidth">
                                                 <el-select style="width: 100%" v-model="item.canEdit" placeholder="默认是">
@@ -383,92 +556,154 @@
                                                 </el-select>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('schema') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('schema') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="远程数据表所在库:" :prop="'elements.' + index + '.schema'"
                                                           :rules="item.rules.schema" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.schema" placeholder="默认第一行“数据库”值" autocomplete="off" size="small" maxlength="300"></el-input>
+                                                <el-input v-model.trim="item.schema" placeholder="默认第一行“数据库”值"
+                                                          autocomplete="off" size="small" maxlength="300"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('table') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('table') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="远程数据表名:" :prop="'elements.' + index + '.table'"
                                                           :rules="item.rules.table" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.table" autocomplete="off" size="small" maxlength="300"></el-input>
+                                                <el-input v-model.trim="item.table" autocomplete="off" size="small"
+                                                          maxlength="300"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('keyColumn') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('keyColumn') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="键字段:" :prop="'elements.' + index + '.keyColumn'"
                                                           :rules="item.rules.keyColumn" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.keyColumn" autocomplete="off" size="small" maxlength="300"></el-input>
+                                                <el-input v-model.trim="item.keyColumn" autocomplete="off" size="small"
+                                                          maxlength="300"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('valueColumn') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('valueColumn') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="值字段:" :prop="'elements.' + index + '.valueColumn'"
-                                                  :rules="item.rules.valueColumn" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.valueColumn" autocomplete="off" size="small" maxlength="300"></el-input>
+                                                          :rules="item.rules.valueColumn" :label-width="formLabelWidth">
+                                                <el-input v-model.trim="item.valueColumn" autocomplete="off"
+                                                          size="small" maxlength="300"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('min') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('min') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="计数器允许的最小值:" :prop="'elements.' + index + '.min'"
                                                           :rules="item.rules.min" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.min" placeholder="格式要求number" autocomplete="off" size="small" maxlength="30"></el-input>
+                                                <el-input v-model.trim="item.min" placeholder="格式要求number"
+                                                          autocomplete="off" size="small" maxlength="30"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('max') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('max') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="计数器允许的最大值:" :prop="'elements.' + index + '.max'"
                                                           :rules="item.rules.max" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.max" placeholder="格式要求number" autocomplete="off" size="small" maxlength="30"></el-input>
+                                                <el-input v-model.trim="item.max" placeholder="格式要求number"
+                                                          autocomplete="off" size="small" maxlength="30"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('precision') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('precision') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="数值精度:" :prop="'elements.' + index + '.precision'"
                                                           :rules="item.rules.precision" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.precision" placeholder="格式要求非负整数,且不能小于'计数器步长'的小数位数" autocomplete="off" size="small" maxlength="30"></el-input>
+                                                <el-input v-model.trim="item.precision"
+                                                          placeholder="格式要求非负整数,且不能小于'计数器步长'的小数位数" autocomplete="off"
+                                                          size="small" maxlength="30"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('step') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('step') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="计数器步长:" :prop="'elements.' + index + '.step'"
                                                           :rules="item.rules.step" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.step" placeholder="格式要求number" autocomplete="off" size="small" maxlength="30"></el-input>
+                                                <el-input v-model.trim="item.step" placeholder="格式要求number"
+                                                          autocomplete="off" size="small" maxlength="30"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('start') == -1 && (item.typeIndex || item.typeIndex == 0)">
-                                            <el-form-item label="开始时间:" :prop="'elements.' + index + '.start'" :rules="item.rules.start" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.start" placeholder="默认00:00" autocomplete="off" size="small" maxlength="5"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('start') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-form-item label="开始时间:" :prop="'elements.' + index + '.start'"
+                                                          :rules="item.rules.start" :label-width="formLabelWidth">
+                                                <el-input v-model.trim="item.start" placeholder="默认00:00"
+                                                          autocomplete="off" size="small" maxlength="5"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('end') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('end') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="结束时间:" :prop="'elements.' + index + '.end'"
                                                           :rules="item.rules.end" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.end" placeholder="默认23:59" autocomplete="off" size="small" maxlength="5"></el-input>
+                                                <el-input v-model.trim="item.end" placeholder="默认23:59"
+                                                          autocomplete="off" size="small" maxlength="5"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('timeStep') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('timeStep') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="间隔时间:" :prop="'elements.' + index + '.timeStep'"
                                                           :rules="item.rules.timeStep" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.step" placeholder="默认00:30" autocomplete="off" size="small" maxlength="5"></el-input>
+                                                <el-input v-model.trim="item.step" placeholder="默认00:30"
+                                                          autocomplete="off" size="small" maxlength="5"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('acceptType') == -1 && (item.typeIndex || item.typeIndex == 0)">
-                                            <el-form-item label="图片后缀类型:" :prop="'elements.' + index + '.acceptType'" :rules="item.rules.acceptType" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.acceptType" placeholder="例：'.jpg,.PNG',多个使用逗号分隔" autocomplete="off" size="small" maxlength="30"></el-input>
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('acceptType') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                            <el-form-item label="图片后缀类型:" :prop="'elements.' + index + '.acceptType'"
+                                                          :rules="item.rules.acceptType" :label-width="formLabelWidth">
+                                                <el-input v-model.trim="item.acceptType"
+                                                          placeholder="例：'.jpg,.PNG',多个使用逗号分隔" autocomplete="off"
+                                                          size="small" maxlength="30"></el-input>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="8" v-if="item.hides.indexOf('limitSize') == -1 && (item.typeIndex || item.typeIndex == 0)">
+                                        <el-col :span="8"
+                                                v-if="item.hides.indexOf('limitSize') == -1 && (item.typeIndex || item.typeIndex == 0)">
                                             <el-form-item label="图片大小限制:" :prop="'elements.' + index + '.limitSize'"
                                                           :rules="item.rules.limitSize" :label-width="formLabelWidth">
-                                                <el-input v-model.trim="item.limitSize" placeholder="格式要求正整数,单位：字节" autocomplete="off" size="small" maxlength="30"></el-input>
+                                                <el-input v-model.trim="item.limitSize" placeholder="格式要求正整数,单位：字节"
+                                                          autocomplete="off" size="small" maxlength="30"></el-input>
                                             </el-form-item>
                                         </el-col>
                                         <el-col :span="24" style="text-align: right;">
                                             <el-button-group>
-                                                <el-button type="primary" size="mini" icon="el-icon-arrow-up" v-if="index != 0" @click="upAddFormColumn(item, index)">上移</el-button>
-                                                <el-button type="primary" size="mini" icon="el-icon-arrow-down" v-if="index != mainAdd.form.elements.length - 1" @click="downAddFormColumn(item, index)">下移</el-button>
+                                                <el-button type="primary" size="mini" icon="el-icon-arrow-up"
+                                                           v-if="index != 0"
+                                                           @click="up(item, index, mainAdd.form.elements)">上移</el-button>
+                                                <el-button type="primary" size="mini" icon="el-icon-arrow-down"
+                                                           v-if="index != mainAdd.form.elements.length - 1"
+                                                           @click="down(item, index, mainAdd.form.elements)">下移</el-button>
                                             </el-button-group>
-                                            <el-button type="danger" plain size="mini" @click="removeAddFormColumn(item, index)">移除</el-button>
+                                            <el-button type="danger" plain size="mini"
+                                                       @click="remove(item, index, mainAdd.form.elements, mainAddColumns)">移除</el-button>
                                         </el-col>
-                                    </el-row>
-                                </el-card>
-                            </span>
+                                        </el-row>
+                                    </el-card>
+                                </span>
+                            </el-card>
+                            <el-card shadow="hover" style="margin-top: 8px;">
+                                <el-col :span="24" style="margin-bottom: 8px;">
+                                    <el-form-item label="唯一键组合" prop="uniques" :label-width="formLabelWidth">
+                                        <el-button type="primary" plain size="mini" @click="showAddUniques">添加</el-button>
+                                    </el-form-item>
+                                </el-col>
+                                <span v-for="(item,index) in mainAdd.form.uniques">
+                                    <el-card shadow="hover" style="margin-top: 8px;">
+                                        <el-row style="border: 0px solid gray;" :gutter="24">
+                                            <el-col :span="12">
+                                                <el-input v-model.trim="item.toast" readOnly placeholder="唯一键冲突前端提示文案"
+                                                          autocomplete="off" size="small" maxlength="300"></el-input>
+                                            </el-col>
+                                            <el-col :span="12">
+                                                <el-select readOnly v-model="item.columns" multiple placeholder="请选择唯一键组合"
+                                                           style="width: 100%;margin-top: 6px;">
+                                                    <el-option v-for="item in mainWhereColumns" :key="item.name"
+                                                               :label="'列名:' + item.name + '   类型:' + item.type"
+                                                               :value="item.name">
+                                                    </el-option>
+                                                </el-select>
+                                            </el-col>
+                                        </el-row>
+                                    </el-card>
+                                </span>
+                            </el-card>
                         </el-row>
                     </el-form>
                 </el-card>
@@ -525,6 +760,21 @@
             <el-button type="primary" plain size="mini" @click="addWhereFun">确认</el-button>
         </div>
     </el-dialog>
+
+    <el-dialog title="添加唯一键组合" :visible.sync="mainAdd.uniqueVisible" class="group-dialog" :before-close="closeAddUnique">
+        <el-input v-model.trim="mainAdd.uniqueToast" placeholder="唯一键冲突前端提示文案" autocomplete="off" size="small" maxlength="300"></el-input>
+        <el-select v-model="mainAdd.uniqueColumns" multiple placeholder="请选择唯一键组合" style="width: 100%;margin-top: 6px;">
+            <el-option
+                    v-for="item in mainWhereColumns"
+                    :key="item.name"
+                    :label="'列名:' + item.name + '   类型:' + item.type"
+                    :value="item.name">
+            </el-option>
+        </el-select>
+        <div style="margin-top: 8px;text-align: right;">
+            <el-button type="primary" plain size="mini" @click="addUniqueFun">确认</el-button>
+        </div>
+    </el-dialog>
 </div>
 
 <script>
@@ -554,9 +804,10 @@
                 } else {
                     if (/(^[1-9]\d*$)/.test(value)) {
                         callback();
-                    }else{
+                    } else {
                         callback(new Error('格式要求正整数'));
-                    };
+                    }
+                    ;
                 }
             };
             var validateMap = (rule, value, callback) => {
@@ -597,11 +848,11 @@
                 basic: {
                     form: {},
                     rules: {
-                        title: [{required : true, message: '请输入', trigger: 'change' }],
-                        schema: [{required : true, message: '请输入', trigger: 'change' }],
-                        table: [{required : true, message: '请输入', trigger: 'change' }],
-                        primaryKey: [{required : true, message: '请输入', trigger: 'change' }],
-                        pagination: [{required : true, message: '请选择', trigger: 'change' }],
+                        title: [{required: true, message: '请输入', trigger: 'change'}],
+                        schema: [{required: true, message: '请输入', trigger: 'change'}],
+                        table: [{required: true, message: '请输入', trigger: 'change'}],
+                        primaryKey: [{required: true, message: '请输入', trigger: 'change'}],
+                        pagination: [{required: true, message: '请选择', trigger: 'change'}],
                     },
                     checked: false
                 },
@@ -613,13 +864,18 @@
                         columns: []
                     },
                     rules: {
-                        columns: [{required : true, message: '查询列不能为空', validator: validateColumns, trigger: 'change' }],
+                        columns: [{required: true, message: '查询列不能为空', validator: validateColumns, trigger: 'change'}],
                         columnRules: {
-                            key: [{required : true, message: 'sql查询字段不能为空', trigger: 'change' }],
-                            label: [{required : true, message: '前端列头文案不能为空', trigger: 'change' }],
-                            width: [{required : false, message: '格式要求正整数', validator: validateNum, trigger: 'change' }],
-                            formatterSwitchValue: [{required : true, message: '请输入', trigger: 'change' }],
-                            formatterTextMap: [{required : true, message: '格式要求map类型的json,key value都必须为strin', validator: validateMap, trigger: 'change' }],
+                            key: [{required: true, message: 'sql查询字段不能为空', trigger: 'change'}],
+                            label: [{required: true, message: '前端列头文案不能为空', trigger: 'change'}],
+                            width: [{required: false, message: '格式要求正整数', validator: validateNum, trigger: 'change'}],
+                            formatterSwitchValue: [{required: true, message: '请输入', trigger: 'change'}],
+                            formatterTextMap: [{
+                                required: true,
+                                message: '格式要求map类型的json,key value都必须为strin',
+                                validator: validateMap,
+                                trigger: 'change'
+                            }],
                         }
                     }
                 },
@@ -632,26 +888,38 @@
                         list: []
                     },
                     rules: {
-                        name: [{required : true, message: '请输入按钮文案', trigger: 'change' }],
-                        externalLinksBottomUrl: [{required : true, message: '请输入跳转链接', trigger: 'change' }],
+                        name: [{required: true, message: '请输入按钮文案', trigger: 'change'}],
+                        externalLinksBottomUrl: [{required: true, message: '请输入跳转链接', trigger: 'change'}],
                     }
                 },
                 mainAdd: {
                     visible: false,
                     item: null,
+                    uniqueVisible: false,
+                    uniqueToast: '',
+                    uniqueColumns: [],
                     form: {
-                        elements: []
+                        elements: [],
+                        unqiues: []
                     },
                     rules: {
-                        typeIndex: [{required : true, message: '请选择表单类型', trigger: 'change' }],
-                        key: [{required : true, message: '请填写数据库字段名', trigger: 'change' }],
-                        elements: [{required : false, message: '表单项不能为空', validator: validateColumns, trigger: 'change' }],
+                        typeIndex: [{required: true, message: '请选择表单类型', trigger: 'change'}],
+                        key: [{required: true, message: '请填写数据库字段名', trigger: 'change'}],
+                        elements: [{
+                            required: false,
+                            message: '表单项不能为空',
+                            validator: validateColumns,
+                            trigger: 'change'
+                        }],
                     }
                 },
                 mainWhere: {
                     visible: false,
                     item: null,
-                    rules: {},
+                    rules: {
+                        key: [{required: true, message: '请填写数据库字段名', trigger: 'change'}],
+                        typeIndex: [{required: true, message: '请选择判断类型', trigger: 'change'}],
+                    },
                     form: {
                         wheres: []
                     }
@@ -661,7 +929,7 @@
         methods: {
             submit() {
                 this.loading = true;
-                this.activeNames = ["1","2","3","4"]
+                this.activeNames = ["1", "2", "3", "4"]
 
                 let basicFormValid = null,
                         mainTableFormValid = null,
@@ -729,14 +997,58 @@
                     }
                 }, 100)
             },
+            up(item, index, elements) {
+                elements[index] = elements.splice(index - 1, 1, elements[index])[0];
+            },
+            down(item, index, elements) {
+                elements[index] = elements.splice(index + 1, 1, elements[index])[0];
+            },
+            remove(item, index, elements, needPush) {
+                elements.splice(index, 1)
+                if (needPush) {
+                    needPush.push({
+                        name: item.key,
+                        type: item.dataType
+                    })
+                }
+            },
+            addUniqueFun() {
+                if (this.mainAdd.uniqueToast && this.mainAdd.uniqueColumns.length > 0) {
+                    this.mainAdd.form.unqiues.push({
+                        toast: JSON.parse(JSON.stringify(this.mainAdd.uniqueToast)),
+                        columns: JSON.parse(JSON.stringify(this.mainAdd.uniqueColumns)),
+                    })
+                } else {
+                    this.$message.error('请填写完整');
+                    return
+                }
+                this.closeAddUnique()
+                console.log(this.mainAdd.form.unqiues)
+            },
+            closeAddUnique() {
+                this.mainAdd.uniqueVisible = false;
+                this.mainAdd.uniqueToast = ''
+                this.mainAdd.uniqueColumns = []
+            },
+            showAddUniques() {
+                this.mainAdd.uniqueVisible = true;
+            },
+            whereJudgeTypeChange(index) {
+                if (typeof this.mainWhere.form.wheres[index].typeIndex == 'number') {
+                    this.mainWhere.form.wheres[index].shows = this.whereTypes[this.mainWhere.form.wheres[index].typeIndex].shows
+                    this.mainWhere.form.wheres[index].rules = this.whereTypes[this.mainWhere.form.wheres[index].typeIndex].rules
+                } else {
+                    delete this.mainWhere.form.wheres[index].typeIndex
+                }
+            },
             addWhereFun() {
                 this.loading = true
                 if (this.mainWhere.item != null && typeof this.mainWhere.item != 'undefined') {
-                    for (let i = 0; i < this.mainColumns.length; i ++) {
+                    for (let i = 0; i < this.mainWhereColumns.length; i++) {
                         if (this.mainWhereColumns[i].name === this.mainWhere.item) {
                             this.mainWhere.form.wheres.push({
-                                key: this.mainColumns[i].name,
-                                dataType: this.mainColumns[i].type,
+                                key: this.mainWhereColumns[i].name,
+                                dataType: this.mainWhereColumns[i].type,
                                 shows: []
                             })
                             this.$refs.mainWhereForm.validateField("wheres");
@@ -761,19 +1073,6 @@
                     this.mainAdd.rules.elements[0].required = false
                 }
             },
-            upAddFormColumn(item, index) {
-                this.mainAdd.form.elements[index] = this.mainAdd.form.elements.splice(index - 1, 1, this.mainAdd.form.elements[index])[0];
-            },
-            downAddFormColumn(item, index) {
-                this.mainAdd.form.elements[index] = this.mainAdd.form.elements.splice(index + 1, 1, this.mainAdd.form.elements[index])[0];
-            },
-            removeAddFormColumn(item, index) {
-                this.mainAdd.form.elements.splice(index, 1)
-                this.mainAddColumns.push({
-                    name: item.key,
-                    type: item.dataType
-                })
-            },
             addElementTypeChange(index) {
                 if (typeof this.mainAdd.form.elements[index].typeIndex == 'number') {
                     this.mainAdd.form.elements[index].hides = this.addElementTypes[this.mainAdd.form.elements[index].typeIndex].hides
@@ -785,14 +1084,14 @@
             addFormColumnFun() {
                 this.loading = true
                 if (this.mainAdd.item != null && typeof this.mainAdd.item != 'undefined') {
-                    for (let i = 0; i < this.mainAddColumns.length; i ++) {
+                    for (let i = 0; i < this.mainAddColumns.length; i++) {
                         if (this.mainAddColumns[i].name === this.mainAdd.item) {
                             this.mainAdd.form.elements.push({
                                 key: this.mainAddColumns[i].name,
                                 dataType: this.mainAddColumns[i].type,
                                 hides: []
                             })
-                            this.mainAddColumns.splice(i,1)
+                            this.mainAddColumns.splice(i, 1)
                             this.$refs.mainAddForm.validateField("elements");
                             break
                         }
@@ -807,15 +1106,6 @@
             },
             showAddFormColumn() {
                 this.mainAdd.visible = true
-            },
-            upAddBottom(item, index) {
-                this.mainBottom.form.list[index] = this.mainBottom.form.list.splice(index - 1, 1, this.mainBottom.form.list[index])[0];
-            },
-            downAddBottom(item, index) {
-                this.mainBottom.form.list[index] = this.mainBottom.form.list.splice(index + 1, 1, this.mainBottom.form.list[index])[0];
-            },
-            removeAddBottom(item, index) {
-                this.mainBottom.form.list.splice(index, 1)
             },
             bottomTypeChange(index) {
                 if (typeof this.mainBottom.form.list[index].typeIndex == 'number') {
@@ -832,19 +1122,6 @@
                 })
                 this.loading = false
             },
-            upAddColumn(item, index) {
-                this.mainTable.form.columns[index] = this.mainTable.form.columns.splice(index - 1, 1, this.mainTable.form.columns[index])[0];
-            },
-            downAddColumn(item, index) {
-                this.mainTable.form.columns[index] = this.mainTable.form.columns.splice(index + 1, 1, this.mainTable.form.columns[index])[0];
-            },
-            removeAddColumn(item, index) {
-                this.mainTable.form.columns.splice(index, 1)
-                this.mainColumns.push({
-                    name: item.key,
-                    type: item.type
-                })
-            },
             formatterTypeChange(index) {
                 if (typeof this.mainTable.form.columns[index].formatterTypeIndex == 'number') {
                     this.mainTable.form.columns[index].hides = this.formatterTypes[this.mainTable.form.columns[index].formatterTypeIndex].hides
@@ -855,14 +1132,14 @@
             addColumnFun() {
                 this.loading = true
                 if (this.addColumn.item != null && typeof this.addColumn.item != 'undefined') {
-                    for (let i = 0; i < this.mainColumns.length; i ++) {
+                    for (let i = 0; i < this.mainColumns.length; i++) {
                         if (this.mainColumns[i].name === this.addColumn.item) {
                             this.mainTable.form.columns.push({
                                 key: this.mainColumns[i].name,
-                                type: this.mainColumns[i].type,
+                                dataType: this.mainColumns[i].type,
                                 hides: []
                             })
-                            this.mainColumns.splice(i,1)
+                            this.mainColumns.splice(i, 1)
                             this.$refs.mainTableForm.validateField("columns");
                             break
                         }
@@ -890,9 +1167,15 @@
                 this.mainAddColumns = []
                 this.activeNames = []
                 this.mainAdd.form = {
-                    elements: []
+                    elements: [],
+                    unqiues: []
                 }
                 this.mainAdd.item = null
+
+                this.mainWhere.form = {
+                    wheres: []
+                }
+
                 delete this.basic.form.primaryKey
                 this.basic.checked = false
             },
@@ -907,7 +1190,7 @@
                 }
                 this.resetMainTable()
                 this.loading = true
-                axios.get(window.contextPath + '/api/getTable',{
+                axios.get(window.contextPath + '/api/getTable', {
                     params: {
                         schema: this.basic.form.schema,
                         table: this.basic.form.table
@@ -921,9 +1204,9 @@
                         this.mainColumns = JSON.parse(JSON.stringify(res.data.content.table.columns))
                         this.mainWhereColumns = JSON.parse(JSON.stringify(res.data.content.table.columns))
                         this.mainAddColumns = JSON.parse(JSON.stringify(res.data.content.table.columns))
-                        for (let i = 0; i < this.mainAddColumns.length; i ++) {
+                        for (let i = 0; i < this.mainAddColumns.length; i++) {
                             if (this.mainAddColumns[i].name === res.data.content.table.primaryKey) {
-                                this.mainAddColumns.splice(i,1)
+                                this.mainAddColumns.splice(i, 1)
                                 break
                             }
                         }
@@ -938,7 +1221,7 @@
             }
         },
         created: function () {
-            axios.get(window.contextPath + '/api/addElementTypes',{
+            axios.get(window.contextPath + '/api/addElementTypes', {
                 params: {}
             }).then(res => {
                 if (res.data.status != 0) {
@@ -953,7 +1236,7 @@
                 this.$message.error('服务异常');
                 this.loading = false;
             })
-            axios.get(window.contextPath + '/api/formatterTypes',{
+            axios.get(window.contextPath + '/api/formatterTypes', {
                 params: {}
             }).then(res => {
                 if (res.data.status != 0) {
@@ -968,7 +1251,7 @@
                 this.$message.error('服务异常');
                 this.loading = false;
             })
-            axios.get(window.contextPath + '/api/bottomTypes',{
+            axios.get(window.contextPath + '/api/bottomTypes', {
                 params: {}
             }).then(res => {
                 if (res.data.status != 0) {
@@ -983,7 +1266,7 @@
                 this.$message.error('服务异常');
                 this.loading = false;
             })
-            axios.get(window.contextPath + '/api/whereTypes',{
+            axios.get(window.contextPath + '/api/whereTypes', {
                 params: {}
             }).then(res => {
                 if (res.data.status != 0) {
