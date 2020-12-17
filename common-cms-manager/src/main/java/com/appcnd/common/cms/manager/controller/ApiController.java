@@ -1,8 +1,8 @@
 package com.appcnd.common.cms.manager.controller;
 
-import com.appcnd.common.cms.entity.constant.AddColumnType;
-import com.appcnd.common.cms.entity.constant.ElType;
-import com.appcnd.common.cms.entity.constant.FormatterType;
+import com.appcnd.common.cms.entity.bottom.ExternalLinksBottom;
+import com.appcnd.common.cms.entity.constant.*;
+import com.appcnd.common.cms.entity.db.*;
 import com.appcnd.common.cms.entity.form.add.*;
 import com.appcnd.common.cms.entity.table.formatter.FormatterPic;
 import com.appcnd.common.cms.entity.table.formatter.FormatterSwitch;
@@ -120,20 +120,114 @@ public class ApiController {
 
         list.add(new FormatterTypeModel("图片格式化", FormatterPic.class, FormatterType.PIC)
                 .addHide("formatterSwitchActiveValue","formatterSwitchActiveLabel","formatterSwitchInactiveValue","formatterSwitchInactiveLabel",
-                        "formatterTextMap"));
+                        "formatterTextMap","formatterUrlTarget","formatterUrlText"));
 
         list.add(new FormatterTypeModel("开关格式化", FormatterSwitch.class, FormatterType.SWITCH)
-                .addHide("formatterPicWidth","formatterPicHeight","formatterTextMap"));
+                .addHide("formatterPicWidth","formatterPicHeight","formatterTextMap","formatterUrlTarget","formatterUrlText"));
 
         list.add(new FormatterTypeModel("文本格式化", FormatterText.class, FormatterType.TEXT)
                 .addHide("formatterPicWidth","formatterPicHeight",
-                        "formatterSwitchActiveValue","formatterSwitchActiveLabel","formatterSwitchInactiveValue","formatterSwitchInactiveLabel"));
+                        "formatterSwitchActiveValue","formatterSwitchActiveLabel","formatterSwitchInactiveValue","formatterSwitchInactiveLabel",
+                        "formatterUrlTarget","formatterUrlText"));
 
         list.add(new FormatterTypeModel("链接格式化", FormatterUrl.class, FormatterType.URL)
                 .addHide("formatterPicWidth","formatterPicHeight","formatterTextMap",
                         "formatterSwitchActiveValue","formatterSwitchActiveLabel","formatterSwitchInactiveValue","formatterSwitchInactiveLabel"));
 
         return HttpResult.success().pull("list", list).json();
+    }
+
+    @RequestMapping(value = "/bottomTypes", produces = "application/json;charset=UTF-8")
+    public String bottomTypes() {
+        List<BottomTypeModel> list = new ArrayList<>();
+        list.add(new BottomTypeModel("外链按钮", ExternalLinksBottom.class, BottomType.EXTERNAL_LINKS)
+                .addShows("externalLinksBottomUrl", "externalLinksBottomParamFormDb", "externalLinksBottomParams"));
+        return HttpResult.success().pull("list", list).json();
+    }
+
+    @RequestMapping(value = "/whereTypes", produces = "application/json;charset=UTF-8")
+    public String whereTypes() {
+        List<WhereTypeModel> list = new ArrayList<>();
+        list.add(new WhereTypeModel("=", WhereEq.class, JudgeType.eq)
+                .addShows("value")
+                .addRule("value", true, "请输入", "change"));
+        list.add(new WhereTypeModel("like", WhereLike.class, JudgeType.like)
+                .addShows("value")
+                .addRule("value", true, "请输入", "change"));
+        list.add(new WhereTypeModel(">", WhereGt.class, JudgeType.gt)
+                .addShows("value")
+                .addRule("value", true, "请输入", "change"));
+        list.add(new WhereTypeModel(">=", WhereGteq.class, JudgeType.gteq)
+                .addShows("value")
+                .addRule("value", true, "请输入", "change"));
+        list.add(new WhereTypeModel("<", WhereLt.class, JudgeType.lt)
+                .addShows("value")
+                .addRule("value", true, "请输入", "change"));
+        list.add(new WhereTypeModel("<=", WhereLteq.class, JudgeType.lteq)
+                .addShows("value")
+                .addRule("value", true, "请输入", "change"));
+        list.add(new WhereTypeModel("<=", WhereBt.class, JudgeType.bt)
+                .addShows("begin","end")
+                .addRule("begin", true, "请输入", "change")
+                .addRule("end", true, "请输入", "change"));
+        list.add(new WhereTypeModel("in", WhereLteq.class, JudgeType.in)
+                .addShows("values")
+                .addRule("values", true, "请输入", "change"));
+        return HttpResult.success().pull("list", list).json();
+    }
+
+    @Data
+    public static class WhereTypeModel {
+        private String name;
+        private String className;
+        private JudgeType type;
+        private List<String> shows;
+        // 校验规则
+        private Map<String,List<Rule>> rules;
+
+        public WhereTypeModel(String name, Class clazz, JudgeType type) {
+            this.name = name;
+            this.className = clazz.getName();
+            this.type = type;
+            this.shows = new ArrayList<>();
+        }
+
+        public WhereTypeModel addShows(String... keys) {
+            for (String key : keys) {
+                this.shows.add(key);
+            }
+            return this;
+        }
+
+        public WhereTypeModel addRule(String key, boolean required, String message, String trigger) {
+            if (!this.rules.containsKey(key)) {
+                this.rules.put(key, new ArrayList<>());
+            }
+            this.rules.get(key).add(new Rule(required, message, trigger));
+            return this;
+        }
+    }
+
+    @Data
+    public static class BottomTypeModel {
+        private String name;
+        private String className;
+        private BottomType type;
+        private List<String> shows;
+
+        public BottomTypeModel(String name, Class clazz, BottomType type) {
+            this.name = name;
+            this.className = clazz.getName();
+            this.type = type;
+            this.shows = new ArrayList<>();
+        }
+
+        public BottomTypeModel addShows(String... keys) {
+            for (String key : keys) {
+                this.shows.add(key);
+            }
+            return this;
+        }
     }
 
     @Data
