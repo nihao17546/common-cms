@@ -681,24 +681,32 @@
                             <el-card shadow="hover" style="margin-top: 8px;">
                                 <el-col :span="24" style="margin-bottom: 8px;">
                                     <el-form-item label="唯一键组合" prop="uniques" :label-width="formLabelWidth">
-                                        <el-button type="primary" plain size="mini" @click="showAddUniques">添加</el-button>
+                                        <el-button type="primary" plain size="mini" @click="addUniqueFun">添加</el-button>
                                     </el-form-item>
                                 </el-col>
-                                <span v-for="(item,index) in mainAdd.form.uniques">
+                                <span v-for="(item,index) in mainAdd.form.unqiues">
                                     <el-card shadow="hover" style="margin-top: 8px;">
                                         <el-row style="border: 0px solid gray;" :gutter="24">
                                             <el-col :span="12">
-                                                <el-input v-model.trim="item.toast" readOnly placeholder="唯一键冲突前端提示文案"
-                                                          autocomplete="off" size="small" maxlength="300"></el-input>
+                                                <el-form-item label="冲突前端提示文案:" :prop="'unqiues.' + index + '.toast'"
+                                                              :rules="mainAdd.rules.uniqueToast" :label-width="formLabelWidth">
+                                                    <el-input v-model.trim="item.toast" placeholder="唯一键冲突前端提示文案"
+                                                              autocomplete="off" size="small" maxlength="300"></el-input>
+                                                </el-form-item>
                                             </el-col>
                                             <el-col :span="12">
-                                                <el-select readOnly v-model="item.columns" multiple placeholder="请选择唯一键组合"
-                                                           style="width: 100%;margin-top: 6px;">
-                                                    <el-option v-for="item in mainWhereColumns" :key="item.name"
+                                                <el-form-item label="唯一键组合:" :prop="'unqiues.' + index + '.columns'"
+                                                              :rules="mainAdd.rules.uniqueColumns" :label-width="formLabelWidth">
+                                                    <el-select size="small" v-model="item.columns" multiple placeholder="请选择唯一键组合"
+                                                               style="width: 100%;">
+                                                        <el-option v-for="item in mainWhereColumns" :key="item.name"
                                                                :label="'列名:' + item.name + '   类型:' + item.type"
-                                                               :value="item.name">
-                                                    </el-option>
-                                                </el-select>
+                                                               :value="item.name"></el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="24" style="text-align: right;margin-top: 6px;">
+                                                <el-button type="danger" plain size="mini" @click="remove(item, index, mainAdd.form.unqiues)">移除</el-button>
                                             </el-col>
                                         </el-row>
                                     </el-card>
@@ -761,20 +769,6 @@
         </div>
     </el-dialog>
 
-    <el-dialog title="添加唯一键组合" :visible.sync="mainAdd.uniqueVisible" class="group-dialog" :before-close="closeAddUnique">
-        <el-input v-model.trim="mainAdd.uniqueToast" placeholder="唯一键冲突前端提示文案" autocomplete="off" size="small" maxlength="300"></el-input>
-        <el-select v-model="mainAdd.uniqueColumns" multiple placeholder="请选择唯一键组合" style="width: 100%;margin-top: 6px;">
-            <el-option
-                    v-for="item in mainWhereColumns"
-                    :key="item.name"
-                    :label="'列名:' + item.name + '   类型:' + item.type"
-                    :value="item.name">
-            </el-option>
-        </el-select>
-        <div style="margin-top: 8px;text-align: right;">
-            <el-button type="primary" plain size="mini" @click="addUniqueFun">确认</el-button>
-        </div>
-    </el-dialog>
 </div>
 
 <script>
@@ -895,9 +889,6 @@
                 mainAdd: {
                     visible: false,
                     item: null,
-                    uniqueVisible: false,
-                    uniqueToast: '',
-                    uniqueColumns: [],
                     form: {
                         elements: [],
                         unqiues: []
@@ -905,12 +896,9 @@
                     rules: {
                         typeIndex: [{required: true, message: '请选择表单类型', trigger: 'change'}],
                         key: [{required: true, message: '请填写数据库字段名', trigger: 'change'}],
-                        elements: [{
-                            required: false,
-                            message: '表单项不能为空',
-                            validator: validateColumns,
-                            trigger: 'change'
-                        }],
+                        elements: [{required: false, message: '表单项不能为空', validator: validateColumns, trigger: 'change'}],
+                        uniqueToast: [{required: true, message: '请填写', trigger: 'change'}],
+                        uniqueColumns: [{required: true, message: '请选择', validator: validateColumns, trigger: 'change'}]
                     }
                 },
                 mainWhere: {
@@ -1013,25 +1001,10 @@
                 }
             },
             addUniqueFun() {
-                if (this.mainAdd.uniqueToast && this.mainAdd.uniqueColumns.length > 0) {
-                    this.mainAdd.form.unqiues.push({
-                        toast: JSON.parse(JSON.stringify(this.mainAdd.uniqueToast)),
-                        columns: JSON.parse(JSON.stringify(this.mainAdd.uniqueColumns)),
-                    })
-                } else {
-                    this.$message.error('请填写完整');
-                    return
-                }
-                this.closeAddUnique()
-                console.log(this.mainAdd.form.unqiues)
-            },
-            closeAddUnique() {
-                this.mainAdd.uniqueVisible = false;
-                this.mainAdd.uniqueToast = ''
-                this.mainAdd.uniqueColumns = []
-            },
-            showAddUniques() {
-                this.mainAdd.uniqueVisible = true;
+                this.mainAdd.form.unqiues.push({
+                    toast: '',
+                    columns: [],
+                })
             },
             whereJudgeTypeChange(index) {
                 if (typeof this.mainWhere.form.wheres[index].typeIndex == 'number') {
