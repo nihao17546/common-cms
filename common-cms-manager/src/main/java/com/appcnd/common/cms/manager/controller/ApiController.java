@@ -1,5 +1,6 @@
 package com.appcnd.common.cms.manager.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.appcnd.common.cms.entity.bottom.ExternalLinksBottom;
 import com.appcnd.common.cms.entity.constant.*;
 import com.appcnd.common.cms.entity.db.*;
@@ -13,6 +14,7 @@ import com.appcnd.common.cms.manager.pojo.vo.TableVo;
 import com.appcnd.common.cms.manager.service.IDbService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +34,11 @@ public class ApiController {
     @Autowired
     private IDbService dbService;
 
+    @RequestMapping(value = "/savePreview", produces = "application/json;charset=UTF-8")
+    public String savePreview(@RequestParam String uuid, @RequestBody JSONObject data) {
+        return HttpResult.success().json();
+    }
+
     @RequestMapping(value = "/getTable", produces = "application/json;charset=UTF-8")
     public String getTable(@RequestParam String schema, @RequestParam String table) {
         TableVo tableVo = dbService.getTableByShow(schema, table);
@@ -40,7 +47,6 @@ public class ApiController {
         }
         return HttpResult.success().pull("table", tableVo).json();
     }
-
 
     @RequestMapping(value = "/addElementTypes", produces = "application/json;charset=UTF-8")
     public String addElementTypes() {

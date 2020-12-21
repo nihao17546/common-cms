@@ -28,6 +28,7 @@
                 </el-col>
                 <el-col :span="4" style="text-align: center">
                     <el-button type="primary" plain size="mini" @click="getMainTable">校验</el-button>
+                    <el-button type="primary" plain size="mini" @click="preview" :disabled="!basic.checked">预览</el-button>
                 </el-col>
             </el-row>
             <el-row :gutter="24" v-if="basic.checked">
@@ -773,6 +774,7 @@
 
 <script>
     window.contextPath = '${contextPath}'
+    window.uuid = '${uuid}'
     new Vue({
         name: 'config',
         el: '#app',
@@ -915,6 +917,9 @@
             }
         },
         methods: {
+            preview() {
+                window.open(window.contextPath + "/pages/preview.html")
+            },
             submit() {
                 this.loading = true;
                 this.activeNames = ["1", "2", "3", "4"]
@@ -1257,7 +1262,20 @@
 
             this.basic.form.schema = 'test_cms'
             this.basic.form.table = 'tb_main'
-            // this.getMainTable()
+
+            window.setInterval(() => {
+                let config = {
+                    title: this.basic.form.title,
+                    add_btn: this.basic.form.addBtn,
+                    edit_btn: this.basic.form.editBtn,
+                    delete_btn: this.basic.form.deleteBtn,
+                    table: {
+                        columns: this.mainTable.form.columns ? this.mainTable.form.columns : []
+                    }
+                }
+                let configStr = JSON.stringify(config)
+                localStorage.setItem('config', [configStr])
+            }, 100)
         }
     })
 </script>
