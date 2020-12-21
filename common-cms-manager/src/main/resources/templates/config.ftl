@@ -359,6 +359,12 @@
                                                     <span v-for="(item,index) in where.wheres">
                                                         <el-card shadow="hover" style="margin-top: 8px;">
                                                             <el-row style="border: 0px solid gray;" :gutter="24">
+                                                                <el-col :span="8" style="margin-bottom: 8px;">
+                                                                    <el-form-item label="表:" :label-width="formLabelWidth">
+                                                                        <el-input v-model.trim="item.elementTable" placeholder="" readOnly="true"
+                                                                                  autocomplete="off" size="small"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
                                                                 <el-col :span="8">
                                                                     <el-form-item label="sql查询字段:" :label-width="formLabelWidth"
                                                                                   :prop="'wheres.' + index + '.key'"
@@ -777,6 +783,14 @@
             submit() {
                 this.loading = true;
 
+                let data = JSON.parse(JSON.stringify(this.form))
+
+                if (data.table && data.table.columns && data.table.columns.length > 0) {
+                    for (let i = 0; i < data.table.columns.length; i ++) {
+                        delete data.table.columns[i].options
+                    }
+                }
+
                 if (this.search && this.search.elements && this.search.elements.length > 0) {
                     for (let i = 0; i < this.search.elements.length; i ++) {
                         let searchElement = this.search.elements[i]
@@ -786,20 +800,20 @@
                         let alias = searchElement.alias
                         let obj = JSON.parse(JSON.stringify(searchElement))
                         delete obj.elementTable
-                        if (this.form.table.select.alias == alias) {
-                            if (!this.form.table.select.searchElements) {
-                                this.form.table.select.searchElements = []
+                        if (data.table.select.alias == alias) {
+                            if (!data.table.select.searchElements) {
+                                data.table.select.searchElements = []
                             }
-                            this.form.table.select.searchElements.push(obj)
+                            data.table.select.searchElements.push(obj)
                             break
-                        } else if (this.form.table.select.leftJoins && this.form.table.select.leftJoins.length > 0) {
-                            for (let q = 0; q < this.form.table.select.leftJoins.length; q ++) {
-                                let leftJoin = this.form.table.select.leftJoins[q]
+                        } else if (data.table.select.leftJoins && data.table.select.leftJoins.length > 0) {
+                            for (let q = 0; q < data.table.select.leftJoins.length; q ++) {
+                                let leftJoin = data.table.select.leftJoins[q]
                                 if (leftJoin.alias == alias) {
-                                    if (!this.form.table.select.leftJoins[q].searchElements) {
-                                        this.form.table.select.leftJoins[q].searchElements = []
+                                    if (!data.table.select.leftJoins[q].searchElements) {
+                                        data.table.select.leftJoins[q].searchElements = []
                                     }
-                                    this.form.table.select.leftJoins[q].searchElements.push(obj)
+                                    data.table.select.leftJoins[q].searchElements.push(obj)
                                     break
                                 }
                             }
@@ -807,11 +821,34 @@
                     }
                 }
 
-                let data = JSON.parse(JSON.stringify(this.form))
-
-                if (data.table && data.table.columns && data.table.columns.length > 0) {
-                    for (let i = 0; i < data.table.columns.length; i ++) {
-                        delete data.table.columns[i].options
+                if (this.where && this.where.wheres && this.where.wheres.length > 0) {
+                    for (let i = 0; i < this.where.wheres.length; i ++) {
+                        let where = this.where.wheres[i]
+                        let aa = where.elementTable.split('.');
+                        let schema = aa[0]
+                        let table = aa[1]
+                        let alias = where.alias
+                        let obj = JSON.parse(JSON.stringify(where))
+                        delete obj.elementTable
+                        delete obj.alias
+                        if (data.table.select.alias == alias) {
+                            if (!data.table.select.wheres) {
+                                data.table.select.wheres = []
+                            }
+                            data.table.select.wheres.push(obj)
+                            break
+                        } else if (data.table.select.leftJoins && data.table.select.leftJoins.length > 0) {
+                            for (let q = 0; q < data.table.select.leftJoins.length; q ++) {
+                                let leftJoin = data.table.select.leftJoins[q]
+                                if (leftJoin.alias == alias) {
+                                    if (!data.table.select.leftJoins[q].wheres) {
+                                        data.table.select.leftJoins[q].wheres = []
+                                    }
+                                    data.table.select.leftJoins[q].wheres.push(obj)
+                                    break
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -948,6 +985,7 @@
                                     if (this.mainSearchColumns[i].options[j].key === key) {
                                         this.where.wheres.push({
                                             elementTable: table,
+                                            alias: this.mainSearchColumns[i].options[j].alias,
                                             key: this.mainSearchColumns[i].options[j].key,
                                             type: '',
                                             className: ''
