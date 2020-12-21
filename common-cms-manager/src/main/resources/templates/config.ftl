@@ -260,7 +260,7 @@
                                         <el-card style="margin-top: 10px;" shadow="hover">
                                             <el-row :gutter="24">
                                                 <el-col :span="24" style="margin-bottom: 8px;">
-                                                    <el-button type="primary" plain size="mini" @click="showAddSearchDialog">添加搜索</el-button>
+                                                    <el-button type="primary" plain size="mini" @click="showAddSearchDialog">添加</el-button>
                                                 </el-col>
                                                 <el-form :model="search" ref="mainSearchForm" size="small">
                                                     <el-col :span="24" style="margin-bottom: 8px;"
@@ -340,13 +340,96 @@
                                                                                    @click="down(item, index, search.elements)">下移</el-button>
                                                                     </el-button-group>
                                                                     <el-button type="danger" plain size="mini"
-                                                                               @click="removeSearch(item, index, search.elements)">移除</el-button>
+                                                                               @click="justRemove(item, index, search.elements)">移除</el-button>
                                                                 </el-col>
                                                             </el-row>
                                                         </el-card>
                                                     </el-col>
                                                 </el-form>
                                             </el-row>
+                                        </el-card>
+                                    </el-collapse-item>
+                                    <el-collapse-item title="默认查询条件" name="3">
+                                        <el-card style="margin-top: 10px;" shadow="hover">
+                                            <el-form :model="where" :rules="rules" ref="whereForm" size="small">
+                                                <el-row :gutter="24">
+                                                    <el-col :span="24" style="margin-bottom: 8px;">
+                                                        <el-button type="primary" plain size="mini" @click="showAddWhereDialog">添加</el-button>
+                                                    </el-col>
+                                                    <span v-for="(item,index) in where.wheres">
+                                                        <el-card shadow="hover" style="margin-top: 8px;">
+                                                            <el-row style="border: 0px solid gray;" :gutter="24">
+                                                                <el-col :span="8">
+                                                                    <el-form-item label="sql查询字段:" :label-width="formLabelWidth"
+                                                                                  :prop="'wheres.' + index + '.key'"
+                                                                                  :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                        <el-input v-model.trim="item.key" placeholder="" readOnly="true"
+                                                                                  autocomplete="off" size="small"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="8">
+                                                                    <el-form-item label="类型:" :label-width="formLabelWidth"
+                                                                                  :prop="'wheres.' + index + '.className'"
+                                                                                  :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                        <el-select style="width: 100%" clearable
+                                                                                   v-model.trim="item.className"
+                                                                                   @change="searchWhereTypeChange(index)">
+                                                                            <el-option v-for="(searchWhereType,aIndex) in searchWhereTypes"
+                                                                                       :key="aIndex"
+                                                                                       :label="searchWhereType.label"
+                                                                                       :value="searchWhereType.value">
+                                                                            </el-option>
+                                                                        </el-select>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="8"
+                                                                        v-if="item.type && (item.type == 'eq' || item.type == 'gt' || item.type == 'gteq' || item.type == 'lt' || item.type == 'lteq' || item.type == 'like')">
+                                                                    <el-form-item label="值:" :label-width="formLabelWidth"
+                                                                                  :prop="'wheres.' + index + '.value'"
+                                                                                  :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                        <el-input v-model.trim="item.value" placeholder="" maxlength="50"
+                                                                                  autocomplete="off" size="small"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="8" v-if="item.type && item.type == 'bt'">
+                                                                    <el-form-item label="最小值:" :label-width="formLabelWidth"
+                                                                                  :prop="'wheres.' + index + '.begin'"
+                                                                                  :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                        <el-input v-model.trim="item.begin" placeholder="" maxlength="50"
+                                                                                  autocomplete="off" size="small"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="8" v-if="item.type && item.type == 'bt'">
+                                                                    <el-form-item label="最大值:" :label-width="formLabelWidth"
+                                                                                  :prop="'wheres.' + index + '.end'"
+                                                                                  :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                        <el-input v-model.trim="item.end" placeholder="" maxlength="50"
+                                                                                  autocomplete="off" size="small"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="8" v-if="item.type && item.type == 'in'">
+                                                                    <el-form-item label="集合值:" :label-width="formLabelWidth">
+                                                                        <el-input v-model.trim="item.values" placeholder="" maxlength="50"
+                                                                                  autocomplete="off" size="small" readOnly="true"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="24" style="text-align: right;">
+                                                                    <el-button-group>
+                                                                        <el-button type="primary" size="mini" icon="el-icon-arrow-up"
+                                                                                   v-if="index != 0"
+                                                                                   @click="up(item, index, where.wheres)">上移</el-button>
+                                                                        <el-button type="primary" size="mini" icon="el-icon-arrow-down"
+                                                                                   v-if="index != where.wheres.length - 1"
+                                                                                   @click="down(item, index, where.wheres)">下移</el-button>
+                                                                    </el-button-group>
+                                                                    <el-button type="danger" plain size="mini"
+                                                                               @click="justRemove(item, index, where.wheres)">移除</el-button>
+                                                                </el-col>
+                                                            </el-row>
+                                                        </el-card>
+                                                    </span>
+                                                </el-row>
+                                            </el-form>
                                         </el-card>
                                     </el-collapse-item>
                                 </el-collapse>
@@ -498,10 +581,51 @@
         </el-form>
     </el-dialog>
 
+    <el-dialog title="默认查询选择字段" :visible.sync="where.dialog.visible" class="group-dialog"
+               :before-close="closeAddWhereDialog">
+        <el-select v-model="where.dialog.item" placeholder="请选择" size="small"
+                   style="width: 100%" @change="addWhereDom">
+            <el-option-group
+                    v-for="(group,index) in mainSearchColumns"
+                    :key="group.label"
+                    :label="group.label">
+                <el-option
+                        v-for="(item,index) in group.options"
+                        :key="item+index"
+                        :label="'列名:' + item.key + ' 类型:' + item.dataType"
+                        :value="group.label + ',' + item.key">
+                </el-option>
+            </el-option-group>
+        </el-select>
+        <div style="margin-top: 8px;text-align: right;">
+            <el-button type="primary" plain size="mini" @click="addWhereDom">确认</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="默认查询区间配置" :visible.sync="where.dialog.whereIn && where.dialog.whereIn.visible" class="group-dialog"
+               :show-close="false">
+        <el-form :model="where.dialog.whereIn" ref="whereInForm" size="small">
+            <el-row :gutter="24">
+                <el-col :span="24">
+                    <el-form-item label="区间值:" :label-width="formLabelWidth"
+                                  prop="item"
+                                  :rules="[{required: true, message: '请输入', trigger: 'change'}]">
+                        <el-input v-model.trim="where.dialog.whereIn.item" placeholder="多个值之间使用英文逗号分隔"
+                                  maxlength="1000" autocomplete="off" size="small"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="24" style="text-align: right;">
+                    <el-button type="info" plain size="mini" @click="cancelWhereIn">取消</el-button>
+                    <el-button type="primary" plain size="mini" @click="confirmWhereIn('whereInForm')">确认</el-button>
+                </el-col>
+            </el-row>
+        </el-form>
+    </el-dialog>
 </div>
 <script>
     window.contextPath = '${contextPath}'
     window.searchElementPackage = '${searchElementPackage}'
+    window.wherePackage = '${wherePackage}'
 </script>
 <script>
     window.vue = new Vue({
@@ -559,6 +683,31 @@
                     label: '日期时间选择器（yyyy-MM-dd HH:mm:ss）',
                     value: window.searchElementPackage + 'SearchDatetimePickerBt'
                 }],
+                searchWhereTypes: [{
+                    label: '完全匹配',
+                    value: window.wherePackage + 'WhereEq'
+                },{
+                    label: '区间',
+                    value: window.wherePackage + 'WhereBt'
+                },{
+                    label: '大于',
+                    value: window.wherePackage + 'WhereGt'
+                },{
+                    label: '大于等于',
+                    value: window.wherePackage + 'WhereGteq'
+                },{
+                    label: '小于',
+                    value: window.wherePackage + 'WhereLt'
+                },{
+                    label: '大于等于',
+                    value: window.wherePackage + 'WhereLteq'
+                },{
+                    label: '模糊匹配',
+                    value: window.wherePackage + 'WhereLike'
+                },{
+                    label: '集合',
+                    value: window.wherePackage + 'WhereIn'
+                }],
                 mainDb: {},
                 oneToOnes: [],
                 oneToMores: [],
@@ -591,6 +740,17 @@
                 },
                 search: {
                     elements: []
+                },
+                where: {
+                    dialog: {
+                        visible: false,
+                        item: '',
+                        whereIn: {
+                            visible: false,
+                            item: ''
+                        }
+                    },
+                    wheres: []
                 },
                 rules: {
                     title: [{required: true, message: '请输入', trigger: 'change'}],
@@ -657,11 +817,12 @@
 
                 console.log(JSON.stringify(data))
                 // console.log(JSON.stringify(this.search))
-                this.activeNames = ["1","2"]
+                this.activeNames = ["1","2","3"]
 
                 let basicFormValid = null,
                         mainTableFormValid = null,
-                        mainSearchFormValid = null;
+                        mainSearchFormValid = null,
+                        whereFormValid = null;
 
                 this.$refs['basicForm'].validate((valid) => {
                     if (valid) {
@@ -687,14 +848,24 @@
                     }
                 });
 
+                this.$refs['whereForm'].validate((valid) => {
+                    if (valid) {
+                        whereFormValid = true
+                    } else {
+                        whereFormValid = false
+                    }
+                });
+
                 let aaa = window.setInterval(() => {
                     if (basicFormValid != null
                             && mainTableFormValid != null
-                            && mainSearchFormValid != null) {
+                            && mainSearchFormValid != null
+                            && whereFormValid != null) {
                         window.clearInterval(aaa)
                         if (basicFormValid
                                 && mainTableFormValid
-                                && mainSearchFormValid) {
+                                && mainSearchFormValid
+                                && whereFormValid) {
                             alert(1)
                         } else {
                             alert(0)
@@ -702,6 +873,113 @@
                         this.loading = false;
                     }
                 }, 100)
+            },
+            cancelWhereIn() {
+                delete this.where.wheres[this.where.dialog.index].values
+                delete this.where.wheres[this.where.dialog.index].className
+                delete this.where.wheres[this.where.dialog.index].type
+                this.where.dialog.whereIn = {
+                    visible: false,
+                    item: ''
+                }
+            },
+            confirmWhereIn(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.where.wheres[this.where.dialog.index].values = this.where.dialog.whereIn.item.split(',')
+                        this.where.dialog.whereIn = {
+                            visible: false,
+                            item: ''
+                        }
+                    }
+                })
+            },
+            searchWhereTypeChange(index) {
+                delete this.where.wheres[index].begin
+                delete this.where.wheres[index].end
+                delete this.where.wheres[index].value
+                delete this.where.wheres[index].values
+                if (this.where.wheres[index].className) {
+                    if (this.where.wheres[index].className.indexOf('.WhereEq') > -1) {
+                        this.where.wheres[index].type = 'eq'
+                        this.where.wheres[index].value = ''
+                    } else if (this.where.wheres[index].className.indexOf('.WhereGteq') > -1) {
+                        this.where.wheres[index].type = 'gteq'
+                        this.where.wheres[index].value = ''
+                    } else if (this.where.wheres[index].className.indexOf('.WhereGt') > -1) {
+                        this.where.wheres[index].type = 'gt'
+                        this.where.wheres[index].value = ''
+                    } else if (this.where.wheres[index].className.indexOf('.WhereLteq') > -1) {
+                        this.where.wheres[index].type = 'lteq'
+                        this.where.wheres[index].value = ''
+                    } else if (this.where.wheres[index].className.indexOf('.WhereLt') > -1) {
+                        this.where.wheres[index].type = 'lt'
+                        this.where.wheres[index].value = ''
+                    } else if (this.where.wheres[index].className.indexOf('.WhereBt') > -1) {
+                        this.where.wheres[index].type = 'bt'
+                        this.where.wheres[index].begin = ''
+                        this.where.wheres[index].end = ''
+                    } else if (this.where.wheres[index].className.indexOf('.WhereLike') > -1) {
+                        this.where.wheres[index].type = 'like'
+                        this.where.wheres[index].value = ''
+                    } else if (this.where.wheres[index].className.indexOf('.WhereIn') > -1) {
+                        this.where.wheres[index].type = 'in'
+                        this.where.wheres[index].values = []
+                        this.where.dialog.whereIn = {
+                            visible: true,
+                            item: ''
+                        }
+                    }
+                    this.where.dialog.index = index
+                } else {
+                    delete this.where.wheres[index].type
+                    delete this.where.wheres[index].className
+                    delete this.where.dialog.index
+                }
+            },
+            addWhereDom() {
+                if (this.where.dialog.item != null && typeof this.where.dialog.item != 'undefined') {
+                    let aa = this.where.dialog.item.split(',');
+                    let table = aa[0], key = aa[1];
+                    for (let i = 0; i < this.mainSearchColumns.length; i++) {
+                        if (this.mainSearchColumns[i].label == table) {
+                            if (this.mainSearchColumns[i].options && this.mainSearchColumns[i].options.length > 0) {
+                                for (let j = 0; j < this.mainSearchColumns[i].options.length; j ++) {
+                                    if (this.mainSearchColumns[i].options[j].key === key) {
+                                        this.where.wheres.push({
+                                            elementTable: table,
+                                            key: this.mainSearchColumns[i].options[j].key,
+                                            type: '',
+                                            className: ''
+                                        })
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                this.closeAddWhereDialog()
+            },
+            closeAddWhereDialog() {
+                this.where.dialog = {
+                    visible: false,
+                    item: '',
+                    whereIn: {
+                        visible: false,
+                        item: ''
+                    }
+                }
+            },
+            showAddWhereDialog() {
+                this.where.dialog = {
+                    visible: true,
+                    item: '',
+                    whereIn: {
+                        visible: false,
+                        item: ''
+                    }
+                }
             },
             confirmRemoteSelect(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -916,7 +1194,7 @@
             down(item, index, elements) {
                 elements[index] = elements.splice(index + 1, 1, elements[index])[0];
             },
-            removeSearch(item, index, elements) {
+            justRemove(item, index, elements) {
                 elements.splice(index, 1)
             },
             remove(item, index, table) {
