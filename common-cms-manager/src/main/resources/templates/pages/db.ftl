@@ -12,6 +12,9 @@
             margin-top: 3px;
             margin-bottom: 3px;
         }
+        #app {
+            min-height: 400px;
+        }
     </style>
 </head>
 <body style="margin: 0px;">
@@ -32,6 +35,7 @@
                     <el-button type="primary" @click="getTable(dbMain, form, 'form')" size="mini" :disabled="form.checked">点击获取表结构</el-button>
                     <el-button type="success" @click="submit" size="mini" v-if="form.checked" :disabled="confirmed">确认</el-button>
                     <el-button type="warning" @click="reset" size="mini" v-if="form.checked">重置</el-button>
+                    <el-button type="info" @click="showDialog" size="mini">查看</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -55,9 +59,9 @@
                         <el-input v-model.trim="item.table" placeholder="请填写数据库表" :disabled="item.checked"></el-input>
                     </el-form-item>
                     <el-form-item label="关联主表字段:"
-                                  :prop="index + '.relateKey'"
-                                  :rules="rules.relateKey">
-                        <el-select v-model.trim="item.relateKey" placeholder="请选择关联主表字段" size="small" style="width: 100%" :disabled="item.checked">
+                                  :prop="index + '.parentKey'"
+                                  :rules="rules.parentKey">
+                        <el-select v-model.trim="item.parentKey" placeholder="请选择关联主表字段" size="small" style="width: 100%" :disabled="item.checked">
                             <el-option
                                     v-for="column in dbMain.columns"
                                     :key="column.name"
@@ -67,9 +71,9 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="当前表外键字段:"
-                                  :prop="index + '.parentKey'"
-                                  :rules="rules.parentKey">
-                        <el-input v-model.trim="item.parentKey" placeholder="请填写当前表外键字段" :disabled="item.checked"></el-input>
+                                  :prop="index + '.relateKey'"
+                                  :rules="rules.relateKey">
+                        <el-input v-model.trim="item.relateKey" placeholder="请填写当前表外键字段" :disabled="item.checked"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-button-group>
@@ -100,9 +104,9 @@
                         <el-input v-model.trim="item.table" placeholder="请填写数据库表" :disabled="item.checked"></el-input>
                     </el-form-item>
                     <el-form-item label="关联主表字段:"
-                                  :prop="index + '.relateKey'"
-                                  :rules="rules.relateKey">
-                        <el-select v-model.trim="item.relateKey" placeholder="请选择关联主表字段" size="small" style="width: 100%" :disabled="item.checked">
+                                  :prop="index + '.parentKey'"
+                                  :rules="rules.parentKey">
+                        <el-select v-model.trim="item.parentKey" placeholder="请选择关联主表字段" size="small" style="width: 100%" :disabled="item.checked">
                             <el-option
                                     v-for="column in dbMain.columns"
                                     :key="column.name"
@@ -112,9 +116,9 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="当前表外键字段:"
-                                  :prop="index + '.parentKey'"
-                                  :rules="rules.parentKey">
-                        <el-input v-model.trim="item.parentKey" placeholder="请填写当前表外键字段" :disabled="item.checked"></el-input>
+                                  :prop="index + '.relateKey'"
+                                  :rules="rules.relateKey">
+                        <el-input v-model.trim="item.relateKey" placeholder="请填写当前表外键字段" :disabled="item.checked"></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-button-group>
@@ -126,6 +130,71 @@
             </el-card>
         </div>
     </el-card>
+
+    <el-dialog title="数据库" :visible.sync="dialogVisible" width="80%">
+        <el-row :gutter="24">
+            <el-col :span="8" v-if="dbMain.schema && dbMain.table">
+                <el-card class="box-card">
+                    <div slot="header">
+                        <span>主表 - {{dbMain.schema}}.{{dbMain.table}}</span>
+                        <el-table
+                                :data="dbMain.columns"
+                                border
+                                style="width: 100%">
+                            <el-table-column
+                                    prop="name"
+                                    label="字段">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="type"
+                                    label="类型">
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :span="8" v-for="(item, index) in dbOneToOneFollows" v-if="item.schema && item.table && item.columns && item.columns.length > 0">
+                <el-card class="box-card">
+                    <div slot="header">
+                        <span>一对一从表 - {{item.schema}}.{{item.table}}</span>
+                        <el-table
+                                :data="item.columns"
+                                border
+                                style="width: 100%">
+                            <el-table-column
+                                    prop="name"
+                                    label="字段">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="type"
+                                    label="类型">
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </el-card>
+            </el-col>
+            <el-col :span="8" v-for="(item, index) in dbOneToMoreFollows" v-if="item.schema && item.table && item.columns && item.columns.length > 0">
+                <el-card class="box-card">
+                    <div slot="header">
+                        <span>一对多从表 - {{item.schema}}.{{item.table}}</span>
+                        <el-table
+                                :data="item.columns"
+                                border
+                                style="width: 100%">
+                            <el-table-column
+                                    prop="name"
+                                    label="字段">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="type"
+                                    label="类型">
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </el-card>
+            </el-col>
+        </el-row>
+    </el-dialog>
 </div>
 <script>
     window.contextPath = '${contextPath}'
@@ -159,7 +228,8 @@
                 oneToOneFollowForms: [],
                 dbOneToOneFollows: [],
                 oneToMoreFollowForms: [],
-                dbOneToMoreFollows: []
+                dbOneToMoreFollows: [],
+                dialogVisible: false
             }
         },
         watch: {
@@ -174,6 +244,9 @@
                 this.trans()
                 parent.window.vue.showDisabled = false
                 this.confirmed = true
+            },
+            showDialog() {
+                this.dialogVisible = true
             },
             trans() {
                 let oneToOne = []

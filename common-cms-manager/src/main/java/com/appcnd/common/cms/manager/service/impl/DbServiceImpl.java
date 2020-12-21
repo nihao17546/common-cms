@@ -25,9 +25,8 @@ public class DbServiceImpl implements IDbService {
     @Autowired
     private DbDao dbDao;
 
-    private Pattern patternColumn = Pattern.compile("`[A-Za-z]+` [A-Za-z]+");
-    private Pattern patternPri = Pattern.compile("PRIMARY KEY \\(`[A-Za-z]+`\\)");
-    private Pattern patternPriExtra = Pattern.compile("`id`.*,");
+    private Pattern patternColumn = Pattern.compile("`.+` [A-Za-z]+");
+    private Pattern patternPri = Pattern.compile("PRIMARY KEY \\(`.+`\\)");
 
     @Override
     public TableVo getTable(String schema, String table) {
@@ -74,6 +73,7 @@ public class DbServiceImpl implements IDbService {
             String a = sql.substring(matcherColumn.start(), matcherColumn.end());
             String name = a.substring(1, a.indexOf("` "));
             if (name.equalsIgnoreCase(tableVo.getPrimaryKey())) {
+                Pattern patternPriExtra = Pattern.compile("`" + tableVo.getPrimaryKey() + "`.*,");
                 Matcher matcherPriExtra = patternPriExtra.matcher(sql);
                 if (matcherPriExtra.find()) {
                     String aa = sql.substring(matcherPriExtra.start(), matcherPriExtra.end() - 1);

@@ -17,7 +17,7 @@
 <body style="margin: 0px;">
 <div id="app" v-loading="loading">
     <el-row :gutter="24">
-        <el-col :span="8">
+        <el-col :span="8" v-if="mainDb.schema && mainDb.table">
             <el-card class="box-card">
                 <div slot="header">
                     <span>主表 - {{mainDb.schema}}.{{mainDb.table}}</span>
@@ -37,7 +37,7 @@
                 </div>
             </el-card>
         </el-col>
-        <el-col :span="8" v-for="(item, index) in oneToOnes">
+        <el-col :span="8" v-for="(item, index) in oneToOnes" v-if="item.schema && item.table">
             <el-card class="box-card">
                 <div slot="header">
                     <span>一对一从表 - {{item.schema}}.{{item.table}}</span>
@@ -57,7 +57,7 @@
                 </div>
             </el-card>
         </el-col>
-        <el-col :span="8" v-for="(item, index) in oneToMores">
+        <el-col :span="8" v-for="(item, index) in oneToMores" v-if="item.schema && item.table">
             <el-card class="box-card">
                 <div slot="header">
                     <span>一对多从表 - {{item.schema}}.{{item.table}}</span>

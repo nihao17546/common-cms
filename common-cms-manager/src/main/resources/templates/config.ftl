@@ -18,9 +18,9 @@
                 <el-tab-pane label="数据库配置">
                     <iframe id="db" src="${contextPath}/pages/db.html" frameborder="0" width="100%" :height="height"></iframe>
                 </el-tab-pane>
-                <el-tab-pane label="数据库查看" :disabled="showDisabled">
-                    <iframe id="dbShow" src="${contextPath}/pages/dbShow.html" frameborder="0" width="100%" :height="height"></iframe>
-                </el-tab-pane>
+                <#--<el-tab-pane label="数据库查看" :disabled="showDisabled">-->
+                    <#--<iframe id="dbShow" src="${contextPath}/pages/dbShow.html" frameborder="0" width="100%" :height="height"></iframe>-->
+                <#--</el-tab-pane>-->
                 <el-tab-pane label="页面配置" :disabled="showDisabled">
                     <el-card class="box-card">
                         <div slot="header">
@@ -1406,9 +1406,9 @@
                 window.open(window.contextPath + "/pages/preview.html")
             },
             init(mainDb, oneToOnes, oneToMores) {
-                document.getElementById("dbShow").contentWindow.vue.mainDb = mainDb
-                document.getElementById("dbShow").contentWindow.vue.oneToOnes = oneToOnes
-                document.getElementById("dbShow").contentWindow.vue.oneToMores = oneToMores
+                // document.getElementById("dbShow").contentWindow.vue.mainDb = mainDb
+                // document.getElementById("dbShow").contentWindow.vue.oneToOnes = oneToOnes
+                // document.getElementById("dbShow").contentWindow.vue.oneToMores = oneToMores
                 window.vue.mainDb = mainDb
                 window.vue.oneToOnes = oneToOnes
                 window.vue.oneToMores = oneToMores
