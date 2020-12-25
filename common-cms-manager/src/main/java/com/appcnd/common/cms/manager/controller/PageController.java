@@ -1,6 +1,7 @@
 package com.appcnd.common.cms.manager.controller;
 
 import com.appcnd.common.cms.entity.db.Where;
+import com.appcnd.common.cms.entity.form.add.AddElement;
 import com.appcnd.common.cms.entity.form.search.SearchElement;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,8 @@ public class PageController {
                 SearchElement.class.getName().replace("SearchElement", ""));
         request.setAttribute("wherePackage",
                 Where.class.getName().replace("Where", ""));
+        request.setAttribute("addElementPackage",
+                AddElement.class.getName().replace("AddElement", ""));
         return "index";
     }
 
@@ -33,6 +36,8 @@ public class PageController {
                 SearchElement.class.getName().replace("SearchElement", ""));
         request.setAttribute("wherePackage",
                 Where.class.getName().replace("Where", ""));
+        request.setAttribute("addElementPackage",
+                AddElement.class.getName().replace("AddElement", ""));
         return "config";
     }
 
@@ -44,6 +49,8 @@ public class PageController {
                 SearchElement.class.getName().replace("SearchElement", ""));
         request.setAttribute("wherePackage",
                 Where.class.getName().replace("Where", ""));
+        request.setAttribute("addElementPackage",
+                AddElement.class.getName().replace("AddElement", ""));
         return "pages/" + page;
     }
 

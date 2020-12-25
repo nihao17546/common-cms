@@ -438,6 +438,80 @@
                                             </el-form>
                                         </el-card>
                                     </el-collapse-item>
+                                    <el-collapse-item title="新增/编辑表单配置" name="4" v-if="form.add_btn || form.edit_btn">
+                                        <el-card style="margin-top: 10px;" shadow="hover">
+                                            <el-form :model="form.add_form" :rules="rules" ref="addForm" size="small">
+                                                <el-row :gutter="24">
+                                                    <el-col :span="8">
+                                                        <el-form-item label="前端弹窗宽（%）:" prop="width" :label-width="formLabelWidth">
+                                                            <el-input-number size="small" v-model="form.add_form.width"
+                                                                             :min="50" :max="100"
+                                                                             style="width: 100%"></el-input-number>
+                                                        </el-form-item>
+                                                    </el-col>
+                                                    <el-col :span="8">
+                                                        <el-form-item label="添加字段" prop="elements" :label-width="formLabelWidth">
+                                                            <el-button type="primary" plain size="mini" @click="showAddFormColumnDialog">添加</el-button>
+                                                        </el-form-item>
+                                                    </el-col>
+                                                </el-row>
+                                                <span v-for="(item,index) in form.add_form.elements">
+                                                        <el-card shadow="hover" style="margin-top: 8px;">
+                                                            <el-row style="border: 0px solid gray;" :gutter="24">
+                                                                <el-col :span="8">
+                                                                    <el-form-item label="字段:" :label-width="formLabelWidth"
+                                                                                  :prop="'elements.' + index + '.key'"
+                                                                                  :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                        <el-input v-model.trim="item.key" placeholder="" readOnly="true"
+                                                                                  autocomplete="off" size="small"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="8">
+                                                                    <el-form-item label="类型:" :label-width="formLabelWidth"
+                                                                                  :prop="'elements.' + index + '.className'"
+                                                                                  :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                        <el-select style="width: 100%" clearable v-model="item.className"
+                                                                                   @change="addFormClassChange(index)">
+                                                                            <el-option v-for="(type,aIndex) in addFormTypes" :key="type.value"
+                                                                                       :label="type.label" :value="type.value">
+                                                                            </el-option>
+                                                                        </el-select>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="8" v-if="item.shows.indexOf('label') != -1">
+                                                                    <el-form-item label="表单文案:" :label-width="formLabelWidth"
+                                                                                  :prop="'elements.' + index + '.label'"
+                                                                                  :rules="[{required: true, message: '请输入', trigger: 'change'}]">
+                                                                        <el-input v-model.trim="item.label" placeholder="" maxlength="50"
+                                                                                  autocomplete="off" size="small"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="8" v-if="item.shows.indexOf('clearable') != -1">
+                                                                    <el-form-item label="表单可清空:" :label-width="formLabelWidth"
+                                                                                  :prop="'elements.' + index + '.clearable'"
+                                                                                  :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                        <el-select style="width: 100%" v-model="item.clearable">
+                                                                            <el-option :key="true" label="是" :value="true"></el-option>
+                                                                            <el-option :key="false" label="否" :value="false"></el-option>
+                                                                        </el-select>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="8" v-if="item.shows.indexOf('canEdit') != -1">
+                                                                    <el-form-item label="是否可编辑:" :label-width="formLabelWidth"
+                                                                                  :prop="'elements.' + index + '.canEdit'"
+                                                                                  :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                        <el-select style="width: 100%" v-model="item.canEdit">
+                                                                            <el-option :key="true" label="是" :value="true"></el-option>
+                                                                            <el-option :key="false" label="否" :value="false"></el-option>
+                                                                        </el-select>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                            </el-row>
+                                                        </el-card>
+                                                    </span>
+                                            </el-form>
+                                        </el-card>
+                                    </el-collapse-item>
                                 </el-collapse>
                                 <el-row :gutter="24">
                                     <el-col :span="24" style="margin-top: 10px;text-align: right;">
@@ -627,11 +701,32 @@
             </el-row>
         </el-form>
     </el-dialog>
+
+    <el-dialog title="添加字段" :visible.sync="formColumnDialog.visible" class="group-dialog" :before-close="closeFormColumnDialog">
+        <el-select v-model="formColumnDialog.item" placeholder="请选择" size="small"
+                   style="width: 100%" @change="addFormColumn">
+            <el-option-group
+                    v-for="(group,index) in mainFormColumns"
+                    :key="group.label"
+                    :label="group.label">
+                <el-option
+                        v-for="(item,index) in group.options"
+                        :key="item+index"
+                        :label="'列名:' + item.key + ' 类型:' + item.dataType"
+                        :value="group.label + ',' + item.key">
+                </el-option>
+            </el-option-group>
+        </el-select>
+        <div style="margin-top: 8px;text-align: right;">
+            <el-button type="primary" plain size="mini" @click="addTableColumn">确认</el-button>
+        </div>
+    </el-dialog>
 </div>
 <script>
     window.contextPath = '${contextPath}'
     window.searchElementPackage = '${searchElementPackage}'
     window.wherePackage = '${wherePackage}'
+    window.addElementPackage  = '${addElementPackage}'
 </script>
 <script>
     window.vue = new Vue({
@@ -719,6 +814,7 @@
                 oneToMores: [],
                 mainTableColumns: [],
                 mainSearchColumns: [],
+                mainFormColumns: [],
                 showDisabled: true,
                 form: {
                     table: {
@@ -730,6 +826,10 @@
                             searchElements: []
                         },
                         pagination: false
+                    },
+                    add_form: {
+                        elements: [],
+                        unique_columns: []
                     }
                 },
                 searchDialog: {
@@ -776,7 +876,47 @@
                 formatterText: {
                     visible: false,
                     map: []
-                }
+                },
+                formColumnDialog: {
+                    visible: false
+                },
+                addFormTypes: [{
+                    label: '普通文本',
+                    value: window.addElementPackage + 'AddInput'
+                },{
+                    label: '下拉选择框',
+                    value: window.addElementPackage + 'AddSelect'
+                },{
+                    label: '远程下拉选择框',
+                    value: window.addElementPackage + 'AddSelectRemote'
+                },{
+                    label: '单选框',
+                    value: window.addElementPackage + 'AddRadio'
+                },{
+                    label: '计数器',
+                    value: window.addElementPackage + 'AddInputNumber'
+                },{
+                    label: '日期选择器（yyyy-MM-dd）',
+                    value: window.addElementPackage + 'AddDatePicker'
+                },{
+                    label: '日期时间选择器（yyyy-MM-dd HH:mm:ss）',
+                    value: window.addElementPackage + 'AddDateTimePicker'
+                },{
+                    label: '时间选择器',
+                    value: window.addElementPackage + 'AddTimePicker'
+                },{
+                    label: '图片上传',
+                    value: window.addElementPackage + 'AddUploadPic'
+                },{
+                    label: '富文本',
+                    value: window.addElementPackage + 'AddRich'
+                },{
+                    label: '创建时间',
+                    value: window.addElementPackage + 'AddCreateDateTime'
+                },{
+                    label: '更新时间',
+                    value: window.addElementPackage + 'AddUpdateDateTime'
+                }]
             }
         },
         methods: {
@@ -854,7 +994,7 @@
 
                 console.log(JSON.stringify(data))
                 // console.log(JSON.stringify(this.search))
-                this.activeNames = ["1","2","3"]
+                this.activeNames = ["1","2","3","4"]
 
                 let basicFormValid = null,
                         mainTableFormValid = null,
@@ -910,6 +1050,71 @@
                         this.loading = false;
                     }
                 }, 100)
+            },
+            addFormClassChange(index) {
+                if (this.form.add_form.elements[index].className) {
+                    if (this.form.add_form.elements[index].className.indexOf('.AddInputNumber') > -1) {
+                        this.form.add_form.elements[index].elType = 'INPUT_NUMBER'
+                        this.form.add_form.elements[index].columnType = 'COM'
+                        this.form.add_form.elements[index].canEdit = true
+                        this.form.add_form.elements[index].clearable = true
+                        this.form.add_form.elements[index].label = ''
+                        this.form.add_form.elements[index].size = 'small'
+                        this.form.add_form.elements[index].min = ''
+                        this.form.add_form.elements[index].max = ''
+                        this.form.add_form.elements[index].precision = ''
+                        this.form.add_form.elements[index].step = ''
+                        this.form.add_form.elements[index].shows = ['label','canEdit','clearable','min','max','precision','step']
+                    }
+                } else {
+                    delete this.form.add_form.elements[index].className
+                    delete this.form.add_form.elements[index].elType
+                    delete this.form.add_form.elements[index].columnType
+                    delete this.form.add_form.elements[index].canEdit
+                    delete this.form.add_form.elements[index].clearable
+                    delete this.form.add_form.elements[index].label
+                    delete this.form.add_form.elements[index].size
+                    delete this.form.add_form.elements[index].min
+                    delete this.form.add_form.elements[index].max
+                    delete this.form.add_form.elements[index].precision
+                    delete this.form.add_form.elements[index].step
+                }
+                this.form.add_form.elements = JSON.parse(JSON.stringify(this.form.add_form.elements))
+            },
+            addFormColumn() {
+                if (this.formColumnDialog.item != null && typeof this.formColumnDialog.item != 'undefined') {
+                    let aa = this.formColumnDialog.item.split(',');
+                    let table = aa[0], key = aa[1];
+                    for (let i = 0; i < this.mainFormColumns.length; i++) {
+                        if (this.mainFormColumns[i].label == table) {
+                            if (this.mainFormColumns[i].options && this.mainFormColumns[i].options.length > 0) {
+                                for (let j = 0; j < this.mainFormColumns[i].options.length; j ++) {
+                                    if (this.mainFormColumns[i].options[j].key === key) {
+                                        this.form.add_form.elements.push({
+                                            key: this.mainFormColumns[i].options[j].key,
+                                            option: JSON.stringify(this.mainFormColumns[i].options[j]),
+                                            shows: []
+                                        })
+                                        this.mainFormColumns[i].options.splice(j, 1)
+                                        this.$refs.addForm.validateField("elements");
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                this.closeFormColumnDialog()
+            },
+            closeFormColumnDialog() {
+                this.formColumnDialog = {
+                    visible : false
+                }
+            },
+            showAddFormColumnDialog() {
+                this.formColumnDialog = {
+                    visible : true
+                }
             },
             cancelWhereIn() {
                 delete this.where.wheres[this.where.dialog.index].values
@@ -1406,14 +1611,12 @@
                 window.open(window.contextPath + "/pages/preview.html")
             },
             init(mainDb, oneToOnes, oneToMores) {
-                // document.getElementById("dbShow").contentWindow.vue.mainDb = mainDb
-                // document.getElementById("dbShow").contentWindow.vue.oneToOnes = oneToOnes
-                // document.getElementById("dbShow").contentWindow.vue.oneToMores = oneToMores
                 window.vue.mainDb = mainDb
                 window.vue.oneToOnes = oneToOnes
                 window.vue.oneToMores = oneToMores
                 window.vue.mainTableColumns = []
                 window.vue.mainSearchColumns = []
+                window.vue.mainFormColumns = []
                 window.vue.form = {
                     table: {
                         columns: [],
@@ -1424,6 +1627,10 @@
                             searchElements: []
                         },
                         pagination: false
+                    },
+                    add_form: {
+                        elements: [],
+                        unique_columns: []
                     }
                 }
                 window.vue.search = {
@@ -1434,7 +1641,14 @@
                     window.vue.form.table.select.table = window.vue.mainDb.table
                     window.vue.form.table.select.alias = 'a'
                     window.vue.form.table.select.primaryKey = window.vue.mainDb.primaryKey
+                    window.vue.form.add_form.schema = window.vue.mainDb.schema
+                    window.vue.form.add_form.table = window.vue.mainDb.table
+                    window.vue.form.add_form.primaryKey = window.vue.mainDb.primaryKey
                     let column = {
+                        label: window.vue.mainDb.schema + '.' + window.vue.mainDb.table,
+                        options: []
+                    }
+                    let formColumn = {
                         label: window.vue.mainDb.schema + '.' + window.vue.mainDb.table,
                         options: []
                     }
@@ -1445,8 +1659,17 @@
                             label: window.vue.mainDb.schema + '.' +window.vue.mainDb.table,
                             alias: 'a'
                         })
+                        if (window.vue.mainDb.columns[i].name != window.vue.mainDb.primaryKey) {
+                            formColumn.options.push({
+                                key: window.vue.mainDb.columns[i].name,
+                                dataType: window.vue.mainDb.columns[i].type,
+                                label: window.vue.mainDb.schema + '.' +window.vue.mainDb.table,
+                                alias: 'a'
+                            })
+                        }
                     }
                     window.vue.mainTableColumns.push(column)
+                    window.vue.mainFormColumns.push(formColumn)
                 }
                 if (window.vue.oneToOnes && window.vue.oneToOnes.length > 0) {
                     for (let i = 0; i < window.vue.oneToOnes.length; i ++) {

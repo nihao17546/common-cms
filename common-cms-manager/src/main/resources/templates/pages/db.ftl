@@ -367,7 +367,7 @@
             }
         },
         created: function () {
-            this.form.schema = 'test_cms'
+            this.form.schema = 'test'
             this.form.table = 'tb_main'
         }
     })
