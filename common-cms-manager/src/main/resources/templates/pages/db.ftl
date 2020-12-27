@@ -42,8 +42,8 @@
     </el-card>
     <el-card class="box-card" v-if="form.checked">
         <div slot="header">
-            <span>一对一从表</span>
-            <el-button style="float: right; padding: 3px 0" type="text" @click="addOneToOneFollow">点击添加</el-button>
+            <span>[{{form.schema}}.{{form.table}}]一对一从表</span>
+            <el-button style="float: right; padding: 3px 0" type="text" @click="addOneToOneFollow" :disabled="confirmed">点击添加</el-button>
         </div>
         <div v-for="(item,index) in oneToOneFollowForms">
             <el-card class="box-card">
@@ -87,8 +87,8 @@
     </el-card>
     <el-card class="box-card" v-if="form.checked">
         <div slot="header">
-            <span>一对多从表</span>
-            <el-button style="float: right; padding: 3px 0" type="text" @click="addOneToMoreFollow">点击添加</el-button>
+            <span>[{{form.schema}}.{{form.table}}]一对多从表</span>
+            <el-button style="float: right; padding: 3px 0" type="text" @click="addOneToMoreFollow" :disabled="confirmed">点击添加</el-button>
         </div>
         <div v-for="(item,index) in oneToMoreFollowForms">
             <el-card class="box-card">
@@ -126,6 +126,53 @@
                             <el-button type="danger" @click="removeTable(dbOneToMoreFollows, oneToMoreFollowForms, index)" size="mini">移除</el-button>
                         </el-button-group>
                     </el-form-item>
+                    <el-card class="box-card" v-if="item.checked">
+                        <div slot="header">
+                            <span>[{{item.schema}}.{{item.table}}]一对一从表</span>
+                            <el-button style="float: right; padding: 3px 0" type="text" @click="addFollowOneToOneFollow(index)" :disabled="confirmed">点击添加</el-button>
+                        </div>
+                        <div v-for="(itemFollow,indexFollow) in item.oneToOneFollowForms">
+                            <el-card class="box-card">
+                                <el-form :inline="true" :disabled="confirmed" size="small"
+                                         :model="itemFollow" :ref="'followOneToOneFollowRef' + indexFollow">
+                                    <el-form-item label="数据库:"
+                                                  prop="schema"
+                                                  :rules="rules.schema">
+                                        <el-input v-model.trim="itemFollow.schema" placeholder="请填写数据库" :disabled="itemFollow.checked"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="数据库表:"
+                                                  prop="table"
+                                                  :rules="rules.table">
+                                        <el-input v-model.trim="itemFollow.table" placeholder="请填写数据库表" :disabled="itemFollow.checked"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="关联主表字段:"
+                                                  prop="parentKey"
+                                                  :rules="rules.parentKey">
+                                        <el-select v-model.trim="itemFollow.parentKey" placeholder="请选择关联主表字段" size="small" style="width: 100%" :disabled="itemFollow.checked">
+                                            <el-option
+                                                    v-for="column in dbOneToMoreFollows[index].columns"
+                                                    :key="column.name"
+                                                    :label="'列名:' + column.name + '   类型:' + column.type"
+                                                    :value="column.name">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                    <el-form-item label="当前表外键字段:"
+                                                  prop="relateKey"
+                                                  :rules="rules.relateKey">
+                                        <el-input v-model.trim="itemFollow.relateKey" placeholder="请填写当前表外键字段" :disabled="itemFollow.checked"></el-input>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button-group>
+                                            <el-button type="primary" @click="getTable(oneToMoreFollowForms[index].dbOneToOneFollow[indexFollow], itemFollow, 'followOneToOneFollowRef' + indexFollow)"
+                                                       size="mini" :disabled="itemFollow.checked">点击获取表结构</el-button>
+                                            <el-button type="danger" @click="removeTable(oneToMoreFollowForms[index].dbOneToOneFollow, oneToMoreFollowForms[index].oneToOneFollowForms, indexFollow)" size="mini">移除</el-button>
+                                        </el-button-group>
+                                    </el-form-item>
+                                </el-form>
+                            </el-card>
+                        </div>
+                    </el-card>
                 </el-form>
             </el-card>
         </div>
@@ -283,6 +330,21 @@
                 dbs.splice(index, 1)
                 forms.splice(index, 1)
             },
+            addFollowOneToOneFollow(index) {
+                if (typeof this.oneToMoreFollowForms[index].oneToOneFollowForms == 'undefined') {
+                    this.oneToMoreFollowForms[index].oneToOneFollowForms = []
+                    this.oneToMoreFollowForms[index].dbOneToOneFollow = []
+                }
+                this.oneToMoreFollowForms[index].oneToOneFollowForms.push({
+                    schema: '',
+                    table: '',
+                    relateKey: '',
+                    parentKey: '',
+                    checked: false
+                })
+                this.oneToMoreFollowForms[index].dbOneToOneFollow.push({})
+                this.oneToMoreFollowForms = JSON.parse(JSON.stringify(this.oneToMoreFollowForms))
+            },
             addOneToMoreFollow() {
                 this.oneToMoreFollowForms.push({
                     schema: '',
@@ -369,6 +431,14 @@
         created: function () {
             this.form.schema = 'test'
             this.form.table = 'tb_main'
+            this.oneToMoreFollowForms.push({
+                schema: 'test',
+                table: 'tb_follow',
+                checked: false,
+                parentKey: 'id',
+                relateKey: 'main_id'
+            })
+            this.dbOneToMoreFollows.push({})
         }
     })
 </script>
