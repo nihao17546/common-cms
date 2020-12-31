@@ -403,6 +403,15 @@
                                             </el-form-item>
                                         </el-col>
                                         <el-col :span="6">
+                                            <el-form-item label="输入框宽度:"
+                                                          :prop="'table.select.searchElements.' + index + '.width'"
+                                                          :rules="rules.zNumberMust"
+                                                          label-width="120px">
+                                                <el-input v-model.trim="item.width"  placeholder="单位px"
+                                                          autocomplete="off" size="small" maxlength="50"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="6">
                                             <el-form-item label="类型:" label-width="100px"
                                                           :prop="'table.select.searchElements.' + index + '.className'"
                                                           :rules="[{required: true, message: '请选择', trigger: 'change'}]">
@@ -415,6 +424,13 @@
                                                 </el-select>
                                             </el-form-item>
                                         </el-col>
+                                        <el-col :span="6">
+                                            <el-form-item label="默认值:" label-width="100px"
+                                                          :prop="'table.select.searchElements.' + index + '.defaultValue'">
+                                                <el-input v-model.trim="item.defaultValue" placeholder="" maxlength="100"
+                                                          autocomplete="off" size="small"></el-input>
+                                            </el-form-item>
+                                        </el-col>
                                         <el-col :span="6"
                                                 v-if="item.elType && item.elType == 'SELECT' && item.className.indexOf('.SearchSelectRemote') > -1">
                                             <el-form-item label="远程下拉菜单配置:" label-width="130px">
@@ -422,12 +438,16 @@
                                                 <el-button type="text" plain @click="editRemoteSelect(item,['form','table','select','searchElements',index])">修改</el-button>
                                             </el-form-item>
                                         </el-col>
-                                        <el-col :span="6">
-                                            <el-form-item label="默认值:" label-width="100px"
-                                                          :prop="'table.select.searchElements.' + index + '.defaultValue'">
-                                                <el-input v-model.trim="item.defaultValue" placeholder="" maxlength="100"
-                                                          autocomplete="off" size="small"></el-input>
+                                        <el-col :span="12"
+                                                v-if="item.elType && item.elType == 'SELECT' && item.className.indexOf('.SearchSelectRemote') == -1 && item.className.indexOf('.SearchSelect') > -1">
+                                            <el-form-item label="下拉选项配置:" label-width="130px">
+                                                {{item.options | json}}
+                                                <el-button type="text" plain @click="editSelect(item,['form','table','select','searchElements',index])">修改</el-button>
                                             </el-form-item>
+                                        </el-col>
+                                        <el-col :span="24" style="text-align: right;">
+                                            <el-button type="danger" plain size="mini"
+                                                       @click="justRemove(item, index, form.table.select.searchElements)">移除</el-button>
                                         </el-col>
                                     </el-row>
                                 </el-card>
@@ -458,6 +478,15 @@
                                                     </el-form-item>
                                                 </el-col>
                                                 <el-col :span="6">
+                                                    <el-form-item label="输入框宽度:"
+                                                                  :prop="'table.select.leftJoins.' + leftJoinIndex + '.searchElements.' + index + '.width'"
+                                                                  :rules="rules.zNumberMust"
+                                                                  label-width="120px">
+                                                        <el-input v-model.trim="item.width"  placeholder="单位px"
+                                                                  autocomplete="off" size="small" maxlength="50"></el-input>
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="6">
                                                     <el-form-item label="类型:" label-width="100px"
                                                                   :prop="'table.select.leftJoins.' + leftJoinIndex + '.searchElements.' + index + '.className'"
                                                                   :rules="[{required: true, message: '请选择', trigger: 'change'}]">
@@ -470,6 +499,13 @@
                                                         </el-select>
                                                     </el-form-item>
                                                 </el-col>
+                                                <el-col :span="6">
+                                                    <el-form-item label="默认值:" label-width="100px"
+                                                                  :prop="'table.select.leftJoins.' + leftJoinIndex + '.searchElements.' + index + '.defaultValue'">
+                                                        <el-input v-model.trim="item.defaultValue" placeholder="" maxlength="100"
+                                                                  autocomplete="off" size="small"></el-input>
+                                                    </el-form-item>
+                                                </el-col>
                                                 <el-col :span="6"
                                                         v-if="item.elType && item.elType == 'SELECT' && item.className.indexOf('.SearchSelectRemote') > -1">
                                                     <el-form-item label="远程下拉菜单配置:" label-width="130px">
@@ -477,12 +513,16 @@
                                                         <el-button type="text" plain @click="editRemoteSelect(item,['form','table','select','leftJoins',leftJoinIndex,'searchElements',index])">修改</el-button>
                                                     </el-form-item>
                                                 </el-col>
-                                                <el-col :span="6">
-                                                    <el-form-item label="默认值:" label-width="100px"
-                                                                  :prop="'table.select.leftJoins.' + leftJoinIndex + '.searchElements.' + index + '.defaultValue'">
-                                                        <el-input v-model.trim="item.defaultValue" placeholder="" maxlength="100"
-                                                                  autocomplete="off" size="small"></el-input>
+                                                <el-col :span="12"
+                                                        v-if="item.elType && item.elType == 'SELECT' && item.className.indexOf('.SearchSelectRemote') == -1 && item.className.indexOf('.SearchSelect') > -1">
+                                                    <el-form-item label="下拉选项配置:" label-width="130px">
+                                                        {{item.options | json}}
+                                                        <el-button type="text" plain @click="editSelect(item,['form','table','select','leftJoins',leftJoinIndex,'searchElements',index])">修改</el-button>
                                                     </el-form-item>
+                                                </el-col>
+                                                <el-col :span="24" style="text-align: right;">
+                                                    <el-button type="danger" plain size="mini"
+                                                               @click="justRemove(item, index, form.table.select.leftJoins[leftJoinIndex].searchElements)">移除</el-button>
                                                 </el-col>
                                             </el-row>
                                         </el-card>
@@ -616,6 +656,43 @@
             </el-form-item>
         </el-form>
     </el-dialog>
+
+    <el-dialog title="下拉菜单选项" :visible.sync="selectDialog.visible" class="group-dialog" :before-close="closeSelectDialog">
+        <el-form :model="selectDialog" ref="selectDialog" size="small">
+            <el-row :gutter="24">
+                <el-col :span="24">
+                    <el-form-item label="下拉菜单选项:" label-width="120px"
+                                  prop="options"
+                                  :rules="rules.columns">
+                        <el-button type="primary" plain size="mini" @click="pushSelect">添加</el-button>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="24" v-for="(item,index) in selectDialog.options">
+                <el-col :span="10">
+                    <el-form-item label="选项外显名称:" label-width="120px"
+                                  :prop="'options.' + index + '.label'"
+                                  :rules="[{required: true, message: '请输入', trigger: 'change'}]">
+                        <el-input size="small" placeholder="选项外显名称" v-model.trim="item.label"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="10">
+                    <el-form-item label="选项值:" label-width="100px"
+                                  :prop="'options.' + index + '.value'"
+                                  :rules="[{required: true, message: '请输入', trigger: 'change'}]">
+                        <el-input size="small" placeholder="选项外显名称" v-model.trim="item.value"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="4">
+                    <el-button type="danger" plain size="mini" @click="removeSelect(index)">移除</el-button>
+                </el-col>
+            </el-row>
+            <el-form-item style="text-align: right;">
+                <el-button type="info" plain size="mini" @click="closeSelectDialog">取消</el-button>
+                <el-button type="primary" plain size="mini" @click="confirmSelect('selectDialog')">确认</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
 </div>
 </body>
 <script>
@@ -664,6 +741,10 @@
                 mainDb: null,
                 followDbs: null,
                 form: {
+                    pagination: false,
+                    add_btn: false,
+                    edit_btn: false,
+                    delete_btn: false,
                     table: {
                         pagination: false,
                         columns: [],
@@ -672,7 +753,7 @@
                     }
                 },
                 rules: {
-                    columns: [{required: true, message: '查询列不能为空', validator: validateColumns, trigger: 'change'}],
+                    columns: [{required: true, message: '不能为空', validator: validateColumns, trigger: 'change'}],
                     zNumber: [{required: false, message: '请输入正整数格式内容', validator: validateZNum, trigger: 'change'}],
                     zNumberMust: [{required: true, message: '请输入正整数格式内容', validator: validateZNum, trigger: 'change'}],
                 },
@@ -701,6 +782,11 @@
                 },
                 remoteSelectDialog: {
                     visible: false,
+                    db: []
+                },
+                selectDialog: {
+                    visible: false,
+                    options: [],
                     db: []
                 },
                 formatterTypes: [{
@@ -789,6 +875,78 @@
                         alert(0)
                     }
                 });
+            },
+            editSelect(item, db) {
+                let options = []
+                if (item.options) {
+                    options = JSON.parse(JSON.stringify(item.options))
+                }
+                this.selectDialog = {
+                    visible: true,
+                    options: options,
+                    db: db
+                }
+                this.selectDialog = JSON.parse(JSON.stringify(this.selectDialog))
+            },
+            confirmSelect(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.closeSelectDialog()
+                    }
+                })
+            },
+            removeSelect(index) {
+                this.selectDialog.options.splice(index,1)
+            },
+            pushSelect() {
+                this.selectDialog.options.push({
+                    label: '',
+                    value: ''
+                })
+            },
+            closeSelectDialog() {
+                let data = this
+                for (let i = 0; i < this.selectDialog.db.length; i ++) {
+                    data = data[this.selectDialog.db[i]]
+                }
+                let mm = []
+                if (this.selectDialog.options && this.selectDialog.options.length > 0) {
+                    for (let i = 0; i < this.selectDialog.options.length; i ++) {
+                        if (typeof this.selectDialog.options[i].label != 'undefined'
+                                && typeof this.selectDialog.options[i].value != 'undefined'
+                                && this.selectDialog.options[i].label != ''
+                                && this.selectDialog.options[i].value != ''
+                                && this.selectDialog.options[i].label != null
+                                && this.selectDialog.options[i].value != null) {
+                            mm.push({
+                                label: this.selectDialog.options[i].label,
+                                value: this.selectDialog.options[i].value
+                            })
+                        }
+                    }
+                }
+                if (mm.length > 0) {
+                    if (typeof data.options == 'undefined') {
+                        data.options = []
+                    }
+                    data.options = mm
+                } else {
+                    delete data.judgeType
+                    delete data.elType
+                    delete data.format
+                    delete data.schema
+                    delete data.table
+                    delete data.keyColumn
+                    delete data.valueColumn
+                    delete data.options
+                    delete data.className
+                }
+                this.form = JSON.parse(JSON.stringify(this.form))
+                this.selectDialog = {
+                    visible: false,
+                    options: [],
+                    db: []
+                }
             },
             editRemoteSelect(item, db) {
                 this.remoteSelectDialog = {
@@ -895,6 +1053,7 @@
                 delete item.table
                 delete item.keyColumn
                 delete item.valueColumn
+                delete item.options
                 if (item.className) {
                     if (item.className.indexOf('.SearchSelectRemote') > -1) {
                         item.judgeType = 'eq'
@@ -907,6 +1066,11 @@
                     } else if (item.className.indexOf('.SearchSelect') > -1) {
                         item.judgeType = 'eq'
                         item.elType = 'SELECT'
+                        this.selectDialog = {
+                            visible: true,
+                            options: [],
+                            db: db
+                        }
                         this.form = JSON.parse(JSON.stringify(this.form))
                     } else if (item.className.indexOf('.SearchInputEq') > -1) {
                         item.judgeType = 'eq'
