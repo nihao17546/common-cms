@@ -738,7 +738,7 @@
                                             <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('limitSize') > -1">
                                                 <el-form-item label="图片大小限制:"
                                                               :prop="'add_form.elements.' + index + '.limitSize'"
-                                                              :rules="rules.zNumberMust"
+                                                              :rules="rules.zNumber"
                                                               label-width="120px">
                                                     <el-input v-model.trim="item.limitSize"  placeholder="单位：字节"
                                                               autocomplete="off" size="small" maxlength="50"></el-input>
