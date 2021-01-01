@@ -11,13 +11,15 @@
         .el-card__header {
             padding-bottom: 2px;
         }
+        body {
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
     </style>
 </head>
 <body>
 <div id="app" v-loading="loading">
-    <el-dialog
-            title="预览"
-            :visible.sync="previewVisible" :before-close="closePreview">
+    <el-dialog title="预览" :visible.sync="previewVisible" :before-close="closePreview">
         <pre>{{form}}</pre>
     </el-dialog>
     <el-form :model="form" :rules="rules" ref="form" size="small" v-if="mainDb">
@@ -796,6 +798,43 @@
                                     </el-card>
                                 </template>
                             </el-card>
+                            <el-card shadow="hover" style="margin-bottom: 8px;">
+                                <div slot="header">
+                                    <el-form-item label="唯一键组合" :prop="'add_form.unique_columns'" :rules="rules.unique_columns" label-width="100px">
+                                        <el-button type="text" plain @click="addUnique(['form','add_form'])">添加</el-button>
+                                    </el-form-item>
+                                </div>
+                                <template v-if="form.add_form.unique_columns && form.add_form.unique_columns.length > 0">
+                                    <el-row style="border: 0px solid gray;" :gutter="24" v-for="(item,index) in form.add_form.unique_columns">
+                                        <el-col :span="10">
+                                            <el-form-item label="冲突前端提示文案:"
+                                                          :prop="'add_form.unique_columns.' + index + '.toast'"
+                                                          :rules="[{required: true, message: '请填写', trigger: 'change'}]"
+                                                          label-width="150px">
+                                                <el-input v-model.trim="item.toast" placeholder="唯一键冲突前端提示文案"
+                                                          autocomplete="off" size="small" maxlength="300"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="10">
+                                            <el-form-item label="唯一键组合:"
+                                                          :prop="'add_form.unique_columns.' + index + '.columns'"
+                                                          :rules="rules.columns"
+                                                          label-width="130px">
+                                                <el-select size="small" v-model="item.columns" multiple placeholder="请选择唯一键组合"
+                                                           style="width: 100%;">
+                                                    <el-option v-for="uniqueColumn in mainColumns[0].options"
+                                                               :key="uniqueColumn.key"
+                                                               :label="'列名:' + uniqueColumn.key + '   类型:' + uniqueColumn.dataType"
+                                                               :value="uniqueColumn.key"></el-option>
+                                                </el-select>
+                                            </el-form-item>
+                                        </el-col>
+                                        <el-col :span="4" style="text-align: right;">
+                                            <el-button type="danger" plain size="mini" @click="justRemove(item, index, form.add_form.unique_columns)">移除</el-button>
+                                        </el-col>
+                                    </el-row>
+                                </template>
+                            </el-card>
                         </el-card>
                     </el-collapse-item>
                 </el-collapse>
@@ -809,7 +848,7 @@
 
 
 
-    <el-dialog title="添加列" :visible.sync="tableColumnDialog.visible" class="group-dialog" :before-close="closeAddTableColumnDialog">
+    <el-dialog title="添加列" :top="dialogTop" :visible.sync="tableColumnDialog.visible" class="group-dialog" :before-close="closeAddTableColumnDialog">
         <el-select v-model="tableColumnDialog.value" placeholder="请选择" size="small"
                    style="width: 100%" @change="addTableColumn">
             <el-option-group
@@ -828,7 +867,7 @@
         </div>
     </el-dialog>
 
-    <el-dialog title="文本格式化" :visible.sync="formatterTextDialog.visible" class="group-dialog" :before-close="closeFormatterTextDialog">
+    <el-dialog title="文本格式化" :top="dialogTop":visible.sync="formatterTextDialog.visible" class="group-dialog" :before-close="closeFormatterTextDialog">
         <div style="margin-bottom: 5px;text-align: left;">
             <el-button type="primary" plain size="mini" @click="pushFormatterText">添加</el-button>
         </div>
@@ -847,7 +886,7 @@
         </div>
     </el-dialog>
 
-    <el-dialog title="默认搜索条件" :visible.sync="whereColumnDialog.visible" class="group-dialog" :before-close="closeWhereColumnDialog">
+    <el-dialog title="默认搜索条件" :top="dialogTop" :visible.sync="whereColumnDialog.visible" class="group-dialog" :before-close="closeWhereColumnDialog">
         <el-select v-model="whereColumnDialog.value" placeholder="请选择" size="small"
                    style="width: 100%" @change="addWhereColumn">
             <el-option-group
@@ -866,7 +905,7 @@
         </div>
     </el-dialog>
 
-    <el-dialog title="添加搜索表单项" :visible.sync="searchColumnDialog.visible" class="group-dialog" :before-close="closeSearchColumnDialog">
+    <el-dialog title="添加搜索表单项" :top="dialogTop" :visible.sync="searchColumnDialog.visible" class="group-dialog" :before-close="closeSearchColumnDialog">
         <el-select v-model="searchColumnDialog.value" placeholder="请选择" size="small"
                    style="width: 100%" @change="addSearchColumn">
             <el-option-group
@@ -885,7 +924,7 @@
         </div>
     </el-dialog>
 
-    <el-dialog title="远程下拉菜单配置" :visible.sync="remoteSelectDialog.visible" class="group-dialog" :before-close="closeRemoteSelectDialog">
+    <el-dialog title="远程下拉菜单配置" :top="dialogTop" :visible.sync="remoteSelectDialog.visible" class="group-dialog" :before-close="closeRemoteSelectDialog">
         <el-form :model="remoteSelectDialog" ref="remoteSelectDialog" size="small">
             <el-form-item label="数据库:" label-width="100px" prop="schema"
                           :rules="[{required: true, message: '请输入', trigger: 'change'}]">
@@ -924,7 +963,7 @@
         </el-form>
     </el-dialog>
 
-    <el-dialog title="下拉菜单选项" :visible.sync="selectDialog.visible" class="group-dialog" :before-close="closeSelectDialog">
+    <el-dialog title="下拉菜单选项" :top="dialogTop" :visible.sync="selectDialog.visible" class="group-dialog" :before-close="closeSelectDialog">
         <el-form :model="selectDialog" ref="selectDialog" size="small">
             <el-row :gutter="24">
                 <el-col :span="24">
@@ -961,7 +1000,7 @@
         </el-form>
     </el-dialog>
 
-    <el-dialog title="表单项" :visible.sync="addFormDialog.visible" class="group-dialog" :before-close="closeAddFormDialog">
+    <el-dialog title="表单项" :top="dialogTop" :visible.sync="addFormDialog.visible" class="group-dialog" :before-close="closeAddFormDialog">
         <el-select v-model="addFormDialog.item" placeholder="请选择" size="small"
                    style="width: 100%" @change="closeAddFormDialog">
             <el-option
@@ -973,7 +1012,7 @@
         </el-select>
     </el-dialog>
 
-    <el-dialog title="校验规则配置" :visible.sync="ruleDialog.visible" class="group-dialog" :before-close="closeRuleDialog">
+    <el-dialog title="校验规则配置" :top="dialogTop" :visible.sync="ruleDialog.visible" class="group-dialog" :before-close="closeRuleDialog">
         <el-form :model="ruleDialog" ref="ruleDialog" size="small">
             <el-form-item label="是否必填:" label-width="120px" prop="required"
                           :rules="[{required: true, message: '请输入', trigger: 'change'}]">
@@ -998,14 +1037,15 @@
             </el-form-item>
         </el-form>
     </el-dialog>
+
 </div>
 </body>
 <script>
     window.contextPath = '${contextPath}'
     window.basePackage = '${basePackage}'
-    // window.setInterval(() => {
-    //     window.parent.document.getElementById("basic").height = Math.max(document.getElementById("app").offsetHeight + 15, 500)
-    // }, 200)
+    window.setInterval(() => {
+        window.parent.document.getElementById("basic").height =  window.document.body.scrollHeight
+    }, 1)
 
     window.vue = new Vue({
         name: 'm',
@@ -1056,6 +1096,7 @@
             return {
                 loading: false,
                 height: window.innerHeight - 78,
+                dialogTop: '150px',
                 activeNames: [],
                 previewVisible: false,
                 aliasTable: {},
@@ -1244,6 +1285,20 @@
                         alert(0)
                     }
                 });
+            },
+            addUnique(db) {
+                let data = this
+                for (let i = 0; i < db.length; i ++) {
+                    data = data[db[i]]
+                }
+                if (typeof data.unique_columns == 'undefined') {
+                    data.unique_columns = []
+                }
+                data.unique_columns.push({
+                    toast: '',
+                    columns: [],
+                })
+                this.form = JSON.parse(JSON.stringify(this.form))
             },
             confirmRule(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -2180,6 +2235,9 @@
             this.addElementShows[window.basePackage + 'form.add.AddRich'] = ['label','maxlength','rule']
             this.addElementShows[window.basePackage + 'form.add.AddCreateDateTime'] = []
             this.addElementShows[window.basePackage + 'form.add.AddUpdateDateTime'] = []
+            window.setInterval(() => {
+                this.dialogTop = (window.parent.ScollPostion().top + 30) + 'px'
+            }, 100)
         }
     })
 </script>
