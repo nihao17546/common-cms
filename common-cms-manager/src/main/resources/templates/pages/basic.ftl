@@ -762,6 +762,14 @@
                                                     <el-button type="text" plain @click="editSelect(item,['form','add_form','elements',index])">修改</el-button>
                                                 </el-form-item>
                                             </el-col>
+                                            <el-col :span="12" v-if="item.className && addElementShows[item.className].indexOf('rule') > -1">
+                                                <el-form-item label="前端校验规则:" label-width="130px">
+                                                    {{item.rule | json}}
+                                                    <el-button type="text" v-if="!item.rule" plain @click="showAddRule(item,['form','add_form','elements',index])">添加</el-button>
+                                                    <el-button type="text" v-if="item.rule" plain @click="showAddRule(item,['form','add_form','elements',index])">修改</el-button>
+                                                    <el-button type="text" v-if="item.rule" plain @click="delAddRule(item)">删除</el-button>
+                                                </el-form-item>
+                                            </el-col>
                                             <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('canEdit') > -1">
                                                 <el-form-item label="是否可编辑:" label-width="130px"
                                                               :prop="'add_form.elements.' + index + '.canEdit'"
@@ -771,6 +779,18 @@
                                                         <el-option :key="false" label="否" :value="false"></el-option>
                                                     </el-select>
                                                 </el-form-item>
+                                            </el-col>
+                                            <el-col :span="24" style="text-align: right;">
+                                                <el-button-group>
+                                                    <el-button type="primary" size="mini" icon="el-icon-arrow-up"
+                                                               v-if="index != 0"
+                                                               @click="up(item, index, form.add_form.elements)">上移</el-button>
+                                                    <el-button type="primary" size="mini" icon="el-icon-arrow-down"
+                                                               v-if="index != form.add_form.elements.length - 1"
+                                                               @click="down(item, index, form.add_form.elements)">下移</el-button>
+                                                </el-button-group>
+                                                <el-button type="danger" plain size="mini"
+                                                           @click="justRemove(item, index, form.add_form.elements)">移除</el-button>
                                             </el-col>
                                         </el-row>
                                     </el-card>
@@ -952,6 +972,32 @@
             </el-option>
         </el-select>
     </el-dialog>
+
+    <el-dialog title="校验规则配置" :visible.sync="ruleDialog.visible" class="group-dialog" :before-close="closeRuleDialog">
+        <el-form :model="ruleDialog" ref="ruleDialog" size="small">
+            <el-form-item label="是否必填:" label-width="120px" prop="required"
+                          :rules="[{required: true, message: '请输入', trigger: 'change'}]">
+                <el-select style="width: 100%" v-model.trim="ruleDialog.required">
+                    <el-option :key="true" label="是" :value="true"></el-option>
+                    <el-option :key="false" label="否" :value="false"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="错误提示文案:" label-width="120px" prop="message"
+                          :rules="[{required: true, message: '请输入', trigger: 'change'}]">
+                <el-input v-model.trim="ruleDialog.message" placeholder="" maxlength="500"
+                          autocomplete="off" size="small"></el-input>
+            </el-form-item>
+            <el-form-item label="正则表达式校验:" label-width="130px" prop="regular"
+                          :rules="[{required: false, message: '请输入', trigger: 'change'}]">
+                <el-input v-model.trim="ruleDialog.regular" placeholder="请填写正则表达式" maxlength="1000"
+                          autocomplete="off" size="small"></el-input>
+            </el-form-item>
+            <el-form-item style="text-align: right;">
+                <el-button type="info" plain size="mini" @click="closeRuleDialog">取消</el-button>
+                <el-button type="primary" plain size="mini" @click="confirmRule('ruleDialog')">确认</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
 </div>
 </body>
 <script>
@@ -1068,6 +1114,10 @@
                 addFormDialog: {
                     visible: false,
                     columns: [],
+                    db: []
+                },
+                ruleDialog: {
+                    visible: false,
                     db: []
                 },
                 formatterTypes: [{
@@ -1194,6 +1244,50 @@
                         alert(0)
                     }
                 });
+            },
+            confirmRule(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        let data = this
+                        for (let i = 0; i < this.ruleDialog.db.length; i ++) {
+                            data = data[this.ruleDialog.db[i]]
+                        }
+                        data.rule = {
+                            required: this.ruleDialog.required,
+                            message: this.ruleDialog.message,
+                            regular: this.ruleDialog.regular
+                        }
+                        this.closeRuleDialog()
+                    }
+                })
+            },
+            closeRuleDialog() {
+                this.ruleDialog = {
+                    visible: false,
+                    db: []
+                }
+            },
+            delAddRule(item) {
+                delete item.rule
+                this.form = JSON.parse(JSON.stringify(this.form))
+            },
+            showAddRule(item,db) {
+                let required = false
+                let message = undefined
+                let regular = undefined
+                if (item.rule) {
+                    required = item.rule.required,
+                    message = item.rule.message,
+                    regular = item.rule.regular
+                }
+                this.ruleDialog = {
+                    visible: true,
+                    db: db,
+                    required: required,
+                    message: message,
+                    regular: regular
+                }
+                this.ruleDialog = JSON.parse(JSON.stringify(this.ruleDialog))
             },
             addElementTypeChange(item,db) {
                 delete item.elType
@@ -1481,6 +1575,7 @@
                     delete data.clearable
                     delete data.options
                     delete data.radios
+                    delete data.rule
                 }
                 this.form = JSON.parse(JSON.stringify(this.form))
                 this.selectDialog = {
@@ -1582,6 +1677,7 @@
                         delete data.canEdit
                         delete data.size
                         delete data.clearable
+                        delete data.rule
                         this.form = JSON.parse(JSON.stringify(this.form))
                     }
                 }
