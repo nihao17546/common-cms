@@ -66,6 +66,13 @@ public class EntityTest {
                                 AddElement.datetime().key("time").label("时间").to(Date.class).build()
                         )
                         .build())
+                .followTables(FollowTable.builder()
+                        .bottomName("从表按钮")
+                        .pagination(true)
+                        .addBtn(true)
+                        .editBtn(true)
+                        .deleteBtn(true)
+                        .build())
                 .build();
         System.out.println(configEntity.json());
         System.out.println(DesUtil.encrypt(configEntity.getTitle()));
