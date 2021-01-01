@@ -16,6 +16,7 @@ import com.appcnd.common.cms.entity.table.formatter.FormatterSwitch;
 import com.appcnd.common.cms.entity.table.formatter.FormatterText;
 import com.appcnd.common.cms.starter.util.DesUtil;
 
+import java.util.Date;
 import java.util.Arrays;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Arrays;
 public class EntityTest {
     public static void main(String[] args) throws Exception {
         ConfigEntity configEntity = ConfigEntity.builder()
-                .addBtn(false)
+                .addBtn(true)
                 .deleteBtn(false)
                 .editBtn(false)
                 .title("测试")
@@ -59,6 +60,12 @@ public class EntityTest {
                                         SearchSelectRemote.builder().schema("test").table("tb_city").keyColumn("id").valueColumn("name").key("city_id").label("城市").build()
                                 ).build()
                         ).build())
+                .addForm(AddForm.builder().schema("test").table("tb_main").primaryKey("id").width(100)
+                        .elements(
+                                AddElement.input().key("name").label("名称").canEdit(true).build(),
+                                AddElement.datetime().key("time").label("时间").to(Date.class).build()
+                        )
+                        .build())
                 .build();
         System.out.println(configEntity.json());
         System.out.println(DesUtil.encrypt(configEntity.getTitle()));

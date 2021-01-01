@@ -16,7 +16,7 @@
         <el-tab-pane label="数据库配置" name="db">
             <iframe id="database" src="${contextPath}/pages/database.html" frameborder="0" width="100%" :height="height"></iframe>
         </el-tab-pane>
-        <el-tab-pane label="基础配置" name="basic" :disabled="!mainDb || !mainDb.schema">
+        <el-tab-pane label="页面配置" name="basic" :disabled="!mainDb || !mainDb.schema">
             <iframe id="basic" src="${contextPath}/pages/basic.html" frameborder="0" width="100%" height="1200"></iframe>
         </el-tab-pane>
     </el-tabs>

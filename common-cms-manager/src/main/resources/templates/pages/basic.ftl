@@ -32,7 +32,7 @@
             </el-col>
             <el-col :span="6">
                 <el-form-item label="允许新增:" prop="add_btn" label-width="100px">
-                    <el-select style="width: 100%" v-model="form.add_btn">
+                    <el-select style="width: 100%" v-model="form.add_btn" @change="addEditDeleteBtnChange(form)">
                         <el-option :key="true" label="是" :value="true"></el-option>
                         <el-option :key="false" label="否" :value="false"></el-option>
                     </el-select>
@@ -40,7 +40,7 @@
             </el-col>
             <el-col :span="6">
                 <el-form-item label="允许编辑:" prop="edit_btn" label-width="100px">
-                    <el-select style="width: 100%" v-model="form.edit_btn">
+                    <el-select style="width: 100%" v-model="form.edit_btn" @change="addEditDeleteBtnChange(form)">
                         <el-option :key="true" label="是" :value="true"></el-option>
                         <el-option :key="false" label="否" :value="false"></el-option>
                     </el-select>
@@ -48,7 +48,7 @@
             </el-col>
             <el-col :span="6">
                 <el-form-item label="允许删除:" prop="delete_btn" label-width="100px">
-                    <el-select style="width: 100%" v-model="form.delete_btn">
+                    <el-select style="width: 100%" v-model="form.delete_btn" @change="addEditDeleteBtnChange(form)">
                         <el-option :key="true" label="是" :value="true"></el-option>
                         <el-option :key="false" label="否" :value="false"></el-option>
                     </el-select>
@@ -531,6 +531,253 @@
                             </template>
                         </el-card>
                     </el-collapse-item>
+                    <el-collapse-item title="新增/编辑表单" name="add" v-if="form.add_form">
+                        <el-card shadow="hover">
+                            <el-row :gutter="24">
+                                <el-col :span="6">
+                                    <el-form-item label="前端弹窗宽（%）:" :prop="'add_form.width'" label-width="140px">
+                                        <el-input-number size="small" v-model="form.add_form.width"
+                                                         :min="50" :max="100"
+                                                         style="width: 100%"></el-input-number>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-card shadow="hover" style="margin-bottom: 8px;">
+                                <div slot="header">
+                                    <el-form-item label="表单项" :prop="'add_form.elements'" :rules="rules.columns" label-width="100px">
+                                        <el-button type="text" plain @click="showAddFormColumn(mainColumns[0], ['form'])">添加</el-button>
+                                    </el-form-item>
+                                </div>
+                                <template v-if="form.add_form.elements && form.add_form.elements.length > 0">
+                                    <el-card shadow="hover" v-for="(item,index) in form.add_form.elements" style="margin-bottom: 8px;">
+                                        <el-row style="border: 0px solid gray;" :gutter="24">
+                                            <el-col :span="6">
+                                                <el-form-item label="字段:" label-width="100px">
+                                                    <el-input v-model.trim="item.key" placeholder="" maxlength="100"
+                                                              :prop="'add_form.elements.' + index + '.key'"
+                                                              :rules="[{required: true, message: '不能为空', trigger: 'change'}]"
+                                                              autocomplete="off" size="small" readOnly="true"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6">
+                                                <el-form-item label="类型:" label-width="100px"
+                                                              :prop="'add_form.elements.' + index + '.className'"
+                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                    <el-select style="width: 100%" clearable
+                                                               v-model.trim="item.className"
+                                                               @change="addElementTypeChange(item,['form','add_form','elements',index])">
+                                                        <el-option v-for="(type,addElementTypeIndex) in addElementTypes"
+                                                                   :key="type.value" :value="type.value" :label="type.label" >
+                                                        </el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('label') > -1">
+                                                <el-form-item label="控件标题:" label-width="100px"
+                                                              :prop="'add_form.elements.' + index + '.label'"
+                                                              :rules="[{required: true, message: '请输入', trigger: 'change'}]">
+                                                    <el-input v-model.trim="item.label" placeholder="" maxlength="20"
+                                                              autocomplete="off" size="small"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('type') > -1">
+                                                <el-form-item label="文本框类型:" label-width="110px"
+                                                              :prop="'add_form.elements.' + index + '.type'"
+                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                    <el-select style="width: 100%" v-model.trim="item.type">
+                                                        <el-option key="text" label="普通单行" value="text"></el-option>
+                                                        <el-option key="textarea" label="多行" value="textarea"></el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('placeholder') > -1">
+                                                <el-form-item label="输入框提示文案:" label-width="120px"
+                                                              :prop="'add_form.elements.' + index + '.placeholder'"
+                                                              :rules="[{required: false, message: '请输入', trigger: 'change'}]">
+                                                    <el-input v-model.trim="item.placeholder" placeholder="" maxlength="100"
+                                                              autocomplete="off" size="small"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('clearable') > -1">
+                                                <el-form-item label="是否可一键清空:" label-width="130px"
+                                                              :prop="'add_form.elements.' + index + '.clearable'"
+                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                    <el-select style="width: 100%" v-model.trim="item.clearable">
+                                                        <el-option :key="true" label="是" :value="true"></el-option>
+                                                        <el-option :key="false" label="否" :value="false"></el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('to') > -1">
+                                                <el-form-item label="转换格式:" label-width="110px"
+                                                              :prop="'add_form.elements.' + index + '.to'"
+                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                    <el-select style="width: 100%" v-model.trim="item.to">
+                                                        <el-option key="java.lang.String" label="java.lang.String" value="java.lang.String"></el-option>
+                                                        <el-option key="java.lang.Long" label="java.lang.Long" value="java.lang.Long"></el-option>
+                                                        <el-option key="java.util.Date" label="java.util.Date" value="java.util.Date"></el-option>
+                                                        <el-option key="java.sql.Timestamp" label="java.sql.Timestamp" value="java.sql.Timestamp"></el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('size') > -1">
+                                                <el-form-item label="控件大小:" label-width="110px"
+                                                              :prop="'add_form.elements.' + index + '.size'"
+                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                    <el-select style="width: 100%" v-model.trim="item.size">
+                                                        <el-option key="mini" label="小" value="mini"></el-option>
+                                                        <el-option key="small" label="中" value="small"></el-option>
+                                                        <el-option key="medium" label="大" value="medium"></el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('width') > -1">
+                                                <el-form-item label="控件宽度:"
+                                                              :prop="'add_form.elements.' + index + '.width'"
+                                                              :rules="rules.number"
+                                                              label-width="100px">
+                                                    <el-input v-model.trim="item.width"  placeholder="单位px"
+                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('minlength') > -1">
+                                                <el-form-item label="最小输入长度:"
+                                                              :prop="'add_form.elements.' + index + '.minlength'"
+                                                              :rules="rules.zNumber"
+                                                              label-width="120px">
+                                                    <el-input v-model.trim="item.minlength"  placeholder=""
+                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('maxlength') > -1">
+                                                <el-form-item label="最大输入长度:"
+                                                              :prop="'add_form.elements.' + index + '.maxlength'"
+                                                              :rules="rules.zNumber"
+                                                              label-width="120px">
+                                                    <el-input v-model.trim="item.maxlength"  placeholder=""
+                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('min') > -1">
+                                                <el-form-item label="计数器最小值:"
+                                                              :prop="'add_form.elements.' + index + '.min'"
+                                                              :rules="rules.number"
+                                                              label-width="120px">
+                                                    <el-input v-model.trim="item.min"  placeholder=""
+                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('max') > -1">
+                                                <el-form-item label="计数器最大值:"
+                                                              :prop="'add_form.elements.' + index + '.max'"
+                                                              :rules="rules.number"
+                                                              label-width="120px">
+                                                    <el-input v-model.trim="item.max"  placeholder=""
+                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('precision') > -1">
+                                                <el-form-item label="数值精度:"
+                                                              :prop="'add_form.elements.' + index + '.precision'"
+                                                              :rules="rules.number"
+                                                              label-width="120px">
+                                                    <el-input v-model.trim="item.precision"  placeholder=""
+                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('start') > -1">
+                                                <el-form-item label="开始时间:"
+                                                              :prop="'add_form.elements.' + index + '.start'"
+                                                              :rules="[{required: true, message: '请输入', trigger: 'change'}]"
+                                                              label-width="100px">
+                                                    <el-time-select style="width: 100%"
+                                                            v-model.trim="item.start"
+                                                            :picker-options="{start: '00:00',step: '00:01',end: '23:59'}"
+                                                            placeholder="选择开始时间">
+                                                    </el-time-select>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('end') > -1">
+                                                <el-form-item label="截止时间:"
+                                                              :prop="'add_form.elements.' + index + '.end'"
+                                                              :rules="[{required: true, message: '请输入', trigger: 'change'}]"
+                                                              label-width="100px">
+                                                    <el-time-select style="width: 100%"
+                                                            v-model.trim="item.end"
+                                                            :picker-options="{start: '00:00',step: '00:01',end: '23:59'}"
+                                                            placeholder="选择截止时间">
+                                                    </el-time-select>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('step') > -1">
+                                                <el-form-item label="步长:" v-if="item.className.indexOf('.AddInputNumber') > -1"
+                                                              :prop="'add_form.elements.' + index + '.step'"
+                                                              :rules="rules.number"
+                                                              label-width="120px">
+                                                    <el-input v-model.trim="item.step"  placeholder=""
+                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="时间间隔:" v-if="item.className.indexOf('.AddTimePicker') > -1"
+                                                              :prop="'add_form.elements.' + index + '.step'"
+                                                              :rules="[{required: true, message: '请输入', trigger: 'change'}]"
+                                                              label-width="100px">
+                                                    <el-time-select v-model.trim="item.step" style="width: 100%"
+                                                                    :picker-options="{start: '00:00',step: '00:01',end: '23:59'}"
+                                                                    placeholder="时间间隔">
+                                                    </el-time-select>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('acceptType') > -1">
+                                                <el-form-item label="图片格式限制:" label-width="120px"
+                                                              :prop="'add_form.elements.' + index + '.acceptType'"
+                                                              :rules="[{required: false, message: '请输入', trigger: 'change'}]">
+                                                    <el-input v-model.trim="item.acceptType" placeholder="例：'.jpg,.PNG'，多个使用逗号分隔" maxlength="100"
+                                                              autocomplete="off" size="small"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('limitSize') > -1">
+                                                <el-form-item label="图片大小限制:"
+                                                              :prop="'add_form.elements.' + index + '.limitSize'"
+                                                              :rules="rules.zNumberMust"
+                                                              label-width="120px">
+                                                    <el-input v-model.trim="item.limitSize"  placeholder="单位：字节"
+                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('remoteSelect') > -1">
+                                                <el-form-item label="远程下拉菜单配置:" label-width="130px">
+                                                    {{item.schema}}.{{item.table}}[{{item.keyColumn}}-{{item.valueColumn}}]
+                                                    <el-button type="text" plain @click="editRemoteSelect(item,['form','add_form','elements',index])">修改</el-button>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="12" v-if="item.className && addElementShows[item.className].indexOf('select') > -1">
+                                                <el-form-item label="下拉选项配置:" label-width="130px">
+                                                    {{item.options | json}}
+                                                    <el-button type="text" plain @click="editSelect(item,['form','add_form','elements',index])">修改</el-button>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="12" v-if="item.className && addElementShows[item.className].indexOf('radio') > -1">
+                                                <el-form-item label="单选框配置:" label-width="130px">
+                                                    {{item.radios | json}}
+                                                    <el-button type="text" plain @click="editSelect(item,['form','add_form','elements',index])">修改</el-button>
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('canEdit') > -1">
+                                                <el-form-item label="是否可编辑:" label-width="130px"
+                                                              :prop="'add_form.elements.' + index + '.canEdit'"
+                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                    <el-select style="width: 100%" v-model.trim="item.canEdit">
+                                                        <el-option :key="true" label="是" :value="true"></el-option>
+                                                        <el-option :key="false" label="否" :value="false"></el-option>
+                                                    </el-select>
+                                                </el-form-item>
+                                            </el-col>
+                                        </el-row>
+                                    </el-card>
+                                </template>
+                            </el-card>
+                        </el-card>
+                    </el-collapse-item>
                 </el-collapse>
             </el-col>
         </el-row>
@@ -693,6 +940,18 @@
             </el-form-item>
         </el-form>
     </el-dialog>
+
+    <el-dialog title="表单项" :visible.sync="addFormDialog.visible" class="group-dialog" :before-close="closeAddFormDialog">
+        <el-select v-model="addFormDialog.item" placeholder="请选择" size="small"
+                   style="width: 100%" @change="closeAddFormDialog">
+            <el-option
+                    v-for="(item,index) in addFormDialog.columns"
+                    :key="item+index"
+                    :label="'列名:' + item.key + ' 类型:' + item.dataType"
+                    :value="item.key">
+            </el-option>
+        </el-select>
+    </el-dialog>
 </div>
 </body>
 <script>
@@ -732,6 +991,22 @@
                     }
                 }
             };
+
+            var validateNumber = (rule, value, callback) => {
+                if (!value || value === '') {
+                    if (rule.required) {
+                        callback(new Error(rule.message));
+                    } else {
+                        callback();
+                    }
+                } else {
+                    if (/^(\-|\+)?\d+(\.\d+)?$/.test(value)) {
+                        callback();
+                    } else {
+                        callback(new Error('请输入数字格式内容'));
+                    }
+                }
+            };
             return {
                 loading: false,
                 height: window.innerHeight - 78,
@@ -756,6 +1031,7 @@
                     columns: [{required: true, message: '不能为空', validator: validateColumns, trigger: 'change'}],
                     zNumber: [{required: false, message: '请输入正整数格式内容', validator: validateZNum, trigger: 'change'}],
                     zNumberMust: [{required: true, message: '请输入正整数格式内容', validator: validateZNum, trigger: 'change'}],
+                    number: [{required: false, message: '请输入数字格式内容', validator: validateNumber, trigger: 'change'}],
                 },
                 mainColumns: [],
                 tableColumnDialog: {
@@ -787,6 +1063,11 @@
                 selectDialog: {
                     visible: false,
                     options: [],
+                    db: []
+                },
+                addFormDialog: {
+                    visible: false,
+                    columns: [],
                     db: []
                 },
                 formatterTypes: [{
@@ -857,6 +1138,44 @@
                 },{
                     label: '日期时间选择器（yyyy-MM-dd HH:mm:ss）',
                     value: window.basePackage + 'form.search.SearchDatetimePickerBt'
+                }],
+                addElementShows: {},
+                addElementTypes: [{
+                    label: '普通文本',
+                    value: window.basePackage + 'form.add.AddInput'
+                },{
+                    label: '下拉选择框',
+                    value: window.basePackage + 'form.add.AddSelect'
+                },{
+                    label: '远程下拉选择框',
+                    value: window.basePackage + 'form.add.AddSelectRemote'
+                },{
+                    label: '单选框',
+                    value: window.basePackage + 'form.add.AddRadio'
+                },{
+                    label: '计数器',
+                    value: window.basePackage + 'form.add.AddInputNumber'
+                },{
+                    label: '日期选择器（yyyy-MM-dd）',
+                    value: window.basePackage + 'form.add.AddDatePicker'
+                },{
+                    label: '日期时间选择器（yyyy-MM-dd HH:mm:ss）',
+                    value: window.basePackage + 'form.add.AddDateTimePicker'
+                },{
+                    label: '时间选择器',
+                    value: window.basePackage + 'form.add.AddTimePicker'
+                },{
+                    label: '图片上传',
+                    value: window.basePackage + 'form.add.AddUploadPic'
+                },{
+                    label: '富文本',
+                    value: window.basePackage + 'form.add.AddRich'
+                },{
+                    label: '创建时间',
+                    value: window.basePackage + 'form.add.AddCreateDateTime'
+                },{
+                    label: '更新时间',
+                    value: window.basePackage + 'form.add.AddUpdateDateTime'
                 }]
             }
         },
@@ -876,15 +1195,231 @@
                     }
                 });
             },
+            addElementTypeChange(item,db) {
+                delete item.elType
+                delete item.columnType
+                delete item.canEdit
+                delete item.size
+                delete item.width
+                delete item.label
+                delete item.rule
+                delete item.min
+                delete item.max
+                delete item.precision
+                delete item.step
+                delete item.type
+                delete item.placeholder
+                delete item.clearable
+                delete item.maxlength
+                delete item.minlength
+                delete item.to
+                delete item.format
+                delete item.start
+                delete item.end
+                delete item.acceptType
+                delete item.limitSize
+                delete item.schema
+                delete item.table
+                delete item.keyColumn
+                delete item.valueColumn
+                delete item.options
+                delete item.radios
+                if (item.className) {
+                    if (item.className.indexOf('.AddInputNumber') > -1) {
+                        item.elType = 'INPUT_NUMBER'
+                        item.columnType = 'COM'
+                        item.canEdit = true
+                        item.size = 'small'
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddInput') > -1) {
+                        item.elType = 'INPUT'
+                        item.columnType = 'COM'
+                        item.canEdit = true
+                        item.size = 'small'
+                        item.type = 'text'
+                        item.clearable = true
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddDatePicker') > -1) {
+                        item.elType = 'DATE_PICKER'
+                        item.columnType = 'COM'
+                        item.canEdit = true
+                        item.size = 'small'
+                        item.clearable = true
+                        item.format = "yyyy-MM-dd"
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddDateTimePicker') > -1) {
+                        item.elType = 'DATETIME_PICKER'
+                        item.columnType = 'COM'
+                        item.canEdit = true
+                        item.size = 'small'
+                        item.clearable = true
+                        item.format = "yyyy-MM-dd HH:mm:ss"
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddTimePicker') > -1) {
+                        item.elType = 'TIME_PICKER'
+                        item.columnType = 'COM'
+                        item.canEdit = true
+                        item.size = 'small'
+                        item.clearable = true
+                        item.start = '00:00'
+                        item.end = '23:59'
+                        item.step = '00:30'
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddUploadPic') > -1) {
+                        item.elType = 'UPLOAD_PIC'
+                        item.columnType = 'COM'
+                        item.canEdit = true
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddUpdateDateTime') > -1) {
+                        item.elType = 'DATETIME_PICKER'
+                        item.columnType = 'UPDATE_DATETIME'
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddUpdateDateTime') > -1) {
+                        item.elType = 'DATETIME_PICKER'
+                        item.columnType = 'CREATE_DATETIME'
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddRich') > -1) {
+                        item.elType = 'RICH'
+                        item.columnType = 'COM'
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddSelectRemote') > -1) {
+                        item.elType = 'SELECT'
+                        item.columnType = 'COM'
+                        item.canEdit = true
+                        item.size = 'small'
+                        item.clearable = true
+                        this.remoteSelectDialog = {
+                            visible: true,
+                            db: db
+                        }
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddSelect') > -1) {
+                        item.elType = 'SELECT'
+                        item.columnType = 'COM'
+                        item.canEdit = true
+                        item.size = 'small'
+                        item.clearable = true
+                        this.selectDialog = {
+                            visible: true,
+                            options: [],
+                            db: db,
+                            key: 'options'
+                        }
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.AddRadio') > -1) {
+                        item.elType = 'RADIO'
+                        item.columnType = 'COM'
+                        item.canEdit = true
+                        item.size = 'small'
+                        this.selectDialog = {
+                            visible: true,
+                            options: [],
+                            db: db,
+                            key: 'radios'
+                        }
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    }
+                } else {
+                    delete item.className
+                    this.form = JSON.parse(JSON.stringify(this.form))
+                }
+            },
+            addEditDeleteBtnChange(form) {
+                if (form.add_btn || form.edit_btn || form.delete_btn) {
+                    if (typeof form.add_form == 'undefined') {
+                        form.add_form = {
+                            elements: [],
+                            width: 50
+                        }
+                    }
+                } else {
+                    delete form.add_form
+                }
+                this.form = JSON.parse(JSON.stringify(this.form))
+            },
+            closeAddFormDialog() {
+                if (this.addFormDialog.item) {
+                    let data = this
+                    for (let i = 0; i < this.addFormDialog.db.length; i ++) {
+                        data = data[this.addFormDialog.db[i]]
+                    }
+                    if (typeof data.add_form == 'undefined') {
+                        data.add_form = {}
+                    }
+                    if (typeof data.add_form.schema == 'undefined') {
+                        data.add_form.schema = this.addFormDialog.schema
+                    }
+                    if (typeof data.add_form.table == 'undefined') {
+                        data.add_form.table = this.addFormDialog.table
+                    }
+                    if (typeof data.add_form.primaryKey == 'undefined') {
+                        data.add_form.primaryKey = this.addFormDialog.primaryKey
+                    }
+                    if (typeof data.add_form.elements == 'undefined') {
+                        data.add_form.elements = []
+                    }
+                    if (typeof data.add_form.width == 'undefined') {
+                        data.add_form.width = 50
+                    }
+                    data.add_form.elements.push({
+                        key: this.addFormDialog.item,
+                        className: ''
+                    })
+                    this.$refs.form.validateField("add_form.elements");
+                }
+                this.addFormDialog = {
+                    visible: false,
+                    columns: [],
+                    db: []
+                }
+            },
+            showAddFormColumn(column, db) {
+                let data = this
+                for (let i = 0; i < db.length; i ++) {
+                    data = data[db[i]]
+                }
+                let exs = []
+                if (data.add_form && data.add_form.elements && data.add_form.elements.length > 0) {
+                    for (let i = 0; i < data.add_form.elements.length; i ++) {
+                        exs.push(data.add_form.elements[i].key)
+                    }
+                }
+                let cols = []
+                for (let i = 0; i < column.options.length; i ++) {
+                    if (exs.indexOf(column.options[i].key) == -1
+                            && column.options[i].key != column.primaryKey) {
+                        cols.push({
+                            key: column.options[i].key,
+                            dataType: column.options[i].dataType
+                        })
+                    }
+                }
+                this.addFormDialog = {
+                    visible: true,
+                    columns: cols,
+                    schema: column.schema,
+                    table: column.table,
+                    primaryKey: column.primaryKey,
+                    db: db,
+                    item: ''
+                }
+                this.addFormDialog = JSON.parse(JSON.stringify(this.addFormDialog))
+            },
             editSelect(item, db) {
                 let options = []
+                let key = ''
                 if (item.options) {
                     options = JSON.parse(JSON.stringify(item.options))
+                    key = 'options'
+                } else {
+                    options = JSON.parse(JSON.stringify(item.radios))
+                    key = 'radios'
                 }
                 this.selectDialog = {
                     visible: true,
                     options: options,
-                    db: db
+                    db: db,
+                    key: key
                 }
                 this.selectDialog = JSON.parse(JSON.stringify(this.selectDialog))
             },
@@ -926,10 +1461,10 @@
                     }
                 }
                 if (mm.length > 0) {
-                    if (typeof data.options == 'undefined') {
-                        data.options = []
+                    if (typeof data[this.selectDialog.key] == 'undefined') {
+                        data[this.selectDialog.key] = []
                     }
-                    data.options = mm
+                    data[this.selectDialog.key] = mm
                 } else {
                     delete data.judgeType
                     delete data.elType
@@ -940,6 +1475,12 @@
                     delete data.valueColumn
                     delete data.options
                     delete data.className
+                    delete data.columnType
+                    delete data.canEdit
+                    delete data.size
+                    delete data.clearable
+                    delete data.options
+                    delete data.radios
                 }
                 this.form = JSON.parse(JSON.stringify(this.form))
                 this.selectDialog = {
@@ -1037,6 +1578,10 @@
                         delete data.keyColumn
                         delete data.valueColumn
                         delete data.className
+                        delete data.columnType
+                        delete data.canEdit
+                        delete data.size
+                        delete data.clearable
                         this.form = JSON.parse(JSON.stringify(this.form))
                     }
                 }
@@ -1069,7 +1614,8 @@
                         this.selectDialog = {
                             visible: true,
                             options: [],
-                            db: db
+                            db: db,
+                            key: 'options'
                         }
                         this.form = JSON.parse(JSON.stringify(this.form))
                     } else if (item.className.indexOf('.SearchInputEq') > -1) {
@@ -1476,6 +2022,7 @@
                 let column = {
                     schema: mainDb.schema,
                     table: mainDb.table,
+                    primaryKey: mainDb.primaryKey,
                     options: []
                 }
                 for (let i = 0; i < mainDb.columns.length; i ++) {
@@ -1507,6 +2054,7 @@
                         let followColumn = {
                             schema: mainDb.follows[i].schema,
                             table: mainDb.follows[i].table,
+                            primaryKey: mainDb.follows[i].primaryKey,
                             options: []
                         }
                         for (let j = 0; j < mainDb.follows[i].columns.length; j ++) {
@@ -1524,6 +2072,18 @@
             }
         },
         created: function () {
+            this.addElementShows[window.basePackage + 'form.add.AddInput'] = ['label','placeholder','clearable','size','width','rule','type','maxlength','minlength','canEdit']
+            this.addElementShows[window.basePackage + 'form.add.AddSelect'] = ['label','placeholder','clearable','size','width','rule','canEdit','select']
+            this.addElementShows[window.basePackage + 'form.add.AddSelectRemote'] = ['label','placeholder','clearable','size','width','rule','canEdit','remoteSelect']
+            this.addElementShows[window.basePackage + 'form.add.AddRadio'] = ['label','size','rule','canEdit','radio']
+            this.addElementShows[window.basePackage + 'form.add.AddInputNumber'] = ['label','size','width','rule','min','max','precision','step','canEdit']
+            this.addElementShows[window.basePackage + 'form.add.AddDatePicker'] = ['label','to','placeholder','clearable','size','width','rule','canEdit']
+            this.addElementShows[window.basePackage + 'form.add.AddDateTimePicker'] = ['label','to','placeholder','clearable','size','width','rule','canEdit']
+            this.addElementShows[window.basePackage + 'form.add.AddTimePicker'] = ['label','placeholder','clearable','size','width','rule','start','end','step','canEdit']
+            this.addElementShows[window.basePackage + 'form.add.AddUploadPic'] = ['label','placeholder','acceptType','limitSize','rule','canEdit']
+            this.addElementShows[window.basePackage + 'form.add.AddRich'] = ['label','maxlength','rule']
+            this.addElementShows[window.basePackage + 'form.add.AddCreateDateTime'] = []
+            this.addElementShows[window.basePackage + 'form.add.AddUpdateDateTime'] = []
         }
     })
 </script>
