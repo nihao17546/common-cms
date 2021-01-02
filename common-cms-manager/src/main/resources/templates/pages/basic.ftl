@@ -227,7 +227,9 @@
                                                         <el-col :span="12" v-if="item.formatter && item.formatter.type && item.formatter.type == 'TEXT'">
                                                             <el-form-item label="文本格式化:" label-width="100px">
                                                                 <span>{{item.formatter.map | json}}</span>
-                                                                <el-button type="text" plain @click="showFormatterTextDialog(item,['form','table','columns',index])">修改</el-button>
+                                                                <el-button type="text" plain v-if="!item.formatter.map" @click="showFormatterTextDialog(item,['form','table','columns',index])">添加</el-button>
+                                                                <el-button type="text" plain v-if="item.formatter.map" @click="showFormatterTextDialog(item,['form','table','columns',index])">修改</el-button>
+                                                                <el-button type="text" plain v-if="item.formatter.map" @click="deleteFormatterTextDialog(item,['form','table','columns',index])">删除</el-button>
                                                             </el-form-item>
                                                         </el-col>
                                                         <el-col :span="24" style="text-align: right;">
@@ -1062,7 +1064,9 @@
                                                             <el-col :span="12" v-if="item.formatter && item.formatter.type && item.formatter.type == 'TEXT'">
                                                                 <el-form-item label="文本格式化:" label-width="100px">
                                                                     <span>{{item.formatter.map | json}}</span>
-                                                                    <el-button type="text" plain @click="showFormatterTextDialog(item,['form','follow_tables',followIndex,'columns',index])">修改</el-button>
+                                                                    <el-button type="text" plain v-if="!item.formatter.map" @click="showFormatterTextDialog(item,['form','follow_tables',followIndex,'columns',index])">添加</el-button>
+                                                                    <el-button type="text" plain v-if="item.formatter.map" @click="showFormatterTextDialog(item,['form','follow_tables',followIndex,'columns',index])">修改</el-button>
+                                                                    <el-button type="text" plain v-if="item.formatter.map" @click="deleteFormatterTextDialog(item,['form','follow_tables',followIndex,'columns',index])">删除</el-button>
                                                                 </el-form-item>
                                                             </el-col>
                                                             <el-col :span="24" style="text-align: right;">
@@ -1118,22 +1122,40 @@
     </el-dialog>
 
     <el-dialog title="文本格式化" :top="dialogTop":visible.sync="formatterTextDialog.visible" class="group-dialog" :before-close="closeFormatterTextDialog">
-        <div style="margin-bottom: 5px;text-align: left;">
-            <el-button type="primary" plain size="mini" @click="pushFormatterText">添加</el-button>
-        </div>
-        <div v-for="(item,index) in formatterTextDialog.map">
+        <el-form :model="formatterTextDialog" ref="formatterTextDialog" size="small">
             <el-row :gutter="24">
+                <el-col :span="24">
+                    <el-form-item label="配置项:" label-width="120px"
+                                  prop="map"
+                                  :rules="rules.columns">
+                        <el-button type="primary" plain size="mini" @click="pushFormatterText">添加</el-button>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="24" v-for="(item,index) in formatterTextDialog.map">
                 <el-col :span="10">
-                    <el-input size="small" placeholder="源数据" v-model.trim="item.key"></el-input>
+                    <el-form-item label="源数据:" label-width="100px"
+                                  :prop="'map.' + index + '.key'"
+                                  :rules="[{required: true, message: '请输入', trigger: 'change'}]">
+                        <el-input size="small" placeholder="源数据" v-model.trim="item.key"></el-input>
+                    </el-form-item>
                 </el-col>
                 <el-col :span="10">
-                    <el-input size="small" placeholder="外显文案" v-model.trim="item.value"></el-input>
+                    <el-form-item label="外显文案:" label-width="100px"
+                                  :prop="'map.' + index + '.value'"
+                                  :rules="[{required: true, message: '请输入', trigger: 'change'}]">
+                        <el-input size="small" placeholder="外显文案" v-model.trim="item.value"></el-input>
+                    </el-form-item>
                 </el-col>
                 <el-col :span="4">
                     <el-button type="danger" plain size="mini" @click="removeFormatterText(index)">移除</el-button>
                 </el-col>
             </el-row>
-        </div>
+            <el-form-item style="text-align: right;">
+                <el-button type="info" plain size="mini" @click="closeFormatterTextDialog">取消</el-button>
+                <el-button type="primary" plain size="mini" @click="confirmFormatterText('formatterTextDialog')">确认</el-button>
+            </el-form-item>
+        </el-form>
     </el-dialog>
 
     <el-dialog title="默认搜索条件" :top="dialogTop" :visible.sync="whereColumnDialog.visible" class="group-dialog" :before-close="closeWhereColumnDialog">
@@ -2283,6 +2305,14 @@
             justRemove(item, index, elements) {
                 elements.splice(index, 1)
             },
+            deleteFormatterTextDialog(item, db) {
+                let data = this
+                for (let i = 0; i < db.length; i ++) {
+                    data = data[db[i]]
+                }
+                delete data.formatter
+                this.form = JSON.parse(JSON.stringify(this.form))
+            },
             showFormatterTextDialog(item,db) {
                 let map = []
                 for(let key  in item.formatter.map){
@@ -2302,6 +2332,13 @@
             },
             pushFormatterText() {
                 this.formatterTextDialog.map.push({})
+            },
+            confirmFormatterText(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.closeFormatterTextDialog()
+                    }
+                })
             },
             closeFormatterTextDialog() {
                 let mm = {}
