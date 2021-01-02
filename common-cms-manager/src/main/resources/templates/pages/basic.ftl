@@ -269,7 +269,7 @@
                                                                               :rules="[{required: true, message: '请选择', trigger: 'change'}]">
                                                                     <el-select style="width: 100%" clearable
                                                                                v-model.trim="item.className"
-                                                                               @change="whereTypeChange(item,index)">
+                                                                               @change="whereTypeChange(item)">
                                                                         <el-option v-for="(type,whereTypeIndex) in whereTypes"
                                                                                    :key="type.value" :value="type.value" :label="type.label" >
                                                                         </el-option>
@@ -330,7 +330,7 @@
                                                                                       :rules="[{required: true, message: '请选择', trigger: 'change'}]">
                                                                             <el-select style="width: 100%" clearable
                                                                                        v-model.trim="item.className"
-                                                                                       @change="whereTypeChange(item,index)">
+                                                                                       @change="whereTypeChange(item)">
                                                                                 <el-option v-for="(type,whereTypeIndex) in whereTypes"
                                                                                            :key="type.value" :value="type.value" :label="type.label" >
                                                                                 </el-option>
@@ -1083,6 +1083,137 @@
                                                             </el-col>
                                                         </el-row>
                                                     </el-card>
+                                                </el-card>
+                                            </el-col>
+                                            <el-col :span="24">
+                                                <el-card shadow="hover" style="margin-bottom: 8px;">
+                                                    <div slot="header">
+                                                        <el-form-item label="默认查询条件" label-width="100px">
+                                                            <el-button type="text" plain @click="showAddWhereColumn(followColumns[followIndex], ['form','follow_tables',followIndex])">添加</el-button>
+                                                        </el-form-item>
+                                                    </div>
+                                                    <template v-if="form.follow_tables && form.follow_tables[followIndex].select && form.follow_tables[followIndex].select.wheres && form.follow_tables[followIndex].select.wheres.length > 0">
+                                                        <el-card shadow="hover" v-for="(item,index) in form.follow_tables[followIndex].select.wheres" style="margin-bottom: 8px;">
+                                                            <el-row style="border: 0px solid gray;" :gutter="24">
+                                                                <el-col :span="6">
+                                                                    <el-form-item label="sql查询字段:" label-width="100px">
+                                                                        {{form.follow_tables[followIndex].select.schema}}.{{form.follow_tables[followIndex].select.table}} -> {{item.key}}
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="6">
+                                                                    <el-form-item label="类型:" label-width="100px"
+                                                                                  :prop="'follow_tables.' + followIndex + '.select.wheres.' + index + '.className'"
+                                                                                  :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                        <el-select style="width: 100%" clearable
+                                                                                   v-model.trim="item.className"
+                                                                                   @change="whereTypeChange(item)">
+                                                                            <el-option v-for="(type,whereTypeIndex) in whereTypes"
+                                                                                       :key="type.value" :value="type.value" :label="type.label" >
+                                                                            </el-option>
+                                                                        </el-select>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="6"
+                                                                        v-if="item.type && (item.type == 'eq' || item.type == 'gt' || item.type == 'gteq' || item.type == 'lt' || item.type == 'lteq' || item.type == 'like')">
+                                                                    <el-form-item label="值:" label-width="100px"
+                                                                                  :prop="'follow_tables.' + followIndex + '.select.wheres.' + index + '.value'"
+                                                                                  :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                        <el-input v-model.trim="item.value" placeholder="" maxlength="50"
+                                                                                  autocomplete="off" size="small"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="6" v-if="item.type && item.type == 'bt'">
+                                                                    <el-form-item label="最小值:" label-width="100px"
+                                                                                  :prop="'follow_tables.' + followIndex + '.select.wheres.' + index + '.begin'"
+                                                                                  :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                        <el-input v-model.trim="item.begin" placeholder="" maxlength="50"
+                                                                                  autocomplete="off" size="small"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="6" v-if="item.type && item.type == 'bt'">
+                                                                    <el-form-item label="最大值:" label-width="100px"
+                                                                                  :prop="'follow_tables.' + followIndex + '.select.wheres.' + index + '.end'"
+                                                                                  :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                        <el-input v-model.trim="item.end" placeholder="" maxlength="50"
+                                                                                  autocomplete="off" size="small"></el-input>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="12" v-if="item.type && item.type == 'in'">
+                                                                    <el-form-item label="集合值:" label-width="100px">
+                                                                        {{item.values | json}}
+                                                                        <el-button type="text" plain @click="editWhereInValues(item)">修改</el-button>
+                                                                    </el-form-item>
+                                                                </el-col>
+                                                                <el-col :span="24" style="text-align: right;">
+                                                                    <el-button type="danger" plain size="mini"
+                                                                               @click="justRemove(item, index, form.follow_tables[followIndex].select.wheres)">移除</el-button>
+                                                                </el-col>
+                                                            </el-row>
+                                                        </el-card>
+                                                    </template>
+                                                    <template v-if="form.follow_tables && form.follow_tables[followIndex].select && form.follow_tables[followIndex].select.leftJoins && form.follow_tables[followIndex].select.leftJoins.length > 0">
+                                                        <template v-for="(leftJoin, leftJoinIndex) in form.follow_tables[followIndex].select.leftJoins">
+                                                            <template v-if="leftJoin.wheres && leftJoin.wheres.length > 0">
+                                                                <el-card shadow="hover" v-for="(item,index) in leftJoin.wheres" style="margin-bottom: 8px;">
+                                                                    <el-row style="border: 0px solid gray;" :gutter="24">
+                                                                        <el-col :span="6">
+                                                                            <el-form-item label="sql查询字段:" label-width="100px">
+                                                                                {{form.follow_tables[followIndex].select.leftJoins[leftJoinIndex].schema}}.{{form.follow_tables[followIndex].select.leftJoins[leftJoinIndex].table}} -> {{item.key}}
+                                                                            </el-form-item>
+                                                                        </el-col>
+                                                                        <el-col :span="6">
+                                                                            <el-form-item label="类型:" label-width="100px"
+                                                                                          :prop="'follow_tables.' + followIndex +'.select.leftJoins.' + leftJoinIndex + '.wheres.' + index + '.className'"
+                                                                                          :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                                <el-select style="width: 100%" clearable
+                                                                                           v-model.trim="item.className"
+                                                                                           @change="whereTypeChange(item)">
+                                                                                    <el-option v-for="(type,whereTypeIndex) in whereTypes"
+                                                                                               :key="type.value" :value="type.value" :label="type.label" >
+                                                                                    </el-option>
+                                                                                </el-select>
+                                                                            </el-form-item>
+                                                                        </el-col>
+                                                                        <el-col :span="6"
+                                                                                v-if="item.type && (item.type == 'eq' || item.type == 'gt' || item.type == 'gteq' || item.type == 'lt' || item.type == 'lteq' || item.type == 'like')">
+                                                                            <el-form-item label="值:" label-width="100px"
+                                                                                          :prop="'follow_tables.' + followIndex +'.select.leftJoins.' + leftJoinIndex + '.wheres.' + index + '.value'"
+                                                                                          :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                                <el-input v-model.trim="item.value" placeholder="" maxlength="50"
+                                                                                          autocomplete="off" size="small"></el-input>
+                                                                            </el-form-item>
+                                                                        </el-col>
+                                                                        <el-col :span="6" v-if="item.type && item.type == 'bt'">
+                                                                            <el-form-item label="最小值:" label-width="100px"
+                                                                                          :prop="'follow_tables.' + followIndex +'.select.leftJoins.' + leftJoinIndex + '.wheres.' + index + '.begin'"
+                                                                                          :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                                <el-input v-model.trim="item.begin" placeholder="" maxlength="50"
+                                                                                          autocomplete="off" size="small"></el-input>
+                                                                            </el-form-item>
+                                                                        </el-col>
+                                                                        <el-col :span="6" v-if="item.type && item.type == 'bt'">
+                                                                            <el-form-item label="最大值:" label-width="100px"
+                                                                                          :prop="'follow_tables.' + followIndex +'.select.leftJoins.' + leftJoinIndex + '.wheres.' + index + '.end'"
+                                                                                          :rules="[{required: true, message: '请填写', trigger: 'change'}]">
+                                                                                <el-input v-model.trim="item.end" placeholder="" maxlength="50"
+                                                                                          autocomplete="off" size="small"></el-input>
+                                                                            </el-form-item>
+                                                                        </el-col>
+                                                                        <el-col :span="12" v-if="item.type && item.type == 'in'">
+                                                                            <el-form-item label="集合值:" label-width="100px">
+                                                                                {{item.values | json}}
+                                                                                <el-button type="text" plain @click="editWhereInValues(item)">修改</el-button>
+                                                                            </el-form-item>
+                                                                        </el-col>
+                                                                        <el-col :span="24" style="text-align: right;">
+                                                                            <el-button type="danger" plain size="mini"
+                                                                                       @click="justRemove(item, index, form.follow_tables[followIndex].select.leftJoins[leftJoinIndex].wheres)">移除</el-button>
+                                                                        </el-col>
+                                                                    </el-row>
+                                                                </el-card>
+                                                            </template>
+                                                        </template>
+                                                    </template>
                                                 </el-card>
                                             </el-col>
                                         </el-card>
@@ -2155,7 +2286,7 @@
                     this.form = JSON.parse(JSON.stringify(this.form))
                 });
             },
-            whereTypeChange(item, index) {
+            whereTypeChange(item) {
                 delete item.type
                 delete item.value
                 delete item.values
