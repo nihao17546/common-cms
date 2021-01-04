@@ -1641,43 +1641,43 @@
                                                     </el-card>
                                                 </template>
                                             </el-card>
-                                            <#--<el-card shadow="hover" style="margin-bottom: 8px;">-->
-                                                <#--<div slot="header">-->
-                                                    <#--<el-form-item label="唯一键组合" :prop="'add_form.unique_columns'" :rules="rules.unique_columns" label-width="100px">-->
-                                                        <#--<el-button type="text" plain @click="addUnique(['form','add_form'])">添加</el-button>-->
-                                                    <#--</el-form-item>-->
-                                                <#--</div>-->
-                                                <#--<template v-if="form.add_form.unique_columns && form.add_form.unique_columns.length > 0">-->
-                                                    <#--<el-row style="border: 0px solid gray;" :gutter="24" v-for="(item,index) in form.add_form.unique_columns">-->
-                                                        <#--<el-col :span="10">-->
-                                                            <#--<el-form-item label="冲突前端提示文案:"-->
-                                                                          <#--:prop="'add_form.unique_columns.' + index + '.toast'"-->
-                                                                          <#--:rules="[{required: true, message: '请填写', trigger: 'change'}]"-->
-                                                                          <#--label-width="150px">-->
-                                                                <#--<el-input v-model.trim="item.toast" placeholder="唯一键冲突前端提示文案"-->
-                                                                          <#--autocomplete="off" size="small" maxlength="300"></el-input>-->
-                                                            <#--</el-form-item>-->
-                                                        <#--</el-col>-->
-                                                        <#--<el-col :span="10">-->
-                                                            <#--<el-form-item label="唯一键组合:"-->
-                                                                          <#--:prop="'add_form.unique_columns.' + index + '.columns'"-->
-                                                                          <#--:rules="rules.columns"-->
-                                                                          <#--label-width="130px">-->
-                                                                <#--<el-select size="small" v-model="item.columns" multiple placeholder="请选择唯一键组合"-->
-                                                                           <#--style="width: 100%;">-->
-                                                                    <#--<el-option v-for="uniqueColumn in mainColumns[0].options"-->
-                                                                               <#--:key="uniqueColumn.key"-->
-                                                                               <#--:label="'列名:' + uniqueColumn.key + '   类型:' + uniqueColumn.dataType"-->
-                                                                               <#--:value="uniqueColumn.key"></el-option>-->
-                                                                <#--</el-select>-->
-                                                            <#--</el-form-item>-->
-                                                        <#--</el-col>-->
-                                                        <#--<el-col :span="4" style="text-align: right;">-->
-                                                            <#--<el-button type="danger" plain size="mini" @click="justRemove(item, index, form.add_form.unique_columns)">移除</el-button>-->
-                                                        <#--</el-col>-->
-                                                    <#--</el-row>-->
-                                                <#--</template>-->
-                                            <#--</el-card>-->
+                                            <el-card shadow="hover" style="margin-bottom: 8px;">
+                                                <div slot="header">
+                                                    <el-form-item label="唯一键组合" :prop="'follow_tables.' + followIndex + '.add_form.unique_columns'" :rules="rules.unique_columns" label-width="100px">
+                                                        <el-button type="text" plain @click="addUnique(['form','follow_tables',followIndex,'add_form'])">添加</el-button>
+                                                    </el-form-item>
+                                                </div>
+                                                <template v-if="form.follow_tables[followIndex].add_form.unique_columns && form.follow_tables[followIndex].add_form.unique_columns.length > 0">
+                                                    <el-row style="border: 0px solid gray;" :gutter="24" v-for="(item,index) in form.follow_tables[followIndex].add_form.unique_columns">
+                                                        <el-col :span="10">
+                                                            <el-form-item label="冲突前端提示文案:"
+                                                                          :prop="'follow_tables.' + followIndex + '.add_form.unique_columns.' + index + '.toast'"
+                                                                          :rules="[{required: true, message: '请填写', trigger: 'change'}]"
+                                                                          label-width="150px">
+                                                                <el-input v-model.trim="item.toast" placeholder="唯一键冲突前端提示文案"
+                                                                          autocomplete="off" size="small" maxlength="300"></el-input>
+                                                            </el-form-item>
+                                                        </el-col>
+                                                        <el-col :span="10">
+                                                            <el-form-item label="唯一键组合:"
+                                                                          :prop="'follow_tables.' + followIndex + '.add_form.unique_columns.' + index + '.columns'"
+                                                                          :rules="rules.columns"
+                                                                          label-width="130px">
+                                                                <el-select size="small" v-model="item.columns" multiple placeholder="请选择唯一键组合"
+                                                                           style="width: 100%;">
+                                                                    <el-option v-for="uniqueColumn in followColumns[followIndex][0].options"
+                                                                               :key="uniqueColumn.key"
+                                                                               :label="'列名:' + uniqueColumn.key + '   类型:' + uniqueColumn.dataType"
+                                                                               :value="uniqueColumn.key"></el-option>
+                                                                </el-select>
+                                                            </el-form-item>
+                                                        </el-col>
+                                                        <el-col :span="4" style="text-align: right;">
+                                                            <el-button type="danger" plain size="mini" @click="justRemove(item, index, form.follow_tables[followIndex].add_form.unique_columns)">移除</el-button>
+                                                        </el-col>
+                                                    </el-row>
+                                                </template>
+                                            </el-card>
                                         </el-card>
                                     </el-collapse-item>
                                 </el-collapse>
