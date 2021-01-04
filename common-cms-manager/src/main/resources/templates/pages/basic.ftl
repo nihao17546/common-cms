@@ -865,7 +865,7 @@
                                               :rules="[{required: true, message: '请选择', trigger: 'change'}]"
                                               :prop="'follow_tables.' + followIndex + '.add_btn'"
                                               label-width="100px">
-                                    <el-select style="width: 100%" v-model="follow.add_btn" @change="addEditDeleteBtnChange(form)">
+                                    <el-select style="width: 100%" v-model="follow.add_btn" @change="addEditDeleteBtnChange(form.follow_tables[followIndex])">
                                         <el-option :key="true" label="是" :value="true"></el-option>
                                         <el-option :key="false" label="否" :value="false"></el-option>
                                     </el-select>
@@ -876,7 +876,7 @@
                                               :rules="[{required: true, message: '请选择', trigger: 'change'}]"
                                               :prop="'follow_tables.' + followIndex + '.edit_btn'"
                                               label-width="100px">
-                                    <el-select style="width: 100%" v-model="follow.edit_btn" @change="addEditDeleteBtnChange(form)">
+                                    <el-select style="width: 100%" v-model="follow.edit_btn" @change="addEditDeleteBtnChange(form.follow_tables[followIndex])">
                                         <el-option :key="true" label="是" :value="true"></el-option>
                                         <el-option :key="false" label="否" :value="false"></el-option>
                                     </el-select>
@@ -887,7 +887,7 @@
                                               :rules="[{required: true, message: '请选择', trigger: 'change'}]"
                                               :prop="'follow_tables.' + followIndex + '.delete_btn'"
                                               label-width="100px">
-                                    <el-select style="width: 100%" v-model="follow.delete_btn" @change="addEditDeleteBtnChange(form)">
+                                    <el-select style="width: 100%" v-model="follow.delete_btn" @change="addEditDeleteBtnChange(form.follow_tables[followIndex])">
                                         <el-option :key="true" label="是" :value="true"></el-option>
                                         <el-option :key="false" label="否" :value="false"></el-option>
                                     </el-select>
@@ -1373,6 +1373,311 @@
                                                     </template>
                                                 </template>
                                             </template>
+                                        </el-card>
+                                    </el-collapse-item>
+                                    <el-collapse-item title="新增/编辑表单" name="add" v-if="form.follow_tables[followIndex].add_form">
+                                        <el-card shadow="hover">
+                                            <el-row :gutter="24">
+                                                <el-col :span="6">
+                                                    <el-form-item label="前端弹窗宽（%）:" label-width="140px"
+                                                                  :prop="'follow_tables.' + followIndex + '.add_form.width'">
+                                                        <el-input-number size="small" v-model="follow.add_form.width"
+                                                                         :min="50" :max="100"
+                                                                         style="width: 100%"></el-input-number>
+                                                    </el-form-item>
+                                                </el-col>
+                                            </el-row>
+                                            <el-card shadow="hover" style="margin-bottom: 8px;">
+                                                <div slot="header">
+                                                    <el-form-item label="表单项" :prop="'follow_tables.' + followIndex + '.add_form.elements'" :rules="rules.columns" label-width="100px">
+                                                        <el-button type="text" plain @click="showAddFormColumn(followColumns[followIndex][0], ['form','follow_tables',followIndex])">添加</el-button>
+                                                    </el-form-item>
+                                                </div>
+                                                <template v-if="form.follow_tables[followIndex].add_form.elements && form.follow_tables[followIndex].add_form.elements.length > 0">
+                                                    <el-card shadow="hover" v-for="(item,index) in form.follow_tables[followIndex].add_form.elements" style="margin-bottom: 8px;">
+                                                        <el-row style="border: 0px solid gray;" :gutter="24">
+                                                            <el-col :span="6">
+                                                                <el-form-item label="字段:" label-width="100px">
+                                                                    <el-input v-model.trim="item.key" placeholder="" maxlength="100"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.key'"
+                                                                              :rules="[{required: true, message: '不能为空', trigger: 'change'}]"
+                                                                              autocomplete="off" size="small" readOnly="true"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6">
+                                                                <el-form-item label="类型:" label-width="100px"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.className'"
+                                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                    <el-select style="width: 100%" clearable
+                                                                               v-model.trim="item.className"
+                                                                               @change="addElementTypeChange(item,['form','follow_tables',followIndex,'add_form','elements',index])">
+                                                                        <el-option v-for="(type,addElementTypeIndex) in addElementTypes"
+                                                                                   :key="type.value" :value="type.value" :label="type.label" >
+                                                                        </el-option>
+                                                                    </el-select>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('label') > -1">
+                                                                <el-form-item label="控件标题:" label-width="100px"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.label'"
+                                                                              :rules="[{required: true, message: '请输入', trigger: 'change'}]">
+                                                                    <el-input v-model.trim="item.label" placeholder="" maxlength="20"
+                                                                              autocomplete="off" size="small"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('type') > -1">
+                                                                <el-form-item label="文本框类型:" label-width="110px"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.type'"
+                                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                    <el-select style="width: 100%" v-model.trim="item.type">
+                                                                        <el-option key="text" label="普通单行" value="text"></el-option>
+                                                                        <el-option key="textarea" label="多行" value="textarea"></el-option>
+                                                                    </el-select>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('placeholder') > -1">
+                                                                <el-form-item label="输入框提示文案:" label-width="120px"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.placeholder'"
+                                                                              :rules="[{required: false, message: '请输入', trigger: 'change'}]">
+                                                                    <el-input v-model.trim="item.placeholder" placeholder="" maxlength="100"
+                                                                              autocomplete="off" size="small"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('clearable') > -1">
+                                                                <el-form-item label="是否可一键清空:" label-width="130px"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.clearable'"
+                                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                    <el-select style="width: 100%" v-model.trim="item.clearable">
+                                                                        <el-option :key="true" label="是" :value="true"></el-option>
+                                                                        <el-option :key="false" label="否" :value="false"></el-option>
+                                                                    </el-select>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('to') > -1">
+                                                                <el-form-item label="转换格式:" label-width="110px"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.to'"
+                                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                    <el-select style="width: 100%" v-model.trim="item.to">
+                                                                        <el-option key="java.lang.String" label="java.lang.String" value="java.lang.String"></el-option>
+                                                                        <el-option key="java.lang.Long" label="java.lang.Long" value="java.lang.Long"></el-option>
+                                                                        <el-option key="java.util.Date" label="java.util.Date" value="java.util.Date"></el-option>
+                                                                        <el-option key="java.sql.Timestamp" label="java.sql.Timestamp" value="java.sql.Timestamp"></el-option>
+                                                                    </el-select>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('size') > -1">
+                                                                <el-form-item label="控件大小:" label-width="110px"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.size'"
+                                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                    <el-select style="width: 100%" v-model.trim="item.size">
+                                                                        <el-option key="mini" label="小" value="mini"></el-option>
+                                                                        <el-option key="small" label="中" value="small"></el-option>
+                                                                        <el-option key="medium" label="大" value="medium"></el-option>
+                                                                    </el-select>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('width') > -1">
+                                                                <el-form-item label="控件宽度:"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.width'"
+                                                                              :rules="rules.number"
+                                                                              label-width="100px">
+                                                                    <el-input v-model.trim="item.width"  placeholder="单位px"
+                                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('minlength') > -1">
+                                                                <el-form-item label="最小输入长度:"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.minlength'"
+                                                                              :rules="rules.zNumber"
+                                                                              label-width="120px">
+                                                                    <el-input v-model.trim="item.minlength"  placeholder=""
+                                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('maxlength') > -1">
+                                                                <el-form-item label="最大输入长度:"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.maxlength'"
+                                                                              :rules="rules.zNumber"
+                                                                              label-width="120px">
+                                                                    <el-input v-model.trim="item.maxlength"  placeholder=""
+                                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('min') > -1">
+                                                                <el-form-item label="计数器最小值:"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.min'"
+                                                                              :rules="rules.number"
+                                                                              label-width="120px">
+                                                                    <el-input v-model.trim="item.min"  placeholder=""
+                                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('max') > -1">
+                                                                <el-form-item label="计数器最大值:"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.max'"
+                                                                              :rules="rules.number"
+                                                                              label-width="120px">
+                                                                    <el-input v-model.trim="item.max"  placeholder=""
+                                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('precision') > -1">
+                                                                <el-form-item label="数值精度:"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.precision'"
+                                                                              :rules="rules.number"
+                                                                              label-width="120px">
+                                                                    <el-input v-model.trim="item.precision"  placeholder=""
+                                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('start') > -1">
+                                                                <el-form-item label="开始时间:"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.start'"
+                                                                              :rules="[{required: true, message: '请输入', trigger: 'change'}]"
+                                                                              label-width="100px">
+                                                                    <el-time-select style="width: 100%"
+                                                                                    v-model.trim="item.start"
+                                                                                    :picker-options="{start: '00:00',step: '00:01',end: '23:59'}"
+                                                                                    placeholder="选择开始时间">
+                                                                    </el-time-select>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('end') > -1">
+                                                                <el-form-item label="截止时间:"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.end'"
+                                                                              :rules="[{required: true, message: '请输入', trigger: 'change'}]"
+                                                                              label-width="100px">
+                                                                    <el-time-select style="width: 100%"
+                                                                                    v-model.trim="item.end"
+                                                                                    :picker-options="{start: '00:00',step: '00:01',end: '23:59'}"
+                                                                                    placeholder="选择截止时间">
+                                                                    </el-time-select>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('step') > -1">
+                                                                <el-form-item label="步长:" v-if="item.className.indexOf('.AddInputNumber') > -1"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.step'"
+                                                                              :rules="rules.number"
+                                                                              label-width="120px">
+                                                                    <el-input v-model.trim="item.step"  placeholder=""
+                                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                                </el-form-item>
+                                                                <el-form-item label="时间间隔:" v-if="item.className.indexOf('.AddTimePicker') > -1"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.step'"
+                                                                              :rules="[{required: true, message: '请输入', trigger: 'change'}]"
+                                                                              label-width="100px">
+                                                                    <el-time-select v-model.trim="item.step" style="width: 100%"
+                                                                                    :picker-options="{start: '00:00',step: '00:01',end: '23:59'}"
+                                                                                    placeholder="时间间隔">
+                                                                    </el-time-select>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('acceptType') > -1">
+                                                                <el-form-item label="图片格式限制:" label-width="120px"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.acceptType'"
+                                                                              :rules="[{required: false, message: '请输入', trigger: 'change'}]">
+                                                                    <el-input v-model.trim="item.acceptType" placeholder="例：'.jpg,.PNG'，多个使用逗号分隔" maxlength="100"
+                                                                              autocomplete="off" size="small"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('limitSize') > -1">
+                                                                <el-form-item label="图片大小限制:"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.limitSize'"
+                                                                              :rules="rules.zNumber"
+                                                                              label-width="120px">
+                                                                    <el-input v-model.trim="item.limitSize"  placeholder="单位：字节"
+                                                                              autocomplete="off" size="small" maxlength="50"></el-input>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('remoteSelect') > -1">
+                                                                <el-form-item label="远程下拉菜单配置:" label-width="130px">
+                                                                    {{item.schema}}.{{item.table}}[{{item.keyColumn}}-{{item.valueColumn}}]
+                                                                    <el-button type="text" plain @click="editRemoteSelect(item,['form','follow_tables',followIndex,'add_form','elements',index])">修改</el-button>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="12" v-if="item.className && addElementShows[item.className].indexOf('select') > -1">
+                                                                <el-form-item label="下拉选项配置:" label-width="130px">
+                                                                    {{item.options | json}}
+                                                                    <el-button type="text" plain @click="editSelect(item,['form','follow_tables',followIndex,'add_form','elements',index])">修改</el-button>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="12" v-if="item.className && addElementShows[item.className].indexOf('radio') > -1">
+                                                                <el-form-item label="单选框配置:" label-width="130px">
+                                                                    {{item.radios | json}}
+                                                                    <el-button type="text" plain @click="editSelect(item,['form','follow_tables',followIndex,'add_form','elements',index])">修改</el-button>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="12" v-if="item.className && addElementShows[item.className].indexOf('rule') > -1">
+                                                                <el-form-item label="前端校验规则:" label-width="130px">
+                                                                    {{item.rule | json}}
+                                                                    <el-button type="text" v-if="!item.rule" plain @click="showAddRule(item,['form','follow_tables',followIndex,'add_form','elements',index])">添加</el-button>
+                                                                    <el-button type="text" v-if="item.rule" plain @click="showAddRule(item,['form','follow_tables',followIndex,'add_form','elements',index])">修改</el-button>
+                                                                    <el-button type="text" v-if="item.rule" plain @click="delAddRule(item)">删除</el-button>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('canEdit') > -1">
+                                                                <el-form-item label="是否可编辑:" label-width="130px"
+                                                                              :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.canEdit'"
+                                                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                                    <el-select style="width: 100%" v-model.trim="item.canEdit">
+                                                                        <el-option :key="true" label="是" :value="true"></el-option>
+                                                                        <el-option :key="false" label="否" :value="false"></el-option>
+                                                                    </el-select>
+                                                                </el-form-item>
+                                                            </el-col>
+                                                            <el-col :span="24" style="text-align: right;">
+                                                                <el-button-group>
+                                                                    <el-button type="primary" size="mini" icon="el-icon-arrow-up"
+                                                                               v-if="index != 0"
+                                                                               @click="up(item, index, form.follow_tables[followIndex].add_form.elements)">上移</el-button>
+                                                                    <el-button type="primary" size="mini" icon="el-icon-arrow-down"
+                                                                               v-if="index != form.follow_tables[followIndex].add_form.elements.length - 1"
+                                                                               @click="down(item, index, form.follow_tables[followIndex].add_form.elements)">下移</el-button>
+                                                                </el-button-group>
+                                                                <el-button type="danger" plain size="mini"
+                                                                           @click="justRemove(item, index, form.follow_tables[followIndex].add_form.elements)">移除</el-button>
+                                                            </el-col>
+                                                        </el-row>
+                                                    </el-card>
+                                                </template>
+                                            </el-card>
+                                            <#--<el-card shadow="hover" style="margin-bottom: 8px;">-->
+                                                <#--<div slot="header">-->
+                                                    <#--<el-form-item label="唯一键组合" :prop="'add_form.unique_columns'" :rules="rules.unique_columns" label-width="100px">-->
+                                                        <#--<el-button type="text" plain @click="addUnique(['form','add_form'])">添加</el-button>-->
+                                                    <#--</el-form-item>-->
+                                                <#--</div>-->
+                                                <#--<template v-if="form.add_form.unique_columns && form.add_form.unique_columns.length > 0">-->
+                                                    <#--<el-row style="border: 0px solid gray;" :gutter="24" v-for="(item,index) in form.add_form.unique_columns">-->
+                                                        <#--<el-col :span="10">-->
+                                                            <#--<el-form-item label="冲突前端提示文案:"-->
+                                                                          <#--:prop="'add_form.unique_columns.' + index + '.toast'"-->
+                                                                          <#--:rules="[{required: true, message: '请填写', trigger: 'change'}]"-->
+                                                                          <#--label-width="150px">-->
+                                                                <#--<el-input v-model.trim="item.toast" placeholder="唯一键冲突前端提示文案"-->
+                                                                          <#--autocomplete="off" size="small" maxlength="300"></el-input>-->
+                                                            <#--</el-form-item>-->
+                                                        <#--</el-col>-->
+                                                        <#--<el-col :span="10">-->
+                                                            <#--<el-form-item label="唯一键组合:"-->
+                                                                          <#--:prop="'add_form.unique_columns.' + index + '.columns'"-->
+                                                                          <#--:rules="rules.columns"-->
+                                                                          <#--label-width="130px">-->
+                                                                <#--<el-select size="small" v-model="item.columns" multiple placeholder="请选择唯一键组合"-->
+                                                                           <#--style="width: 100%;">-->
+                                                                    <#--<el-option v-for="uniqueColumn in mainColumns[0].options"-->
+                                                                               <#--:key="uniqueColumn.key"-->
+                                                                               <#--:label="'列名:' + uniqueColumn.key + '   类型:' + uniqueColumn.dataType"-->
+                                                                               <#--:value="uniqueColumn.key"></el-option>-->
+                                                                <#--</el-select>-->
+                                                            <#--</el-form-item>-->
+                                                        <#--</el-col>-->
+                                                        <#--<el-col :span="4" style="text-align: right;">-->
+                                                            <#--<el-button type="danger" plain size="mini" @click="justRemove(item, index, form.add_form.unique_columns)">移除</el-button>-->
+                                                        <#--</el-col>-->
+                                                    <#--</el-row>-->
+                                                <#--</template>-->
+                                            <#--</el-card>-->
                                         </el-card>
                                     </el-collapse-item>
                                 </el-collapse>
@@ -2054,9 +2359,15 @@
             },
             closeAddFormDialog() {
                 if (this.addFormDialog.item) {
+                    let validate = ''
                     let data = this
                     for (let i = 0; i < this.addFormDialog.db.length; i ++) {
                         data = data[this.addFormDialog.db[i]]
+                        if (i == 1) {
+                            validate = this.addFormDialog.db[i]
+                        } else if (i > 1) {
+                            validate = validate + '.' + this.addFormDialog.db[i]
+                        }
                     }
                     if (typeof data.add_form == 'undefined') {
                         data.add_form = {}
@@ -2080,7 +2391,11 @@
                         key: this.addFormDialog.item,
                         className: ''
                     })
-                    this.$refs.form.validateField("add_form.elements");
+                    if (validate == '') {
+                        this.$refs.form.validateField('add_form.elements');
+                    } else {
+                        this.$refs.form.validateField(validate + '.add_form.elements');
+                    }
                 }
                 this.addFormDialog = {
                     visible: false,
