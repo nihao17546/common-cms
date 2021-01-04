@@ -3058,9 +3058,42 @@
                 }
             },
             showAddTableColumn(columns, db) {
+                let data = this
+                for (let i = 0; i < db.length; i ++) {
+                    data = data[db[i]]
+                }
+                let exs = []
+                if (data.columns && data.columns.length > 0) {
+                    for (let i = 0;i < data.columns.length; i ++) {
+                        exs.push(data.columns[i].key + ' as ' + data.columns[i].prop)
+                    }
+                }
+                let col = []
+                for (let i = 0; i < columns.length; i ++) {
+                    let column = columns[i]
+                    let co = {
+                        schema: column.schema,
+                        table: column.table,
+                        primaryKey: column.primaryKey,
+                        options: []
+                    }
+                    for (let j = 0; j < column.options.length; j ++) {
+                        let index = exs.indexOf(column.options[j].key + ' as ' + column.options[j].alias + '_' + column.options[j].key)
+                        if (index == -1) {
+                            co.options.push({
+                                key: column.options[j].key,
+                                dataType: column.options[j].dataType,
+                                schema: column.options[j].schema,
+                                table: column.options[j].table,
+                                alias: column.options[j].alias
+                            })
+                        }
+                    }
+                    col.push(co)
+                }
                 this.tableColumnDialog = {
                     visible: true,
-                    columns: JSON.parse(JSON.stringify(columns)),
+                    columns: col,
                     value: '',
                     db: db
                 }
