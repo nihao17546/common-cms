@@ -1,4 +1,4 @@
-package com.appcnd.common.cms.starter.util;
+package com.appcnd.common.cms.entity.util;
 
 import javax.crypto.Cipher;
 import java.security.Key;

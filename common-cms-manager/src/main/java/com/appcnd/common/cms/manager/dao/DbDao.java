@@ -16,4 +16,6 @@ public interface DbDao {
                                  @Param("tableName") String tableName);
     List<ColumnInfo> getTableInfo(@Param("tableSchema") String tableSchema,
                                   @Param("tableName") String tableName);
+    List<Map<String,Object>> selectConfig();
+    Map<String,Object> selectConfigById(@Param("id") Integer id);
 }

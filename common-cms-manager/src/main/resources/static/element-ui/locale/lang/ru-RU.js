@@ -36,7 +36,7 @@ exports.default = {
       month10: 'Октябрь',
       month11: 'Ноябрь',
       month12: 'Декабрь',
-      // week: 'week',
+      week: 'неделя',
       weeks: {
         sun: 'Вс',
         mon: 'Пн',
@@ -70,7 +70,8 @@ exports.default = {
     cascader: {
       noMatch: 'Совпадений не найдено',
       loading: 'Загрузка',
-      placeholder: 'Выбрать'
+      placeholder: 'Выбрать',
+      noData: 'Нет данных'
     },
     pagination: {
       goto: 'Перейти',
@@ -87,7 +88,7 @@ exports.default = {
     upload: {
       deleteTip: 'Нажмите [Удалить] для удаления',
       delete: 'Удалить',
-      preview: 'Превью',
+      preview: 'Предпросмотр',
       continue: 'Продолжить'
     },
     table: {
@@ -107,6 +108,16 @@ exports.default = {
       filterPlaceholder: 'Введите ключевое слово',
       noCheckedFormat: '{total} пунктов',
       hasCheckedFormat: '{checked}/{total} выбрано'
+    },
+    image: {
+      error: 'Произошла ошибка'
+    },
+    pageHeader: {
+      title: 'Назад'
+    },
+    popconfirm: {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Отмена'
     }
   }
 };

@@ -67,16 +67,16 @@ public class WebDaoImpl implements IWebDao {
                     sb.append(" like ? ");
                     params.add("%" + searchParam.getValue() + "%");
                 } else if (searchParam.getType().equals(JudgeType.gt.name())) {
-                    sb.append(" > ");
+                    sb.append(" > ? ");
                     params.add(searchParam.getValue());
                 } else if (searchParam.getType().equals(JudgeType.gteq.name())) {
-                    sb.append(" >= ");
+                    sb.append(" >= ? ");
                     params.add(searchParam.getValue());
                 } else if (searchParam.getType().equals(JudgeType.lt.name())) {
-                    sb.append(" < ");
+                    sb.append(" < ? ");
                     params.add(searchParam.getValue());
                 } else if (searchParam.getType().equals(JudgeType.lteq.name())) {
-                    sb.append(" <= ");
+                    sb.append(" <= ? ");
                     params.add(searchParam.getValue());
                 } else if (searchParam.getType().equals(JudgeType.bt.name())) {
                     sb.append(" between ? and ? ");
@@ -98,19 +98,19 @@ public class WebDaoImpl implements IWebDao {
             WhereLike whereLike = (WhereLike) where;
             params.add("%" + whereLike.getValue() + "%");
         } else if (where.getType() == JudgeType.gt) {
-            sb.append(" > ");
+            sb.append(" > ? ");
             WhereGt whereGt = (WhereGt) where;
             params.add(whereGt.getValue());
         } else if (where.getType() == JudgeType.gteq) {
-            sb.append(" >= ");
+            sb.append(" >= ? ");
             WhereGteq whereGteq = (WhereGteq) where;
             params.add(whereGteq.getValue());
         } else if (where.getType() == JudgeType.lt) {
-            sb.append(" < ");
+            sb.append(" < ? ");
             WhereLt whereLt = (WhereLt) where;
             params.add(whereLt.getValue());
         } else if (where.getType() == JudgeType.lteq) {
-            sb.append(" <= ");
+            sb.append(" <= ? ");
             WhereLteq whereLteq = (WhereLteq) where;
             params.add(whereLteq.getValue());
         } else if (where.getType() == JudgeType.in) {

@@ -19,11 +19,8 @@
 </head>
 <body>
 <div id="app" v-loading="loading">
-    <el-dialog title="预览" :visible.sync="previewVisible" :before-close="closePreview">
-        <pre>{{form}}</pre>
-    </el-dialog>
     <el-form :model="form" :rules="rules" ref="form" size="small" v-if="mainDb">
-        <el-collapse accordion>
+        <el-collapse v-model="accordionActiveName">
             <el-collapse-item :title="'主表 - ' + form.table.select.schema + '.' + form.table.select.table" name="main">
                 <div  style="padding-left: 20px;">
                     <el-row :gutter="24">
@@ -383,7 +380,7 @@
                                 </el-collapse-item>
                                 <el-collapse-item title="搜索表单" name="search">
                                     <el-card shadow="hover">
-                                        <el-col :span="24">
+                                        <el-col :span="24"  style="margin-bottom: 8px;">
                                             <el-button type="text" plain @click="showAddSearchColumn(mainColumns, ['form','table'])">添加表单项</el-button>
                                         </el-col>
                                         <template v-if="form.table && form.table.select && form.table.select.searchElements && form.table.select.searchElements.length > 0">
@@ -1220,7 +1217,7 @@
                                     </el-collapse-item>
                                     <el-collapse-item title="搜索表单" name="search">
                                         <el-card shadow="hover">
-                                            <el-col :span="24">
+                                            <el-col :span="24" style="margin-bottom: 8px;">
                                                 <el-button type="text" plain @click="showAddSearchColumn(followColumns[followIndex], ['form','follow_tables',followIndex])">添加表单项</el-button>
                                             </el-col>
                                             <template v-if="form.follow_tables && form.follow_tables.length > 0 && form.follow_tables[followIndex].select && form.follow_tables[followIndex].select.searchElements && form.follow_tables[followIndex].select.searchElements.length > 0">
@@ -1801,7 +1798,7 @@
                 <el-input v-model.trim="remoteSelectDialog.table" placeholder="" maxlength="100"
                           autocomplete="off" size="small" @change="remoteSelectSchemaOrTableChange"></el-input>
             </el-form-item>
-            <el-form-item label="外显字段:" label-width="100px" prop="keyColumn"
+            <el-form-item label="值字段:" label-width="100px" prop="keyColumn"
                           :rules="[{required: true, message: '请选择', trigger: 'change'}]">
                 <el-select v-model.trim="remoteSelectDialog.keyColumn" placeholder="请选择外显字段" size="small" style="width: 100%">
                     <el-option v-for="column in remoteSelectDialog.columns"
@@ -1811,7 +1808,7 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="值字段:" label-width="100px" prop="valueColumn"
+            <el-form-item label="外显字段:" label-width="100px" prop="valueColumn"
                           :rules="[{required: true, message: '请选择', trigger: 'change'}]">
                 <el-select v-model.trim="remoteSelectDialog.valueColumn" placeholder="请选择值字段" size="small" style="width: 100%">
                     <el-option v-for="column in remoteSelectDialog.columns"
@@ -1912,6 +1909,15 @@
         window.parent.document.getElementById("basic").height =  window.document.body.scrollHeight
     }, 1)
 
+    function getParam(name) {
+        var reg = new RegExp("[^\?&]?" + encodeURI(name) + "=[^&]+");
+        var arr = window.location.search.match(reg);
+        if (arr != null) {
+            return decodeURI(arr[0].substring(arr[0].search("=") + 1));
+        }
+        return "";
+    }
+
     window.vue = new Vue({
         name: 'm',
         el: '#app',
@@ -1963,6 +1969,7 @@
                 height: window.innerHeight - 78,
                 dialogTop: '150px',
                 activeNames: [],
+                accordionActiveName: [],
                 followActiveNames: [],
                 previewVisible: false,
                 aliasTable: {},
@@ -2140,19 +2147,87 @@
         },
         methods: {
             preview() {
-                this.previewVisible = true
-            },
-            closePreview() {
-                this.previewVisible = false
+                window.open(window.contextPath + "/pages/preview.html")
             },
             submit() {
                 this.$refs['form'].validate((valid, obj) => {
+                    this.accordionActiveName = []
+                    this.activeNames = []
+                    this.followActiveNames = []
+                    if (this.followDbs && this.followDbs.length > 0) {
+                        for (let i = 0; i < this.followDbs.length; i ++) {
+                            this.followActiveNames.push({
+                                activeNames: []
+                            })
+                        }
+                    }
                     if (valid) {
-                        alert(1)
+                        this.loading = true;
+                        axios.post(window.contextPath + '/api/save',this.form).then(res => {
+                            if (res.data.status != 0) {
+                                this.$message.error(res.data.msg);
+                                this.loading = false;
+                            }
+                            else {
+                                this.loading = false;
+                            }
+                        }).catch(res => {
+                            console.error(res)
+                            this.loading = false;
+                        })
                     } else {
-                        alert(0)
                         for (let key in obj) {
-                            console.log(key + ' -> ' + JSON.stringify(obj[key]))
+                            let items = key.split('.')
+                            if (items[0] == 'follow_tables') {
+                                let followIndex = items[1]
+                                if (this.accordionActiveName.indexOf('follow' + followIndex) == -1) {
+                                    this.accordionActiveName.push('follow' + followIndex)
+                                }
+                                if (items[2] == 'columns') {
+                                    if (this.followActiveNames[followIndex].activeNames.indexOf('table') == -1) {
+                                        this.followActiveNames[followIndex].activeNames.push('table')
+                                    }
+                                } else if (items[2] == 'select') {
+                                    if (items[3] == 'wheres') {
+                                        if (this.followActiveNames[followIndex].activeNames.indexOf('table') == -1) {
+                                            this.followActiveNames[followIndex].activeNames.push('table')
+                                        }
+                                    }  else if (items[3] == 'searchElements') {
+                                        if (this.followActiveNames[followIndex].activeNames.indexOf('search') == -1) {
+                                            this.followActiveNames[followIndex].activeNames.push('search')
+                                        }
+                                    }
+                                } else if (items[2] == 'add_form') {
+                                    if (this.followActiveNames[followIndex].activeNames.indexOf('add') == -1) {
+                                        this.followActiveNames[followIndex].activeNames.push('add')
+                                    }
+                                }
+                            } else {
+                                if (this.accordionActiveName.indexOf('main') == -1) {
+                                    this.accordionActiveName.push('main')
+                                }
+                                if (items[0] == 'table') {
+                                    if (items[1] == 'columns') {
+                                        if (this.activeNames.indexOf('table') == -1) {
+                                            this.activeNames.push('table')
+                                        }
+                                    } else if (items[1] == 'select') {
+                                        if (items[2] == 'wheres') {
+                                            if (this.activeNames.indexOf('table') == -1) {
+                                                this.activeNames.push('table')
+                                            }
+                                        } else if (items[2] == 'searchElements') {
+                                            if (this.activeNames.indexOf('search') == -1) {
+                                                this.activeNames.push('search')
+                                            }
+                                        }
+                                    }
+                                } else if (items[0] == 'add_form') {
+                                    if (this.activeNames.indexOf('add') == -1) {
+                                        this.activeNames.push('add')
+                                    }
+                                }
+                            }
                         }
                     }
                 });
@@ -2294,7 +2369,7 @@
                         item.elType = 'DATETIME_PICKER'
                         item.columnType = 'UPDATE_DATETIME'
                         this.form = JSON.parse(JSON.stringify(this.form))
-                    } else if (item.className.indexOf('.AddUpdateDateTime') > -1) {
+                    } else if (item.className.indexOf('.AddCreateDateTime') > -1) {
                         item.elType = 'DATETIME_PICKER'
                         item.columnType = 'CREATE_DATETIME'
                         this.form = JSON.parse(JSON.stringify(this.form))
@@ -3260,6 +3335,28 @@
             }
         },
         created: function () {
+            let id = getParam("id")
+            if (id) {
+                this.loading = true;
+                axios.get(window.contextPath + '/api/getJson', {
+                    params: {
+                        id: id
+                    }
+                }).then(res => {
+                    if (res.data.status != 0) {
+                        this.$message.error(res.data.msg);
+                        this.loading = false;
+                    } else {
+                        this.form = res.data.content.json
+                        this.loading = false;
+                    }
+                }).catch(res => {
+                    console.error(res)
+                    this.$message.error('服务异常');
+                    this.loading = false;
+                })
+            }
+
             this.addElementShows[window.basePackage + 'form.add.AddInput'] = ['label','placeholder','clearable','size','width','rule','type','maxlength','minlength','canEdit']
             this.addElementShows[window.basePackage + 'form.add.AddSelect'] = ['label','placeholder','clearable','size','width','rule','canEdit','select']
             this.addElementShows[window.basePackage + 'form.add.AddSelectRemote'] = ['label','placeholder','clearable','size','width','rule','canEdit','remoteSelect']
@@ -3274,6 +3371,11 @@
             this.addElementShows[window.basePackage + 'form.add.AddUpdateDateTime'] = []
             window.setInterval(() => {
                 this.dialogTop = (window.parent.ScollPostion().top + 30) + 'px'
+            }, 100)
+
+            window.setInterval(() => {
+                let configStr = JSON.stringify(this.form)
+                localStorage.setItem('config', [configStr])
             }, 100)
         }
     })

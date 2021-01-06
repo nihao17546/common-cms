@@ -56,6 +56,9 @@ function searchForm(systemConfig) {
             if (element.clearable) {
                 clearable = 'clearable'
             }
+            if (element.placeholder == null || typeof element.placeholder == 'undefined') {
+                element.placeholder = ''
+            }
             switch (element.elType) {
                 case 'INPUT':
                     let input = $('<el-input v-model.trim="searchForm.' + element.key + '" ' +
@@ -270,6 +273,9 @@ function addForm(systemConfig) {
                 let canNotEdit = ''
                 if (element.canEdit === false) {
                     canNotEdit = ' disabled '
+                }
+                if (element.placeholder == null || typeof element.placeholder == 'undefined') {
+                    element.placeholder = ''
                 }
                 switch (element.elType) {
                     case 'INPUT':

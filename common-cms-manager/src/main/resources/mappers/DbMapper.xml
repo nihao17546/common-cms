@@ -22,4 +22,12 @@
         where table_name = #{tableName}
         and table_schema = #{tableSchema}
     </select>
+
+    <select id="selectConfig" resultType="java.util.Map">
+        select * from tb_meta_config order by id desc
+    </select>
+
+    <select id="selectConfigById" resultType="java.util.Map">
+        select * from tb_meta_config where id=#{id}
+    </select>
 </mapper>

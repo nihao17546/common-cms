@@ -70,7 +70,8 @@ exports.default = {
     cascader: {
       noMatch: 'No hay datos que coincidan',
       loading: 'Cargando',
-      placeholder: 'Seleccionar'
+      placeholder: 'Seleccionar',
+      noData: 'Sin datos'
     },
     pagination: {
       goto: 'Ir a',
@@ -84,7 +85,7 @@ exports.default = {
       error: 'Entrada inválida'
     },
     upload: {
-      deleteTip: 'press delete to remove', // to be translated
+      deleteTip: 'Pulse Eliminar para retirar',
       delete: 'Eliminar',
       preview: 'Vista Previa',
       continue: 'Continuar'
@@ -106,6 +107,16 @@ exports.default = {
       filterPlaceholder: 'Ingresar palabra clave',
       noCheckedFormat: '{total} artículos',
       hasCheckedFormat: '{checked}/{total} revisados'
+    },
+    image: {
+      error: 'HA FALLADO'
+    },
+    pageHeader: {
+      title: 'Volver'
+    },
+    popconfirm: {
+      confirmButtonText: 'Si',
+      cancelButtonText: 'No'
     }
   }
 };

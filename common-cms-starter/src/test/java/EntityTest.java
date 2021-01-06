@@ -14,7 +14,7 @@ import com.appcnd.common.cms.entity.table.TableColumn;
 import com.appcnd.common.cms.entity.table.formatter.FormatterPic;
 import com.appcnd.common.cms.entity.table.formatter.FormatterSwitch;
 import com.appcnd.common.cms.entity.table.formatter.FormatterText;
-import com.appcnd.common.cms.starter.util.DesUtil;
+import com.appcnd.common.cms.entity.util.DesUtil;
 
 import java.util.Date;
 import java.util.Arrays;
@@ -69,9 +69,10 @@ public class EntityTest {
                 .followTables(FollowTable.builder()
                         .bottomName("从表按钮")
                         .pagination(true)
-                        .addBtn(true)
-                        .editBtn(true)
-                        .deleteBtn(true)
+                        .addBtn(false)
+                        .editBtn(false)
+                        .deleteBtn(false)
+
                         .build())
                 .build();
         System.out.println(configEntity.json());

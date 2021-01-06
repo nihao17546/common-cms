@@ -226,6 +226,14 @@
     window.setInterval(() => {
         window.parent.document.getElementById("database").height = document.getElementById("app").offsetHeight + 15
     }, 200)
+    function getParam(name) {
+        var reg = new RegExp("[^\?&]?" + encodeURI(name) + "=[^&]+");
+        var arr = window.location.search.match(reg);
+        if (arr != null) {
+            return decodeURI(arr[0].substring(arr[0].search("=") + 1));
+        }
+        return "";
+    }
 </script>
 <script>
     window.vue = new Vue({
@@ -350,6 +358,7 @@
                 this.confirmed = false
                 this.$refs.mainDb.resetFields()
                 this.$refs.followDb.resetFields()
+                this.sy()
             },
             getTable(formName, form) {
                 this.$refs[formName].validate((valid) => {
@@ -380,11 +389,31 @@
             }
         },
         created() {
-            this.mainDb = {"schema":"test","table":"tb_main","primaryKey":"id","columns":[{"name":"id","type":"int"},{"name":"name","type":"varchar"},{"name":"type","type":"int"},{"name":"pic","type":"varchar"},{"name":"status","type":"int"},{"name":"city_id","type":"int"},{"name":"time","type":"datetime"},{"name":"rich","type":"text"}],"checked":true,"follows":[{"checked":true,"columns":[{"name":"id","type":"int"},{"name":"name","type":"varchar"},{"name":"main_id","type":"int"}],"schema":"test","primaryKey":"id","table":"tb_main_left","parentKey":"id","relateKey":"main_id"}]}
-            this.followDb = [{"checked":true,"schema":"test","primaryKey":"id","columns":[{"name":"id","type":"int"},{"name":"main_id","type":"int"},{"name":"f_name","type":"varchar"},{"name":"url","type":"varchar"},{"name":"time","type":"datetime"}],"table":"tb_follow","parentKey":"id","relateKey":"main_id","follows":[{"checked":true,"columns":[{"name":"id","type":"int"},{"name":"f_id","type":"int"},{"name":"pos","type":"varchar"}],"schema":"test","primaryKey":"id","table":"tb_follow_left","parentKey":"id","relateKey":"f_id"}]}]
-            window.setTimeout(() => {
-                this.submit()
-            }, 500)
+            let id = getParam("id")
+            if (id) {
+                this.loading = true;
+                axios.get(window.contextPath + '/api/getConfig', {
+                    params: {
+                        id: id
+                    }
+                }).then(res => {
+                    if (res.data.status != 0) {
+                        this.$message.error(res.data.msg);
+                        this.loading = false;
+                    } else {
+                        this.mainDb = res.data.content.db.main
+                        this.followDb = res.data.content.db.follows
+                        this.loading = false;
+                        window.setTimeout(() => {
+                            this.submit()
+                        }, 500)
+                    }
+                }).catch(res => {
+                    console.error(res)
+                    this.$message.error('服务异常');
+                    this.loading = false;
+                })
+            }
         }
     })
 </script>
