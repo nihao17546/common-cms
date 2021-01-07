@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -57,7 +54,7 @@ public class ApiController {
     @RequestMapping(value = "/getConfig", produces = "application/json;charset=UTF-8")
     public String getConfig(@RequestParam Integer id) {
         Map<String,Object> db = dbDao.selectConfigById(id);
-        if (db != null || !db.isEmpty()) {
+        if (db != null && !db.isEmpty()) {
             String configJson = (String) db.get("config");
             if (configJson != null && !configJson.isEmpty()) {
                 JSONObject jsonObject = JSON.parseObject(configJson);
@@ -140,11 +137,17 @@ public class ApiController {
     @RequestMapping(value = "/getJson", produces = "application/json;charset=UTF-8")
     public String getJson(@RequestParam Integer id) {
         Map<String,Object> db = dbDao.selectConfigById(id);
-        if (db != null || !db.isEmpty()) {
+        if (db != null && !db.isEmpty()) {
             String configJson = (String) db.get("config");
             return HttpResult.success().pull("json", JSON.parseObject(configJson)).json();
         }
         return HttpResult.fail("配置不存在").json();
+    }
+
+    @RequestMapping(value = "/delete", produces = "application/json;charset=UTF-8")
+    public String delete(Integer id) {
+        dbDao.delete(id);
+        return HttpResult.success().json();
     }
 
     @RequestMapping(value = "/save", produces = "application/json;charset=UTF-8")
@@ -157,8 +160,24 @@ public class ApiController {
                 fillTableColumn(followTable);
             }
         }
-        System.out.println(param.toJSONString());
-        return null;
+        if (param.containsKey("id")) {
+            Integer id = param.getInteger("id");
+            param.remove("id");
+            Date date = new Date();
+            dbDao.update(id, param.toJSONString(), date);
+        } else {
+            String name = param.getString("name");
+            if (name == null) {
+                return HttpResult.fail("配置名称不能为空").json();
+            }
+            if (dbDao.selectConfigByName(name) != null) {
+                return HttpResult.fail("该配置名称已存在").json();
+            }
+            param.remove("name");
+            Date date = new Date();
+            dbDao.insert(name, param.toJSONString(), date, date);
+        }
+        return HttpResult.success().json();
     }
 
     @RequestMapping(value = "/getConfigs", produces = "application/json;charset=UTF-8")

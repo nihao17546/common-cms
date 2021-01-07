@@ -71,12 +71,12 @@
 <div id="app" v-loading="loading">
     <el-row :gutter="24" style="margin-left: -5px; margin-right: -5px;">
         <el-col :span="24" id="search-card">
-            <el-card shadow="never" class="c-card" v-if="config.search && config.search.elements && config.search.elements.length > 0">
+            <el-card shadow="never" class="c-card" v-if="config.searchElements && config.searchElements.length > 0">
                 <div slot="header" style="margin-top: 5px;margin-bottom: 5px;font-size: 18px;">
                     <span>检索条件</span>
                 </div>
                 <el-form :inline="true">
-                    <template v-for="(co,index) in config.search.elements">
+                    <template v-for="(co,index) in config.searchElements">
                         <el-form-item :label="co.label + ':'" v-if="co.label">
                             <el-input v-if="co.elType == 'INPUT'" type="text" :clearable="co.clearable"
                                       :placeholder="co.placeholder" :size="co.size"></el-input>
@@ -109,8 +109,12 @@
                 <el-row :gutter="12">
                     <el-col :span="12">
                         <el-button v-if="config.add_btn" size="small" @click="showAdd" type="info" plain icon="el-icon-plus">新增</el-button>
-                        <el-button v-if="config.edit_btn" size="small" icon="el-icon-edit">修改</el-button>
+                        <el-button v-if="config.edit_btn" size="small" @click="showAdd" icon="el-icon-edit">修改</el-button>
                         <el-button v-if="config.delete_btn" size="small" type="danger" icon="el-icon-delete">删除</el-button>
+                        <template v-if="config.follow_tables && config.follow_tables.length > 0">
+                            <el-button v-for="(followTable,followTableIndex) in config.follow_tables"
+                                       size="small" type="info" @click="showFollow">{{followTable.bottomName}}</el-button>
+                        </template>
                     </el-col>
                 </el-row>
             </el-card>
@@ -152,6 +156,7 @@
         el: '#app',
         data() {
             return {
+                uuid: null,
                 loading: false,
                 height: window.innerHeight - 78,
                 formLabelWidth: '150px',
@@ -166,17 +171,27 @@
         watch: {
         },
         methods: {
+            showFollow() {
+
+            },
             showAdd() {},
             get() {
-                this.config = JSON.parse(localStorage.getItem('config'))
-                document.title = this.config.title ? this.config.title : '预览'
-                console.log(JSON.stringify(this.config))
+                let config = localStorage.getItem(this.uuid)
+                if (config) {
+                    this.config = JSON.parse(config)
+                    document.title = this.config.title ? this.config.title : '预览'
+                    console.log(JSON.stringify(this.config))
+                }
             },
         },
         beforeDestroy() {
             clearInterval(this.timer);
         },
         mounted() {
+            this.uuid = getParam('uuid')
+            if (!this.uuid) {
+                this.$message.error('预览异常');
+            }
             this.timer = setInterval(this.get, 100);
         },
         created: function () {

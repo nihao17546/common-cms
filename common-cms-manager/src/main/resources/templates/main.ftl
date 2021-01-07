@@ -66,8 +66,8 @@
         },
         methods: {
             init(mainDb, followDbs) {
-                window.vue.mainDb = mainDb
-                window.vue.followDbs = followDbs
+                window.vue.mainDb = JSON.parse(JSON.stringify(mainDb))
+                window.vue.followDbs = JSON.parse(JSON.stringify(followDbs))
             }
         },
         mounted() {

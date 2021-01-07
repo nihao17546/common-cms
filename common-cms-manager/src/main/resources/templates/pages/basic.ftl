@@ -1685,8 +1685,8 @@
             </template>
         </el-collapse>
         <div style="text-align: right;margin-top: 8px;">
-            <el-button type="success" @click="preview">预览</el-button>
-            <el-button type="primary" @click="submit">确认</el-button>
+            <el-button type="success" size="small" @click="preview">预览</el-button>
+            <el-button type="primary" size="small" @click="submit">确认</el-button>
         </div>
     </el-form>
 
@@ -1917,6 +1917,13 @@
         }
         return "";
     }
+    function guid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
 
     window.vue = new Vue({
         name: 'm',
@@ -1965,6 +1972,7 @@
                 }
             };
             return {
+                uuid: null,
                 loading: false,
                 height: window.innerHeight - 78,
                 dialogTop: '150px',
@@ -2147,36 +2155,66 @@
         },
         methods: {
             preview() {
-                window.open(window.contextPath + "/pages/preview.html")
+                window.open(window.contextPath + "/pages/preview.html?uuid=" + this.uuid)
             },
             submit() {
                 this.$refs['form'].validate((valid, obj) => {
-                    this.accordionActiveName = []
-                    this.activeNames = []
-                    this.followActiveNames = []
-                    if (this.followDbs && this.followDbs.length > 0) {
-                        for (let i = 0; i < this.followDbs.length; i ++) {
-                            this.followActiveNames.push({
-                                activeNames: []
-                            })
-                        }
-                    }
                     if (valid) {
-                        this.loading = true;
-                        axios.post(window.contextPath + '/api/save',this.form).then(res => {
-                            if (res.data.status != 0) {
-                                this.$message.error(res.data.msg);
+                        let param = JSON.parse(JSON.stringify(this.form))
+                        let id = getParam('id')
+                        if (id) {
+                            param.id = id
+                            this.loading = true;
+                            axios.post(window.contextPath + '/api/save',param).then(res => {
+                                if (res.data.status != 0) {
+                                    this.$message.error(res.data.msg);
+                                    this.loading = false;
+                                } else {
+                                    this.loading = false;
+                                    window.parent.location.href = window.contextPath + '/list.html'
+                                }
+                            }).catch(res => {
+                                console.error(res)
                                 this.loading = false;
-                            }
-                            else {
-                                this.loading = false;
-                            }
-                        }).catch(res => {
-                            console.error(res)
-                            this.loading = false;
-                        })
+                            })
+                        } else {
+                            this.$prompt('请输入配置名称', '配置名称', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                inputPattern: /^[\u4E00-\u9FA5A-Za-z0-9]{1,20}$/,
+                                inputErrorMessage: '名称不能为空,只支持中文、字母、数字，且长度不能超过20'
+                            }).then(({ value }) => {
+                                param.name = value
+                                this.loading = true;
+                                axios.post(window.contextPath + '/api/save',param).then(res => {
+                                    if (res.data.status != 0) {
+                                        this.$message.error(res.data.msg);
+                                        this.loading = false;
+                                    } else {
+                                        this.loading = false;
+                                        window.parent.location.href = window.contextPath + '/list.html'
+                                    }
+                                }).catch(res => {
+                                    console.error(res)
+                                    this.loading = false;
+                                })
+                            }).catch(() => {
+                                this.$message.warning('取消');
+                            });
+                        }
                     } else {
+                        this.accordionActiveName = []
+                        this.activeNames = []
+                        this.followActiveNames = []
+                        if (this.followDbs && this.followDbs.length > 0) {
+                            for (let i = 0; i < this.followDbs.length; i ++) {
+                                this.followActiveNames.push({
+                                    activeNames: []
+                                })
+                            }
+                        }
                         for (let key in obj) {
+                            console.log(key)
                             let items = key.split('.')
                             if (items[0] == 'follow_tables') {
                                 let followIndex = items[1]
@@ -2193,6 +2231,10 @@
                                             this.followActiveNames[followIndex].activeNames.push('table')
                                         }
                                     }  else if (items[3] == 'searchElements') {
+                                        if (this.followActiveNames[followIndex].activeNames.indexOf('search') == -1) {
+                                            this.followActiveNames[followIndex].activeNames.push('search')
+                                        }
+                                    }  else if (items[3] == 'leftJoins') {
                                         if (this.followActiveNames[followIndex].activeNames.indexOf('search') == -1) {
                                             this.followActiveNames[followIndex].activeNames.push('search')
                                         }
@@ -2217,6 +2259,10 @@
                                                 this.activeNames.push('table')
                                             }
                                         } else if (items[2] == 'searchElements') {
+                                            if (this.activeNames.indexOf('search') == -1) {
+                                                this.activeNames.push('search')
+                                            }
+                                        } else if (items[2] == 'leftJoins') {
                                             if (this.activeNames.indexOf('search') == -1) {
                                                 this.activeNames.push('search')
                                             }
@@ -3180,6 +3226,15 @@
                 delete table.defaultOrder
             },
             init(mainDb, followDbs) {
+                if(Object.keys(mainDb).length == 0){
+                    let id = getParam('id')
+                    let url = window.contextPath + '/pages/basic.html'
+                    if (id) {
+                        url = url + '?id=' + id + '&reload=1'
+                    }
+                    window.location.href = url
+                    return
+                }
                 let alias = 'a'
                 window.vue.mainDb = mainDb
                 window.vue.followDbs = followDbs
@@ -3332,29 +3387,43 @@
                     }
                 }
                 window.vue.form = JSON.parse(JSON.stringify(window.vue.form))
+            },
+            beforeunloadHandler (e) {
+                localStorage.removeItem(this.uuid)
             }
         },
+        mounted() {
+            window.addEventListener('beforeunload', e => this.beforeunloadHandler(e))
+        },
+        destroyed() {
+            window.removeEventListener('beforeunload', e => this.beforeunloadHandler(e))
+        },
         created: function () {
+            this.uuid = guid()
             let id = getParam("id")
             if (id) {
-                this.loading = true;
-                axios.get(window.contextPath + '/api/getJson', {
-                    params: {
-                        id: id
-                    }
-                }).then(res => {
-                    if (res.data.status != 0) {
-                        this.$message.error(res.data.msg);
+                if (!getParam('reload')) {
+                    this.loading = true;
+                    axios.get(window.contextPath + '/api/getJson', {
+                        params: {
+                            id: id
+                        }
+                    }).then(res => {
+                        if (res.data.status != 0) {
+                            this.$message.error(res.data.msg);
+                            this.loading = false;
+                        } else {
+                            window.setInterval(() => {
+                                this.form = res.data.content.json
+                                this.loading = false;
+                            }, 1500)
+                        }
+                    }).catch(res => {
+                        console.error(res)
+                        this.$message.error('服务异常');
                         this.loading = false;
-                    } else {
-                        this.form = res.data.content.json
-                        this.loading = false;
-                    }
-                }).catch(res => {
-                    console.error(res)
-                    this.$message.error('服务异常');
-                    this.loading = false;
-                })
+                    })
+                }
             }
 
             this.addElementShows[window.basePackage + 'form.add.AddInput'] = ['label','placeholder','clearable','size','width','rule','type','maxlength','minlength','canEdit']
@@ -3374,8 +3443,25 @@
             }, 100)
 
             window.setInterval(() => {
-                let configStr = JSON.stringify(this.form)
-                localStorage.setItem('config', [configStr])
+                let configObj = JSON.parse(JSON.stringify(this.form))
+                let searchElements = []
+                if (configObj.table && configObj.table.select && configObj.table.select.searchElements) {
+                    for (let i = 0; i < configObj.table.select.searchElements.length; i ++) {
+                        searchElements.push(configObj.table.select.searchElements[i])
+                    }
+                }
+                if (configObj.table && configObj.table.select && configObj.table.select.leftJoins && configObj.table.select.leftJoins.length > 0) {
+                    for (let i = 0; i < configObj.table.select.leftJoins.length; i ++) {
+                        if (configObj.table.select.leftJoins[i].searchElements && configObj.table.select.leftJoins[i].searchElements.length > 0) {
+                            for (let j = 0; j < configObj.table.select.leftJoins[i].searchElements.length; j ++) {
+                                searchElements.push(configObj.table.select.leftJoins[i].searchElements[j])
+                            }
+                        }
+                    }
+                }
+                configObj.searchElements = searchElements
+                let configStr = JSON.stringify(configObj)
+                localStorage.setItem(this.uuid, [configStr])
             }, 100)
         }
     })

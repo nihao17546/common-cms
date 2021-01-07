@@ -30,4 +30,21 @@
     <select id="selectConfigById" resultType="java.util.Map">
         select * from tb_meta_config where id=#{id}
     </select>
+
+    <insert id="insert">
+        insert into tb_meta_config(`name`,`db_name`,`config`,`created_at`,`updated_at`)
+        values(#{name},1,#{config},#{created_at},#{updated_at})
+    </insert>
+
+    <insert id="update">
+        update tb_meta_config set `config`=#{config},`updated_at`=#{updated_at} where id=#{id}
+    </insert>
+
+    <select id="selectConfigByName" resultType="java.util.Map">
+        select * from tb_meta_config where `name`=#{name}
+    </select>
+
+    <delete id="delete">
+        delete from tb_meta_config where id=#{id}
+    </delete>
 </mapper>

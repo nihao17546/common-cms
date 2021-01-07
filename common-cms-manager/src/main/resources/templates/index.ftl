@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>首页</title>
+    <title>Codeless Plugin</title>
     <link rel="stylesheet" href="${contextPath}/element-ui/theme-chalk/index.css">
     <script src="${contextPath}/vue.min.js"></script>
     <script src="${contextPath}/element-ui/index.js"></script>
@@ -35,8 +35,8 @@
             <el-link :underline="false" href="#">使用文档</el-link>
         </div>
         <div style="margin-top: 150px;width: 330px;">
-            <p style="font-size: xx-large;">通用管理后台配置</p>
-            <p style="font-size: medium;">不写任何前后端代码实现常规后台管理系统的开发</p>
+            <p style="font-size: xx-large;">Codeless Plugin</p>
+            <p style="font-size: medium;">低代码插件配置</p>
         </div>
         <div style="margin-top: 60px;">
             <el-button type="info" plain @click="toLogin">登录</el-button>
@@ -46,7 +46,7 @@
         <div style="position: relative; left: -50%; top: -50%;">
             <el-card class="box-card">
                 <div slot="header" style="text-align: center;font-family: 微软雅黑;color: grey;">
-                    <span>COMMON-CMS </span>
+                    <span>登 录</span>
                 </div>
                 <el-form ref="form" :model="form" :disabled="loading">
                     <el-form-item prop="loginname" :rules="[{required: true, message: '请输入账户', trigger: 'change'}]">

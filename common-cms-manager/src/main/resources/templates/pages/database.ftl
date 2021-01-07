@@ -262,13 +262,14 @@
         },
         methods: {
             sy() {
-                console.log(JSON.stringify(this.mainDb))
-                console.log(JSON.stringify(this.followDb))
-                parent.window.vue.$options.methods.init(this.mainDb, this.followDb)
-                parent.window.document.getElementById("basic").contentWindow.vue.$options.methods.init(this.mainDb, this.followDb)
+                let m = JSON.parse(JSON.stringify(this.mainDb))
+                let f = JSON.parse(JSON.stringify(this.followDb))
+                parent.window.vue.$options.methods.init(m, f)
+                let mm = JSON.parse(JSON.stringify(this.mainDb))
+                let ff = JSON.parse(JSON.stringify(this.followDb))
+                parent.window.document.getElementById("basic").contentWindow.vue.$options.methods.init(mm, ff)
             },
             submit() {
-                console.log(this.$refs['mainDb'])
                 this.$refs['mainDb'].validate((valid) => {
                     if (valid) {
                         if (this.mainDb.follows && this.mainDb.follows.length > 0) {
@@ -400,6 +401,10 @@
                     if (res.data.status != 0) {
                         this.$message.error(res.data.msg);
                         this.loading = false;
+                        if (res.data.msg == '配置不存在') {
+                            alert('配置不存在')
+                            window.parent.location.href = window.contextPath + '/list.html'
+                        }
                     } else {
                         this.mainDb = res.data.content.db.main
                         this.followDb = res.data.content.db.follows

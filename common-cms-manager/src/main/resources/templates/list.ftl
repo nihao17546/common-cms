@@ -54,7 +54,7 @@
                         <el-button type="success" size="mini">预览</el-button>
                         <el-button type="info" size="mini" @click="showJson(props.row)">查看</el-button>
                         <el-button type="primary" size="mini" @click="edit(props.row)">编辑</el-button>
-                        <el-button type="danger" size="mini">删除</el-button>
+                        <el-button type="danger" size="mini" @click="del(props.row.id)">删除</el-button>
                     </el-button-group>
                 </template>
             </el-table-column>
@@ -92,6 +92,33 @@
             }
         },
         methods: {
+            del(id) {
+                this.$confirm('确定要删除?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.loading = true;
+                    axios.get(window.contextPath + '/api/delete',{
+                        params: {
+                            id: id
+                        }
+                    }).then(res => {
+                        if (res.data.status != 0) {
+                            this.$message.error(res.data.msg);
+                            this.loading = false;
+                        }
+                        else {
+                            this.loading = false;
+                            this.getList();
+                        }
+                    }).catch(res => {
+                        console.error(res)
+                        this.loading = false;
+                    })
+                }).catch(() => {
+                });
+            },
             add() {
                 window.location.href = window.contextPath + '/main.html'
             },
@@ -108,23 +135,27 @@
                     visible: true,
                     data: row.config
                 }
+            },
+            getList() {
+                this.tableData = []
+                axios.post(window.contextPath + '/api/getConfigs', {}, {
+                    headers: {}
+                }).then(res => {
+                    if (res.data.status != 0) {
+                        this.$message.error(res.data.msg);
+                    }
+                    else {
+                        this.tableData = res.data.content.list;
+                    }
+                    this.loading = false;
+                }).catch(res => {
+                    console.error(res)
+                    this.loading = false;
+                })
             }
         },
         created: function () {
-            axios.post(window.contextPath + '/api/getConfigs', {}, {
-                headers: {}
-            }).then(res => {
-                if (res.data.status != 0) {
-                    this.$message.error(res.data.msg);
-                }
-                else {
-                    this.tableData = res.data.content.list;
-                }
-                this.loading = false;
-            }).catch(res => {
-                console.error(res)
-                this.loading = false;
-            })
+            this.getList()
         }
     })
 </script>
