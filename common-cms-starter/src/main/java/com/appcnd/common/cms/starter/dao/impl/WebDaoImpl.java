@@ -2,6 +2,8 @@ package com.appcnd.common.cms.starter.dao.impl;
 
 import com.appcnd.common.cms.entity.constant.JudgeType;
 import com.appcnd.common.cms.starter.dao.IWebDao;
+import com.appcnd.common.cms.starter.exception.CmsRuntimeException;
+import com.appcnd.common.cms.starter.pojo.HttpStatus;
 import com.appcnd.common.cms.starter.pojo.db.ListParam;
 import com.appcnd.common.cms.starter.pojo.param.SearchParam;
 import com.appcnd.common.cms.starter.util.DBUtil;
@@ -44,7 +46,7 @@ public class WebDaoImpl implements IWebDao {
                         .append("` = ").append(param.getAlias()).append(".`").append(selectLeftJoin.getRelateKey()).append("`");
                 if (selectLeftJoin.getWheres() != null && !selectLeftJoin.getWheres().isEmpty()) {
                     for (Where where : selectLeftJoin.getWheres()) {
-                        sb.append(" and ").append(selectLeftJoin.getAlias()).append(".").append(where.getKey());
+                        sb.append(" and ").append(selectLeftJoin.getAlias()).append(".`").append(where.getKey()).append("`");
                         fillWhere(params, sb, where);
                     }
                 }
@@ -53,7 +55,7 @@ public class WebDaoImpl implements IWebDao {
         sb.append(" where 1=1 ");
         if (param.getWheres() != null && !param.getWheres().isEmpty()) {
             for (Where where : param.getWheres()) {
-                sb.append(" and ").append(param.getAlias()).append(".").append(where.getKey());
+                sb.append(" and ").append(param.getAlias()).append(".`").append(where.getKey()).append("`");
                 fillWhere(params, sb, where);
             }
         }
@@ -133,6 +135,19 @@ public class WebDaoImpl implements IWebDao {
         }
     }
 
+    private void appendSelectColumns(String column, StringBuilder sb) {
+        String[] columns = column.split(" ");
+        if (columns.length == 3) {
+            sb.append("`").append(columns[0]).append("`");
+            sb.append(" as ");
+            sb.append("`").append(columns[2]).append("`");
+        } else if (columns.length == 1) {
+            sb.append("`").append(columns[0]).append("`");
+        } else {
+            throw new CmsRuntimeException(HttpStatus.SYSTEM_ERROR.getCode(), "列表查询配置错误");
+        }
+    }
+
     @Override
     public List<Map<String, Object>> selectOneToOneList(ListParam param, Integer curPage, Integer pageSize) {
         List<Object> params = new ArrayList<>();
@@ -140,14 +155,16 @@ public class WebDaoImpl implements IWebDao {
         sb.append("select ").append(param.getAlias()).append(".`").append(param.getPrimaryKey()).append("`");
         if (param.getColumns() != null && !param.getColumns().isEmpty()) {
             for (String column : param.getColumns()) {
-                sb.append(",").append(param.getAlias()).append(".").append(column);
+                sb.append(",").append(param.getAlias()).append(".");
+                appendSelectColumns(column, sb);
             }
         }
         if (param.getLeftJoins() != null && !param.getLeftJoins().isEmpty()) {
             for (SelectLeftJoin selectLeftJoin : param.getLeftJoins()) {
                 if (selectLeftJoin.getColumns() != null && !selectLeftJoin.getColumns().isEmpty()) {
                     for (String column : selectLeftJoin.getColumns()) {
-                        sb.append(",").append(selectLeftJoin.getAlias()).append(".").append(column);
+                        sb.append(",").append(selectLeftJoin.getAlias()).append(".");
+                        appendSelectColumns(column, sb);
                     }
                 }
             }

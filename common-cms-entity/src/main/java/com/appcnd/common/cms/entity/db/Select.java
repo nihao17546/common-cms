@@ -59,7 +59,7 @@ public class Select implements Serializable {
                 throw new IllegalArgumentException("查询字段[" + co.getProp() + "]重复");
             }
             columnSet.add(co.getProp().toUpperCase());
-            this.columns.add("`" + co.getKey() + "` as `" + co.getProp() + "`");
+            this.columns.add(co.getKey() + " as " + co.getProp());
         }
         if (leftJoins != null && !leftJoins.isEmpty()) {
             for (SelectLeftJoin leftJoin : leftJoins) {
@@ -80,7 +80,7 @@ public class Select implements Serializable {
                         throw new IllegalArgumentException("查询字段[" + co.getProp() + "]重复");
                     }
                     columnSet.add(co.getProp().toUpperCase());
-                    leftJoin.getColumns().add("`" + co.getKey() + "` as `" + co.getProp() + "`");
+                    leftJoin.getColumns().add(co.getKey() + " as " + co.getProp());
                 }
             }
         }
