@@ -105,7 +105,7 @@
                                                     <el-row style="border: 0px solid gray;" :gutter="24">
                                                         <el-col :span="6">
                                                             <el-form-item label="sql查询字段:" label-width="120px">
-                                                                {{item.key}}
+                                                                {{kpTable[item.key + ' as ' + item.prop].schema}}.{{kpTable[item.key + ' as ' + item.prop].table}}->{{item.key}}
                                                             </el-form-item>
                                                         </el-col>
                                                         <el-col :span="6">
@@ -955,7 +955,7 @@
                                                         <el-row style="border: 0px solid gray;" :gutter="24">
                                                             <el-col :span="6">
                                                                 <el-form-item label="sql查询字段:" label-width="120px">
-                                                                    {{item.key}}
+                                                                    {{followKpTable[followIndex][item.key + ' as ' + item.prop].schema}}.{{followKpTable[followIndex][item.key + ' as ' + item.prop].table}}->{{item.key}}
                                                                 </el-form-item>
                                                             </el-col>
                                                             <el-col :span="6">
@@ -1984,6 +1984,8 @@
                 previewVisible: false,
                 aliasTable: {},
                 followAliasTable: [],
+                kpTable: {},
+                followKpTable: [],
                 mainDb: null,
                 followDbs: null,
                 form: {
@@ -3266,6 +3268,10 @@
                         table: mainDb.table,
                         alias: alias
                     })
+                    window.vue.kpTable[mainDb.columns[i].name + ' as ' + alias + '_' + mainDb.columns[i].name] = {
+                        schema: mainDb.schema,
+                        table: mainDb.table
+                    }
                 }
                 window.vue.mainColumns.push(column)
                 if (mainDb.follows && mainDb.follows.length > 0) {
@@ -3299,6 +3305,10 @@
                                 table: mainDb.follows[i].table,
                                 alias: alias
                             })
+                            window.vue.kpTable[mainDb.follows[i].columns[j].name + ' as ' + alias + '_' + mainDb.follows[i].columns[j].name] = {
+                                schema: mainDb.follows[i].schema,
+                                table: mainDb.follows[i].table
+                            }
                         }
                         window.vue.mainColumns.push(followColumn)
                     }
@@ -3312,6 +3322,7 @@
                             schema: followDbs[i].schema,
                             table: followDbs[i].table
                         }
+                        let followKpTable = {}
                         let follow = {
                             pagination: false,
                             add_btn: false,
@@ -3355,6 +3366,10 @@
                                 table: followDbs[i].table,
                                 alias: alias
                             })
+                            followKpTable[followDbs[i].columns[j].name + ' as ' + alias + '_' + followDbs[i].columns[j].name] = {
+                                schema: followDbs[i].schema,
+                                table: followDbs[i].table
+                            }
                         }
                         followColumns.push(column)
                         let followDb = followDbs[i]
@@ -3388,6 +3403,10 @@
                                         table: followDb.follows[i].table,
                                         alias: alias
                                     })
+                                    followKpTable[followDb.follows[i].columns[j].name + ' as ' + alias + '_' + followDb.follows[i].columns[j].name] = {
+                                        schema: followDb.follows[i].schema,
+                                        table: followDb.follows[i].table
+                                    }
                                 }
                                 followColumns.push(followColumn)
                             }
@@ -3398,6 +3417,7 @@
                         window.vue.form.follow_tables.push(follow)
                         window.vue.followColumns.push(followColumns)
                         window.vue.followAliasTable.push(followAliasTable)
+                        window.vue.followKpTable.push(followKpTable)
                     }
                 }
                 window.vue.form = JSON.parse(JSON.stringify(window.vue.form))
