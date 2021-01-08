@@ -895,6 +895,15 @@
                                     </el-select>
                                 </el-form-item>
                             </el-col>
+                            <el-col :span="6">
+                                <el-form-item label="数量限制:"
+                                              :rules="rules.zNumber"
+                                              :prop="'follow_tables.' + followIndex + '.limit_size'"
+                                              label-width="100px">
+                                    <el-input v-model.trim="follow.limit_size" autocomplete="off" size="small"
+                                              maxlength="50"></el-input>
+                                </el-form-item>
+                            </el-col>
                             <el-col :span="24">
                                 <el-collapse v-model="followActiveNames[followIndex].activeNames">
                                     <el-collapse-item title="表格配置" name="table">
