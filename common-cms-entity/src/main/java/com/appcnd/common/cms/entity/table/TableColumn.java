@@ -21,11 +21,10 @@ public class TableColumn {
     private Boolean sortable;
 
     @Builder
-    public TableColumn(String prop, String label, Integer width, Formatter formatter, Boolean sortable, Integer index, String key) {
+    public TableColumn(String label, Integer width, Formatter formatter, Boolean sortable, Integer index, String key) {
         sortable = sortable == null ? false : sortable;
         CommonAssert.hasText(label, "label  不能为空");
         CommonAssert.notNull(key, "key  不能为空");
-        this.prop = prop == null ? key : prop;
         this.label = label;
         this.width = width;
         this.formatter = formatter;

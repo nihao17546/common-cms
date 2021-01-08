@@ -55,6 +55,9 @@ public class Select implements Serializable {
         Set<String> columnSet = new HashSet<>();
         this.columns = new ArrayList<>();
         for (TableColumn co : tableColumns) {
+            if (co.getProp() == null || co.getProp().isEmpty()) {
+                co.setProp(String.valueOf(aliasA) + "_" + co.getKey());
+            }
             if (columnSet.contains(co.getProp().toUpperCase())) {
                 throw new IllegalArgumentException("查询字段[" + co.getProp() + "]重复");
             }
@@ -76,6 +79,9 @@ public class Select implements Serializable {
                 }
                 leftJoin.setColumns(new ArrayList<>());
                 for (TableColumn co : leftJoin.getTableColumns()) {
+                    if (co.getProp() == null || co.getProp().isEmpty()) {
+                        co.setProp(leftJoin.getAlias() + "_" + co.getKey());
+                    }
                     if (columnSet.contains(co.getProp().toUpperCase())) {
                         throw new IllegalArgumentException("查询字段[" + co.getProp() + "]重复");
                     }
