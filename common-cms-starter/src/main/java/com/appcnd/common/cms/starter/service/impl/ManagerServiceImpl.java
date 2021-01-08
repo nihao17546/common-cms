@@ -1,62 +1,114 @@
-package com.appcnd.common.cms.manager.controller;
+package com.appcnd.common.cms.starter.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.appcnd.common.cms.entity.util.DesUtil;
-import com.appcnd.common.cms.manager.dao.DbDao;
-import com.appcnd.common.cms.manager.pojo.vo.*;
-import com.appcnd.common.cms.manager.service.IDbService;
+import com.appcnd.common.cms.starter.dao.IMetaConfigDao;
+import com.appcnd.common.cms.starter.pojo.HttpStatus;
+import com.appcnd.common.cms.starter.pojo.config.DbConfig;
+import com.appcnd.common.cms.starter.pojo.config.FollowDbConfig;
+import com.appcnd.common.cms.starter.pojo.config.LeftDbConfig;
+import com.appcnd.common.cms.starter.pojo.config.MainDbConfig;
+import com.appcnd.common.cms.starter.pojo.po.ColumnInfo;
+import com.appcnd.common.cms.starter.pojo.po.MetaConfigPo;
+import com.appcnd.common.cms.starter.pojo.vo.ColumnVo;
+import com.appcnd.common.cms.starter.pojo.vo.MetaConfigVo;
+import com.appcnd.common.cms.starter.pojo.vo.TableVo;
+import com.appcnd.common.cms.starter.service.BaseService;
+import com.appcnd.common.cms.starter.service.IManagerService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.sql.Timestamp;
 import java.util.*;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
- * @author nihao 2019/10/19
+ * @author nihao 2021/01/07
  */
-@RestController
-@RequestMapping("/api")
-public class ApiController {
+@Slf4j
+public class ManagerServiceImpl extends BaseService implements IManagerService {
     @Autowired
-    private IDbService dbService;
-    @Autowired
-    private DbDao dbDao;
+    private IMetaConfigDao metaConfigDao;
 
-    @RequestMapping(value = "/login", produces = "application/json;charset=UTF-8")
-    public String savePreview(@RequestParam String loginname, @RequestParam String password,
-                              HttpServletResponse response) throws Exception {
-        if (!loginname.equals("root") || !password.equals("123456")) {
-            return HttpResult.fail("账号或密码错误").json();
+    private Pattern patternColumn = Pattern.compile("`.+` [A-Za-z]+");
+    private Pattern patternPri = Pattern.compile("PRIMARY KEY \\(`.+`\\)");
+
+    @Override
+    public TableVo getTable(String schema, String table) {
+        List<ColumnInfo> list = metaConfigDao.getTableInfo(schema, table);
+        if (list == null || list.isEmpty()) {
+            error(HttpStatus.SYSTEM_ERROR, "表" + schema + "." + table + "不存在");
         }
-        Cookie cookie = new Cookie("commoncmsmanager", DesUtil.encrypt(System.currentTimeMillis() + "#" + loginname));
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        return HttpResult.success().json();
+        TableVo tableVo = new TableVo();
+        List<ColumnVo> columnVoList = new ArrayList<>(list.size() - 1);
+        for (ColumnInfo columnInfo : list) {
+            if ("PRI".equalsIgnoreCase(columnInfo.getCOLUMN_KEY())) {
+                if ("auto_increment".equalsIgnoreCase(columnInfo.getEXTRA())) {
+                    tableVo.setPrimaryKeyExtra("auto_increment");
+                }
+            }
+            ColumnVo columnVo = new ColumnVo();
+            columnVo.setName(columnInfo.getCOLUMN_NAME());
+            columnVo.setType(columnInfo.getDATA_TYPE());
+            columnVoList.add(columnVo);
+        }
+        tableVo.setColumns(columnVoList);
+        return tableVo;
     }
 
-    @RequestMapping(value = "/getTable", produces = "application/json;charset=UTF-8")
-    public String getTable(@RequestParam String schema, @RequestParam String table) {
-        TableVo tableVo = dbService.getTableByShow(schema, table);
-        if (!"AUTO_INCREMENT".equalsIgnoreCase(tableVo.getPrimaryKeyExtra())) {
-            return HttpResult.fail("只支持配置自增主键").json();
+    @Override
+    public TableVo getTableByShow(String schema, String table) {
+        String sql = null;
+        try {
+            Map<String,String> map = metaConfigDao.showTable(schema, table);
+            sql = map.get("Create Table");
+        } catch (Exception e) {
+            error(HttpStatus.SYSTEM_ERROR, "表" + schema + "." + table + "不存在");
         }
-        return HttpResult.success().pull("table", tableVo).json();
+        TableVo tableVo = new TableVo();
+        List<ColumnVo> columnVoList = new ArrayList<>();
+        Matcher matcherPri = patternPri.matcher(sql);
+        if (matcherPri.find()) {
+            String a = sql.substring(matcherPri.start(), matcherPri.end());
+            String name = a.substring(a.indexOf("`") + 1, a.lastIndexOf("`"));
+            tableVo.setPrimaryKey(name);
+        }
+        Matcher matcherColumn = patternColumn.matcher(sql);
+        while (matcherColumn.find()) {
+            String a = sql.substring(matcherColumn.start(), matcherColumn.end());
+            String name = a.substring(1, a.indexOf("` "));
+            if (name.equalsIgnoreCase(tableVo.getPrimaryKey())) {
+                Pattern patternPriExtra = Pattern.compile("`" + tableVo.getPrimaryKey() + "`.*,");
+                Matcher matcherPriExtra = patternPriExtra.matcher(sql);
+                if (matcherPriExtra.find()) {
+                    String aa = sql.substring(matcherPriExtra.start(), matcherPriExtra.end() - 1);
+                    if (aa.lastIndexOf(" ") > 0) {
+                        String extra = aa.substring(aa.lastIndexOf(" ") + 1);
+                        tableVo.setPrimaryKeyExtra(extra);
+                    }
+                }
+            }
+            String type = a.substring(a.indexOf("` ") + 2);
+            ColumnVo columnVo = new ColumnVo();
+            columnVo.setName(name);
+            columnVo.setType(type);
+            columnVoList.add(columnVo);
+        }
+        tableVo.setColumns(columnVoList);
+        return tableVo;
     }
 
-    @RequestMapping(value = "/getConfig", produces = "application/json;charset=UTF-8")
-    public String getConfig(@RequestParam Integer id) {
-        Map<String,Object> db = dbDao.selectConfigById(id);
-        if (db != null && !db.isEmpty()) {
-            String configJson = (String) db.get("config");
+    @Override
+    public DbConfig getConfig(Integer configId) {
+        MetaConfigPo db = metaConfigDao.selectById(configId);
+        if (db != null) {
+            String configJson = db.getConfig();
             if (configJson != null && !configJson.isEmpty()) {
                 JSONObject jsonObject = JSON.parseObject(configJson);
                 DbConfig dbConfig = new DbConfig();
@@ -68,7 +120,7 @@ public class ApiController {
                         JSONObject select = table.getJSONObject("select");
                         mainDbConfig.setSchema(select.getString("schema"));
                         mainDbConfig.setTable(select.getString("table"));
-                        TableVo mainTable = dbService.getTableByShow(mainDbConfig.getSchema(), mainDbConfig.getTable());
+                        TableVo mainTable = getTableByShow(mainDbConfig.getSchema(), mainDbConfig.getTable());
                         mainDbConfig.setPrimaryKey(mainTable.getPrimaryKey());
                         mainDbConfig.setColumns(mainTable.getColumns());
                         if (select.containsKey("leftJoins")) {
@@ -80,7 +132,7 @@ public class ApiController {
                                 leftDbConfig.setTable(leftJoin.getString("table"));
                                 leftDbConfig.setRelateKey(leftJoin.getString("relateKey"));
                                 leftDbConfig.setParentKey(leftJoin.getString("parentKey"));
-                                TableVo leftTable = dbService.getTableByShow(leftDbConfig.getSchema(), leftDbConfig.getTable());
+                                TableVo leftTable = getTableByShow(leftDbConfig.getSchema(), leftDbConfig.getTable());
                                 leftDbConfig.setPrimaryKey(leftTable.getPrimaryKey());
                                 leftDbConfig.setColumns(leftTable.getColumns());
                                 if (mainDbConfig.getFollows() == null) {
@@ -102,7 +154,7 @@ public class ApiController {
                             JSONObject select = followTable.getJSONObject("select");
                             followDbConfig.setSchema(select.getString("schema"));
                             followDbConfig.setTable(select.getString("table"));
-                            TableVo mainTable = dbService.getTableByShow(followDbConfig.getSchema(), followDbConfig.getTable());
+                            TableVo mainTable = getTableByShow(followDbConfig.getSchema(), followDbConfig.getTable());
                             followDbConfig.setPrimaryKey(mainTable.getPrimaryKey());
                             followDbConfig.setColumns(mainTable.getColumns());
                             followDbConfig.setParentKey(followTable.getString("parentKey"));
@@ -116,7 +168,7 @@ public class ApiController {
                                     leftDbConfig.setTable(leftJoin.getString("table"));
                                     leftDbConfig.setRelateKey(leftJoin.getString("relateKey"));
                                     leftDbConfig.setParentKey(leftJoin.getString("parentKey"));
-                                    TableVo leftTable = dbService.getTableByShow(leftDbConfig.getSchema(), leftDbConfig.getTable());
+                                    TableVo leftTable = getTableByShow(leftDbConfig.getSchema(), leftDbConfig.getTable());
                                     leftDbConfig.setPrimaryKey(leftTable.getPrimaryKey());
                                     leftDbConfig.setColumns(leftTable.getColumns());
                                     if (followDbConfig.getFollows() == null) {
@@ -129,30 +181,28 @@ public class ApiController {
                         followDbConfigList.add(followDbConfig);
                     }
                 }
-                return HttpResult.success().pull("db", dbConfig).json();
+                return dbConfig;
             }
         }
-        return HttpResult.fail("配置不存在").json();
+        return null;
     }
 
-    @RequestMapping(value = "/getJson", produces = "application/json;charset=UTF-8")
-    public String getJson(@RequestParam Integer id) {
-        Map<String,Object> db = dbDao.selectConfigById(id);
-        if (db != null && !db.isEmpty()) {
-            String configJson = (String) db.get("config");
-            return HttpResult.success().pull("json", JSON.parseObject(configJson)).json();
+    @Override
+    public JSONObject getJsonConfig(Integer configId) {
+        MetaConfigPo db = metaConfigDao.selectById(configId);
+        if (db != null) {
+            return JSON.parseObject(db.getConfig());
         }
-        return HttpResult.fail("配置不存在").json();
+        return null;
     }
 
-    @RequestMapping(value = "/delete", produces = "application/json;charset=UTF-8")
-    public String delete(Integer id) {
-        dbDao.delete(id);
-        return HttpResult.success().json();
+    @Override
+    public void deleteConfig(Integer configId) {
+        metaConfigDao.delete(configId);
     }
 
-    @RequestMapping(value = "/save", produces = "application/json;charset=UTF-8")
-    public String save(@RequestBody JSONObject param) {
+    @Override
+    public void saveConfig(JSONObject param) {
         fillTableColumn(param.getJSONObject("table"));
         if (param.containsKey("follow_tables")) {
             JSONArray followTables = param.getJSONArray("follow_tables");
@@ -162,32 +212,43 @@ public class ApiController {
             }
         }
         if (param.containsKey("id")) {
-            Integer id = param.getInteger("id");
+            Long id = param.getLong("id");
             param.remove("id");
-            Date date = new Date();
-            dbDao.update(id, JSON.toJSONString(param, SerializerFeature.DisableCircularReferenceDetect), date);
+            MetaConfigPo metaConfigPo = new MetaConfigPo();
+            metaConfigPo.setId(id);
+            metaConfigPo.setConfig(JSON.toJSONString(param, SerializerFeature.DisableCircularReferenceDetect));
+            metaConfigPo.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+            metaConfigDao.update(metaConfigPo);
         } else {
             String name = param.getString("name");
             if (name == null) {
-                return HttpResult.fail("配置名称不能为空").json();
+                error(HttpStatus.SYSTEM_ERROR, "配置名称不能为空");
             }
-            if (dbDao.selectConfigByName(name) != null) {
-                return HttpResult.fail("该配置名称已存在").json();
+            if (metaConfigDao.selectByName(name) != null) {
+                error(HttpStatus.SYSTEM_ERROR, "该配置名称已存在");
             }
             param.remove("name");
-            Date date = new Date();
-            dbDao.insert(name, JSON.toJSONString(param, SerializerFeature.DisableCircularReferenceDetect), date, date);
+            MetaConfigPo metaConfigPo = new MetaConfigPo();
+            metaConfigPo.setName(name);
+            metaConfigPo.setConfig(JSON.toJSONString(param, SerializerFeature.DisableCircularReferenceDetect));
+            metaConfigPo.setCreated_at(new Timestamp(System.currentTimeMillis()));
+            metaConfigDao.insert(metaConfigPo);
         }
-        return HttpResult.success().json();
     }
 
-    @RequestMapping(value = "/getConfigs", produces = "application/json;charset=UTF-8")
-    public String getConfigs() throws Exception {
-        List<Map<String,Object>> list = dbDao.selectConfig();
-        for (Map<String,Object> map : list) {
-            map.put("url", DesUtil.encrypt(map.get("name").toString()));
-        }
-        return HttpResult.success().pull("list", list).json();
+    @Override
+    public List<MetaConfigVo> getAllConfig() {
+        List<MetaConfigPo> poList = metaConfigDao.selectAll();
+        return poList.stream().map(po -> {
+            MetaConfigVo vo = new MetaConfigVo();
+            BeanUtils.copyProperties(po, vo);
+            try {
+                vo.setUrl(DesUtil.encrypt(po.getName()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return vo;
+        }).collect(Collectors.toList());
     }
 
     private void fillTableColumn(JSONObject jsonObject) {
@@ -223,17 +284,5 @@ public class ApiController {
                 }
             }
         }
-    }
-
-    private String getCookieValue(String key, HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(key)) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
     }
 }

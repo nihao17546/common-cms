@@ -40,8 +40,8 @@ public class WebDaoImpl implements IWebDao {
         if (param.getLeftJoins() != null && !param.getLeftJoins().isEmpty()) {
             for (SelectLeftJoin selectLeftJoin : param.getLeftJoins()) {
                 sb.append(" left join `").append(selectLeftJoin.getSchema()).append("`.`").append(selectLeftJoin.getTable()).append("` ").append(selectLeftJoin.getAlias())
-                        .append(" on ").append(selectLeftJoin.getAlias()).append(".`").append(selectLeftJoin.getRelateKey())
-                        .append("` = ").append(param.getAlias()).append(".`").append(selectLeftJoin.getParentKey()).append("`");
+                        .append(" on ").append(selectLeftJoin.getAlias()).append(".`").append(selectLeftJoin.getParentKey())
+                        .append("` = ").append(param.getAlias()).append(".`").append(selectLeftJoin.getRelateKey()).append("`");
                 if (selectLeftJoin.getWheres() != null && !selectLeftJoin.getWheres().isEmpty()) {
                     for (Where where : selectLeftJoin.getWheres()) {
                         sb.append(" and ").append(selectLeftJoin.getAlias()).append(".").append(where.getKey());

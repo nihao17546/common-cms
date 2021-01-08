@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>配置列表</title>
-    <link rel="stylesheet" href="${contextPath}/element-ui/theme-chalk/index.css">
-    <script src="${contextPath}/vue.min.js"></script>
-    <script src="${contextPath}/element-ui/index.js"></script>
-    <script src="${contextPath}/axios.min.js"></script>
+    <link rel="stylesheet" href="${contextPath}/static/element-ui/theme-chalk/index.css">
+    <script src="${contextPath}/static/vue.min.js"></script>
+    <script src="${contextPath}/static/element-ui/index.js"></script>
+    <script src="${contextPath}/static/axios.min.js"></script>
+    <script src="${contextPath}/static/form-create/method.js?v=888"></script>
     <style>
         * {
             margin:0;
@@ -23,12 +24,12 @@
 </head>
 <body>
 <div id="app">
-    <div style="position: absolute; left: 10%; top: 10%;width: 80%;">
+    <div style="position: absolute; left: 10%; top: 10%;width: 80%;" v-loading="loading">
         <el-button type="primary" size="mini" @click="add" style="margin-bottom: 8px;">新增</el-button>
         <el-table
                 :data="tableData"
-                :height="height"
                 border
+                :height="height"
                 style="width: 100%">
             <el-table-column
                     prop="id"
@@ -52,7 +53,7 @@
                     width="250">
                 <template slot-scope="props">
                     <el-button-group>
-                        <el-button type="success" size="mini" @click="preview(props.row)">预览</el-button>
+                        <el-button type="success" size="mini"  @click="preview(props.row)">预览</el-button>
                         <el-button type="info" size="mini" @click="showJson(props.row)">查看</el-button>
                         <el-button type="primary" size="mini" @click="edit(props.row)">编辑</el-button>
                         <el-button type="danger" size="mini" @click="del(props.row.id)">删除</el-button>
@@ -61,7 +62,7 @@
             </el-table-column>
         </el-table>
     </div>
-    <iframe src="${contextPath}/pages/${random}.html" style="border: 0;margin: 0px;padding: 0px;width: 100%;height: 100%;"></iframe>
+    <iframe src="${contextPath}/static/${random}.html" style="border: 0;margin: 0px;padding: 0px;width: 100%;height: 100%;"></iframe>
 
     <el-dialog
             title="JSON"
@@ -104,7 +105,7 @@
                     type: 'warning'
                 }).then(() => {
                     this.loading = true;
-                    axios.get(window.contextPath + '/api/delete',{
+                    axios.get(window.contextPath + '/manager/delete',{
                         params: {
                             id: id
                         }
@@ -125,10 +126,10 @@
                 });
             },
             add() {
-                window.location.href = window.contextPath + '/main.html'
+                window.location.href = window.contextPath + '/manager/main.html'
             },
             edit(row) {
-                window.location.href = window.contextPath + '/main.html?id=' + row.id
+                window.location.href = window.contextPath + '/manager/main.html?id=' + row.id
             },
             closeJson() {
                 this.jsonDialog = {
@@ -142,8 +143,9 @@
                 }
             },
             getList() {
+                this.loading = true;
                 this.tableData = []
-                axios.post(window.contextPath + '/api/getConfigs', {}, {
+                axios.post(window.contextPath + '/manager/getConfigs', {}, {
                     headers: {}
                 }).then(res => {
                     if (res.data.status != 0) {

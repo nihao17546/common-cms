@@ -2,6 +2,7 @@ package com.appcnd.common.cms.starter.config;
 
 import com.appcnd.common.cms.starter.aop.ExceptionHandlerAop;
 import com.appcnd.common.cms.starter.controller.ConfigController;
+import com.appcnd.common.cms.starter.controller.ManagerController;
 import com.appcnd.common.cms.starter.controller.UploadController;
 import com.appcnd.common.cms.starter.controller.WebController;
 import com.appcnd.common.cms.starter.dao.IMetaConfigDao;
@@ -10,9 +11,12 @@ import com.appcnd.common.cms.starter.dao.impl.MetaConfigDaoImpl;
 import com.appcnd.common.cms.starter.dao.impl.WebDaoImpl;
 import com.appcnd.common.cms.starter.pojo.constant.BasicConstant;
 import com.appcnd.common.cms.starter.properties.DbProperties;
+import com.appcnd.common.cms.starter.properties.ManagerProperties;
 import com.appcnd.common.cms.starter.properties.QiniuProperties;
 import com.appcnd.common.cms.starter.properties.ServletProperties;
+import com.appcnd.common.cms.starter.service.IManagerService;
 import com.appcnd.common.cms.starter.service.IWebService;
+import com.appcnd.common.cms.starter.service.impl.ManagerServiceImpl;
 import com.appcnd.common.cms.starter.service.impl.WebServiceImpl;
 import com.appcnd.common.cms.starter.servlet.ResourceServlet;
 import com.appcnd.common.cms.starter.util.ConfigJsonUtil;
@@ -34,7 +38,7 @@ import java.util.Map;
 /**
  * created by nihao 2020/07/07
  */
-@EnableConfigurationProperties({ServletProperties.class, QiniuProperties.class, DbProperties.class})
+@EnableConfigurationProperties({ServletProperties.class, QiniuProperties.class, DbProperties.class, ManagerProperties.class})
 @Import({SpringContextUtil.class, ExceptionHandlerAop.class})
 public class BeanConfig {
     @Autowired
@@ -71,6 +75,10 @@ public class BeanConfig {
     public IWebService webService() {
         return new WebServiceImpl();
     }
+    @Bean(name = BasicConstant.beanNamePrefix + "managerService")
+    public IManagerService managerService() {
+        return new ManagerServiceImpl();
+    }
 
     @PostConstruct
     public void init() throws Exception {
@@ -86,12 +94,15 @@ public class BeanConfig {
         springContextUtil.addBean(WebController.class, BasicConstant.beanNamePrefix + "webController");
         springContextUtil.registerController(BasicConstant.beanNamePrefix + "webController");
 
-        System.out.println(" ____  ____  _      _      ____  _            ____  _      ____\n" +
-                "/   _\\/  _ \\/ \\__/|/ \\__/|/  _ \\/ \\  /|      /   _\\/ \\__/|/ ___\\\n" +
-                "|  /  | / \\|| |\\/||| |\\/||| / \\|| |\\ ||_____ |  /  | |\\/|||    \\\n" +
-                "|  \\__| \\_/|| |  ||| |  ||| \\_/|| | \\||\\____\\|  \\__| |  ||\\___ |\n" +
-                "\\____/\\____/\\_/  \\|\\_/  \\|\\____/\\_/  \\|      \\____/\\_/  \\|\\____/\n" +
-                "                                                 0.0.4-SNAPSHOT");
+        modify(ManagerController.class);
+        springContextUtil.addBean(ManagerController.class, BasicConstant.beanNamePrefix + "managerController");
+        springContextUtil.registerController(BasicConstant.beanNamePrefix + "managerController");
+
+        System.out.println("  / __\\___   __| | ___| | ___  ___ ___ \n" +
+                " / /  / _ \\ / _` |/ _ \\ |/ _ \\/ __/ __|\n" +
+                "/ /__| (_) | (_| |  __/ |  __/\\__ \\__ \\\n" +
+                "\\____/\\___/ \\__,_|\\___|_|\\___||___/___/\n" +
+                " 1.0.0-SNAPSHOT");
     }
 
     /**

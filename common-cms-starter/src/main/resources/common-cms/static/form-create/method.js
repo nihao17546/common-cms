@@ -1,4 +1,4 @@
-$.jump = function (object) {
+function jump(object) {
     let paramFormDb = object.paramFormDb,
         p = object.p,
         url = object.url;
@@ -72,4 +72,21 @@ $.jump = function (object) {
     } else {
         open(null, url, null)
     }
+}
+
+function getParam(name) {
+    var reg = new RegExp("[^\?&]?" + encodeURI(name) + "=[^&]+");
+    var arr = window.location.search.match(reg);
+    if (arr != null) {
+        return decodeURI(arr[0].substring(arr[0].search("=") + 1));
+    }
+    return "";
+}
+
+function guid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0,
+            v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
 }

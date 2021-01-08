@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>database</title>
-    <link rel="stylesheet" href="${contextPath}/element-ui/theme-chalk/index.css">
-    <script src="${contextPath}/vue.min.js"></script>
-    <script src="${contextPath}/element-ui/index.js"></script>
-    <script src="${contextPath}/axios.min.js"></script>
+    <link rel="stylesheet" href="${contextPath}/static/element-ui/theme-chalk/index.css">
+    <script src="${contextPath}/static/vue.min.js"></script>
+    <script src="${contextPath}/static/element-ui/index.js"></script>
+    <script src="${contextPath}/static/axios.min.js"></script>
+    <script src="${contextPath}/static/form-create/method.js?v=888"></script>
     <style>
         .box-card {
             margin-top: 3px;
@@ -226,14 +227,6 @@
     window.setInterval(() => {
         window.parent.document.getElementById("database").height = document.getElementById("app").offsetHeight + 15
     }, 200)
-    function getParam(name) {
-        var reg = new RegExp("[^\?&]?" + encodeURI(name) + "=[^&]+");
-        var arr = window.location.search.match(reg);
-        if (arr != null) {
-            return decodeURI(arr[0].substring(arr[0].search("=") + 1));
-        }
-        return "";
-    }
 </script>
 <script>
     window.vue = new Vue({
@@ -303,7 +296,7 @@
                 follow.primaryKey = ''
                 follow.columns = []
                 if (follow && follow.schema && follow.table) {
-                    axios.get(window.contextPath + '/api/getTable', {
+                    axios.get(window.contextPath + '/manager/getTable', {
                         params: {
                             schema: follow.schema,
                             table: follow.table
@@ -365,7 +358,7 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.loading = true
-                        axios.get(window.contextPath + '/api/getTable', {
+                        axios.get(window.contextPath + '/manager/getTable', {
                             params: {
                                 schema: form.schema,
                                 table: form.table
@@ -393,7 +386,7 @@
             let id = getParam("id")
             if (id) {
                 this.loading = true;
-                axios.get(window.contextPath + '/api/getConfig', {
+                axios.get(window.contextPath + '/manager/getConfig', {
                     params: {
                         id: id
                     }
@@ -403,7 +396,7 @@
                         this.loading = false;
                         if (res.data.msg == '配置不存在') {
                             alert('配置不存在')
-                            window.parent.location.href = window.contextPath + '/list.html'
+                            window.parent.location.href = window.contextPath + '/manager/list.html'
                         }
                     } else {
                         this.mainDb = res.data.content.db.main

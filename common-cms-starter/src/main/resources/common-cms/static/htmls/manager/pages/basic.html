@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>基础配置</title>
-    <link rel="stylesheet" href="${contextPath}/element-ui/theme-chalk/index.css">
-    <script src="${contextPath}/vue.min.js"></script>
-    <script src="${contextPath}/element-ui/index.js"></script>
-    <script src="${contextPath}/axios.min.js"></script>
+    <link rel="stylesheet" href="${contextPath}/static/element-ui/theme-chalk/index.css">
+    <script src="${contextPath}/static/vue.min.js"></script>
+    <script src="${contextPath}/static/element-ui/index.js"></script>
+    <script src="${contextPath}/static/axios.min.js"></script>
+    <script src="${contextPath}/static/form-create/method.js?v=888"></script>
     <style>
         .el-card__header {
             padding-bottom: 2px;
@@ -1909,22 +1910,6 @@
         window.parent.document.getElementById("basic").height =  window.document.body.scrollHeight
     }, 1)
 
-    function getParam(name) {
-        var reg = new RegExp("[^\?&]?" + encodeURI(name) + "=[^&]+");
-        var arr = window.location.search.match(reg);
-        if (arr != null) {
-            return decodeURI(arr[0].substring(arr[0].search("=") + 1));
-        }
-        return "";
-    }
-    function guid() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0,
-                    v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
-
     window.vue = new Vue({
         name: 'm',
         el: '#app',
@@ -2155,7 +2140,7 @@
         },
         methods: {
             preview() {
-                window.open(window.contextPath + "/pages/preview.html?uuid=" + this.uuid)
+                window.open(window.contextPath + "/manager/pages/preview.html?uuid=" + this.uuid)
             },
             submit() {
                 this.$refs['form'].validate((valid, obj) => {
@@ -2165,13 +2150,13 @@
                         if (id) {
                             param.id = id
                             this.loading = true;
-                            axios.post(window.contextPath + '/api/save',param).then(res => {
+                            axios.post(window.contextPath + '/manager/save',param).then(res => {
                                 if (res.data.status != 0) {
                                     this.$message.error(res.data.msg);
                                     this.loading = false;
                                 } else {
                                     this.loading = false;
-                                    window.parent.location.href = window.contextPath + '/list.html'
+                                    window.parent.location.href = window.contextPath + '/manager/list.html'
                                 }
                             }).catch(res => {
                                 console.error(res)
@@ -2186,13 +2171,13 @@
                             }).then(({ value }) => {
                                 param.name = value
                                 this.loading = true;
-                                axios.post(window.contextPath + '/api/save',param).then(res => {
+                                axios.post(window.contextPath + '/manager/save',param).then(res => {
                                     if (res.data.status != 0) {
                                         this.$message.error(res.data.msg);
                                         this.loading = false;
                                     } else {
                                         this.loading = false;
-                                        window.parent.location.href = window.contextPath + '/list.html'
+                                        window.parent.location.href = window.contextPath + '/manager/list.html'
                                     }
                                 }).catch(res => {
                                     console.error(res)
@@ -2650,7 +2635,7 @@
                     valueColumn: item.valueColumn,
                     db: db
                 }
-                axios.get(window.contextPath + '/api/getTable', {
+                axios.get(window.contextPath + '/manager/getTable', {
                     params: {
                         schema: this.remoteSelectDialog.schema,
                         table: this.remoteSelectDialog.table
@@ -2688,7 +2673,7 @@
                         && typeof this.remoteSelectDialog.table != 'undefined'
                         && this.remoteSelectDialog.schema != ''
                         && this.remoteSelectDialog.table != '') {
-                    axios.get(window.contextPath + '/api/getTable', {
+                    axios.get(window.contextPath + '/manager/getTable', {
                         params: {
                             schema: this.remoteSelectDialog.schema,
                             table: this.remoteSelectDialog.table
@@ -3228,7 +3213,7 @@
             init(mainDb, followDbs) {
                 if(Object.keys(mainDb).length == 0){
                     let id = getParam('id')
-                    let url = window.contextPath + '/pages/basic.html'
+                    let url = window.contextPath + '/manager/pages/basic.html'
                     if (id) {
                         url = url + '?id=' + id + '&reload=1'
                     }
@@ -3416,7 +3401,7 @@
             if (id) {
                 if (!getParam('reload')) {
                     this.loading = true;
-                    axios.get(window.contextPath + '/api/getJson', {
+                    axios.get(window.contextPath + '/manager/getJson', {
                         params: {
                             id: id
                         }
@@ -3459,14 +3444,18 @@
                 let searchElements = []
                 if (configObj.table && configObj.table.select && configObj.table.select.searchElements) {
                     for (let i = 0; i < configObj.table.select.searchElements.length; i ++) {
-                        searchElements.push(configObj.table.select.searchElements[i])
+                        if (configObj.table.select.searchElements[i].show) {
+                            searchElements.push(configObj.table.select.searchElements[i])
+                        }
                     }
                 }
                 if (configObj.table && configObj.table.select && configObj.table.select.leftJoins && configObj.table.select.leftJoins.length > 0) {
                     for (let i = 0; i < configObj.table.select.leftJoins.length; i ++) {
                         if (configObj.table.select.leftJoins[i].searchElements && configObj.table.select.leftJoins[i].searchElements.length > 0) {
                             for (let j = 0; j < configObj.table.select.leftJoins[i].searchElements.length; j ++) {
-                                searchElements.push(configObj.table.select.leftJoins[i].searchElements[j])
+                                if (configObj.table.select.leftJoins[i].searchElements[j].show) {
+                                    searchElements.push()
+                                }
                             }
                         }
                     }
