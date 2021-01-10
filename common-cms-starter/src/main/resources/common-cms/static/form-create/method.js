@@ -90,3 +90,14 @@ function guid() {
         return v.toString(16);
     });
 }
+
+function clearCookie(name) {
+    setCookie(name, "", -1);
+}
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}

@@ -24,9 +24,11 @@
 </head>
 <body>
 <div id="app">
-    <div style="position: absolute; left: 10%; top: 10%;width: 80%;" v-loading="loading">
+    <div style="position: absolute; left: 10%; top: 10%;width: 80%;">
+        <el-button type="primary" icon="el-icon-arrow-left" size="mini" @click="back" style="margin-bottom: 8px;">退出</el-button>
         <el-button type="primary" size="mini" @click="add" style="margin-bottom: 8px;">新增</el-button>
         <el-table
+                v-loading="loading"
                 :data="tableData"
                 border
                 :height="height"
@@ -95,6 +97,10 @@
             }
         },
         methods: {
+            back() {
+                clearCookie('commoncmsmanager')
+                window.location.href = window.contextPath + '/manager/index.html'
+            },
             preview(row) {
                 window.open(window.contextPath + '/web/' + row.url + '.html')
             },

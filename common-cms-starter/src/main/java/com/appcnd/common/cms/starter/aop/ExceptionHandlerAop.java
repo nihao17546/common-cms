@@ -1,5 +1,6 @@
 package com.appcnd.common.cms.starter.aop;
 
+import com.appcnd.common.cms.entity.util.DesUtil;
 import com.appcnd.common.cms.starter.exception.CmsRuntimeException;
 import com.appcnd.common.cms.starter.pojo.HttpResult;
 import com.appcnd.common.cms.starter.pojo.HttpStatus;
@@ -38,12 +39,46 @@ public class ExceptionHandlerAop {
 
     @Around("pointcut()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
+        HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletResponse response = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();
+        // 管理相关判断登录
+        String servletPath = request.getServletPath();
+        if (servletPath.startsWith(servletProperties.getUrl() + "/manager")) {
+            if (!servletPath.equals(servletProperties.getUrl() + "/manager/index.html")
+                    && !servletPath.equals(servletProperties.getUrl() + "/manager/login")) {
+                // 是否拦截
+                boolean forbidden = false;
+                String str = CommonUtils.getCookieValue("commoncmsmanager");
+                if (str != null) {
+                    String token = null;
+                    try {
+                        token = DesUtil.decrypt(str);
+                        String[] ss = token.split("#");
+                        Long time = Long.parseLong(ss[0]);
+                        if (time - System.currentTimeMillis() > 1000L * 60 * 24) {
+                            forbidden = true;
+                        }
+                    } catch (Exception e) {
+                        forbidden = true;
+                    }
+                } else {
+                    forbidden = true;
+                }
+                if (forbidden) {
+                    if (servletPath.endsWith(".html")) {
+                        response.setStatus(302);
+                        response.setHeader("location", servletProperties.getUrl() + "/manager/index.html");
+                        return null;
+                    } else {
+                        return HttpResult.build(HttpStatus.NEED_LOGIN);
+                    }
+                }
+            }
+        }
         try {
             Object proceed = point.proceed();
             return proceed;
         } catch (Throwable e) {
-            HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
-            HttpServletResponse response = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();
             if (CommonUtils.isAjax(request)) {
                 if (e instanceof CmsRuntimeException) {
                     CmsRuntimeException cmsRuntimeException = (CmsRuntimeException) e;
