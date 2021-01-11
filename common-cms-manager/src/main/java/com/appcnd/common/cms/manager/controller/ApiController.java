@@ -24,7 +24,7 @@ import java.util.*;
  * @author nihao 2019/10/19
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/manager")
 public class ApiController {
     @Autowired
     private IDbService dbService;
