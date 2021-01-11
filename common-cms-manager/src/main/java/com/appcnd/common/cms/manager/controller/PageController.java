@@ -23,6 +23,8 @@ public class PageController {
         if ("index".equals(page)) {
             return page;
         }
+        request.setAttribute("basePackage",
+                ConfigEntity.class.getName().replace("ConfigEntity", ""));
         String str = getCookieValue("commoncmsmanager", request);
         if (str != null) {
             String token = null;
