@@ -797,7 +797,6 @@
                             </template>
                         </el-row>
                     </el-card>
-                    </el-card>
                 </div>
                 <div id="main_add" class="div-card" v-if="form.add_form">
                     <el-card shadow="hover">
@@ -2755,7 +2754,7 @@
                     }
                 }
                 this.form = JSON.parse(JSON.stringify(this.form))
-                if (typeof id != 'undefined') {
+                if (typeof id == 'number' || typeof id == 'string') {
                     this.loading = true;
                     axios.get(window.contextPath + '/manager/getJson', {
                         params: {
@@ -3529,6 +3528,7 @@
             },
             justRemove(item, index, elements) {
                 elements.splice(index, 1)
+                this.form = JSON.parse(JSON.stringify(this.form))
             },
             deleteFormatterTextDialog(item, db) {
                 let data = this
