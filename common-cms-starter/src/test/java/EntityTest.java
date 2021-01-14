@@ -75,6 +75,7 @@ public class EntityTest {
         ConfigEntity configEntity = ConfigEntity.builder().title("测试").table(table).addBtn(true).deleteBtn(true).editBtn(true)
                 .addForm(addForm).followTables(followTable).build();
         System.out.println(configEntity.json());
+        System.out.println(DesUtil.encrypt("配置名称"));
 
 
 //        JSONObject jsonObject = new JSONObject();

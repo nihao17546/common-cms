@@ -1,4 +1,5 @@
-# COMMON-CMS
+# 编码配置
+
 ---
 ## 目录
 1. [总配置](#h1)
@@ -51,8 +52,8 @@ class Test {
                                                             Formatter.url().build()
                                                     )
                                                     .build(),
-                                            TableColumn.builder().key("time").label("从表时间").prop("f_time").build(), // 从表time字段与主表time字段有冲突，需指定别名 prop
-                                            TableColumn.builder().key("status").label("从表状态").prop("f_status")
+                                            TableColumn.builder().key("time").label("从表时间").build(), 
+                                            TableColumn.builder().key("status").label("从表状态")
                                                     .formatter(
                                                             Formatter.text().kv("0","无效").kv("1","有效").build()
                                                     )
@@ -111,7 +112,7 @@ class Test {
                                     .leftJoins(
                                             SelectLeftJoin.builder().table("tb_city").relateKey("id").parentKey("city_id")
                                                     .tableColumns(
-                                                            TableColumn.builder().key("name").prop("city_name").label("城市").build()
+                                                            TableColumn.builder().key("name").label("城市").build()
                                                     )
                                                     .build()
                                     )
@@ -145,8 +146,16 @@ class Test {
                     .build();
             
             /** 打印配置json */
+            /** 将此字符串添加到配置表tb_meta_config的config字段 */
             System.out.println(configEntity);
-            System.out.println(DesUtil.encrypt(configEntity.getTitle()));
+            /** 指定配置名称，将配置名称添加到tb_meta_config的name字段 */
+            String name = "配置名称";
+            /** 解析配置名称，例如解析结果是：12a7a9141ed033f86b50a74e6519787b，
+             *  项目的访问路径是：http://127.0.0.1:8080/demo
+             *  配置common.cms.web.url为：/cms
+             *  那么访问地址为：http://127.0.0.1:8080/demo/cms/web/12a7a9141ed033f86b50a74e6519787b.html
+            */
+            System.out.println(DesUtil.encrypt(name));
         }
 }
 ~~~
@@ -415,7 +424,6 @@ com.appcnd.common.cms.entity.table.Table
   | 属性 | 类型 | 是否必须 | 默认值 | 说明 |
   | :------| :------ | :------ | :------ | :------ |
   | key | String | 是 |  | sql查询字段 |
-  | prop | String | 否 | 等于key | sql查询别名 |
   | label | String | 是 |  | 前端列头文案 |
   | width | Integer | 否 |  | 前端列宽度 |
   | formatter | [Formatter](#formmatter) | 否 |  | 格式化配置 |
