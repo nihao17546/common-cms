@@ -40,7 +40,7 @@ public class ManagerController extends BaseController {
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html; charset=utf-8");
         Map<String,String> params = new HashMap<>();
-        params.put("random", (new Random().nextInt(6) + 1) + "");
+        params.put("random", (new Random().nextInt(10) + 1) + "");
         params.put("basePackage", ConfigEntity.class.getName().replace("ConfigEntity", ""));
         String text = PageUtil.getPage(request, servletProperties.getUrl(), "manager/" + page, params);
         if (text == null) {
