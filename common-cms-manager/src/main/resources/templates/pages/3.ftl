@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>jq22-a10</title>
+    <title>codeless</title>
     <style>
         canvas { position: absolute; top: 0; left: 0; }
     </style>

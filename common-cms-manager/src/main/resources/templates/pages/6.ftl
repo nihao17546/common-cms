@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>jq22-code4</title>
+    <title>codeless</title>
     <script src="http://libs.baidu.com/jquery/1.11.3/jquery.min.js"></script>
     <style>
         html, body { background: #000; margin: 0; padding:0;}

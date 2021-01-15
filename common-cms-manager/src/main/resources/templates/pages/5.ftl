@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="google" value="notranslate">
     <meta name="robots" content="noindex">
-    <title>jq22-code1</title>
+    <title>codeless</title>
     <style>
         canvas { position: absolute; top: 0; left: 0; }
     </style>

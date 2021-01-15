@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>jq22-code3</title>
+    <title>codeless</title>
     <style>
         body {
             background: #000;

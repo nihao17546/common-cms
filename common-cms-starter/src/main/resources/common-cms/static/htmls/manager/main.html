@@ -2565,11 +2565,15 @@
                                             }
                                         }
                                     }
-                                    this.sy(id)
+                                    this.$nextTick(() => {
+                                        this.sy(id)
+                                    })
                                 }
                             });
                         } else {
-                            this.sy(id)
+                            this.$nextTick(() => {
+                                this.sy(id)
+                            })
                         }
                     }
                 });
@@ -2752,7 +2756,6 @@
                         this.followKpTable.push(followKpTable)
                     }
                 }
-                this.form = JSON.parse(JSON.stringify(this.form))
                 if (typeof id == 'number' || typeof id == 'string') {
                     this.loading = true;
                     axios.get(window.contextPath + '/manager/getJson', {
@@ -2764,16 +2767,17 @@
                             this.$message.error(res.data.msg);
                             this.loading = false;
                         } else {
-                            window.setInterval(() => {
-                                this.form = res.data.content.json
-                                this.loading = false;
-                            }, 1500)
+                            this.form = res.data.content.json
+                            this.form = JSON.parse(JSON.stringify(this.form))
+                            this.loading = false;
                         }
                     }).catch(res => {
                         console.error(res)
                         this.$message.error('服务异常');
                         this.loading = false;
                     })
+                } else {
+                    this.form = JSON.parse(JSON.stringify(this.form))
                 }
             },
             addUnique(db) {
@@ -3810,9 +3814,9 @@
                         this.mainDb = res.data.content.db.main
                         this.followDbs = res.data.content.db.follows
                         this.loading = false;
-                        window.setTimeout(() => {
+                        this.$nextTick(() => {
                             this.dbSubmit(id)
-                        }, 500)
+                        })
                     }
                 }).catch(res => {
                     console.error(res)

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>jq22-code2</title>
+    <title>codeless</title>
     <style>
         html{ background: black;}
         body { width: 100%; height: 100%; position: absolute; left: 0; top: 0; overflow: hidden; margin: 0; background: black; -webkit-filter: invert(0); filter: invert(0); }
