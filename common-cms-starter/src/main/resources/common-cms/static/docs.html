@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="${contextPath}/static/drake.css">
     <script src="${contextPath}/static/vue.min.js"></script>
     <script src="${contextPath}/static/element-ui/index.js"></script>
-    <script src="${contextPath}/static/showdown.min.js"></script>
+    <script src="${contextPath}/static/marked.min.js"></script>
     <script src="${contextPath}/static/form-create/method.js?v=9879"></script>
     <style>
         #app {
@@ -53,7 +53,7 @@
             } else {
                 this.active = 'start'
             }
-            this.start = new showdown.Converter().makeHtml('# 快速开始\n' +
+            this.start = marked('# 快速开始\n' +
                 '#### 添加配置表\n' +
                 '~~~sql\n' +
                 'CREATE TABLE `tb_meta_config` (\n' +
@@ -111,7 +111,7 @@
                 '可视化配置需登录管理后台，以以上配置为例，若项目访问路径为：\n' +
                 'http://127.0.0.1:8080/demo，那么后台管理访问路径为：\n' +
                 'http://127.0.0.1:8080/demo/cms/manager/index.html')
-            this.code = new showdown.Converter().makeHtml('# 编码配置\n ' +
+            this.code = marked('# 编码配置\n ' +
                 '---\n' +
                 '## 目录\n' +
                 '1. [总配置](#h1)\n' +
