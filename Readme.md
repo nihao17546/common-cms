@@ -337,6 +337,7 @@ com.appcnd.common.cms.entity.form.add.AddForm
   | placeholder | String | 否 |  | 提示文案 |
   | acceptType | String | 否 |  | 图片后缀类型(例：".jpg,.PNG"，多个使用逗号分隔) |
   | limitSize | Long | 否 |  | 图片大小限制，单位：字节 |
+  | cut | Boolean | 否 | false | 是否裁剪 |
   | rule | [FormRule](#FormRule) | 否 |  | 校验规则 |
   | canEdit | Boolean | 否 | true | 是否可以编辑 |
   
