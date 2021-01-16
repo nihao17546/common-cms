@@ -2,10 +2,7 @@ package com.appcnd.common.cms.starter.service;
 
 import com.appcnd.common.cms.entity.form.add.UniqueColumn;
 import com.appcnd.common.cms.starter.pojo.db.ListParam;
-import com.appcnd.common.cms.starter.pojo.param.SpecialColumnParam;
-import com.appcnd.common.cms.starter.pojo.po.MetaConfigPo;
-import com.appcnd.common.cms.starter.pojo.vo.ListVO;
-import com.appcnd.common.cms.starter.pojo.db.ListParam;
+import com.appcnd.common.cms.starter.pojo.param.CascadingDeleteParam;
 import com.appcnd.common.cms.starter.pojo.param.SpecialColumnParam;
 import com.appcnd.common.cms.starter.pojo.po.MetaConfigPo;
 import com.appcnd.common.cms.starter.pojo.vo.ListVO;
@@ -31,5 +28,7 @@ public interface IWebService {
     int update(String schema, String table, String primaryKey, Map<String, Object> params,
                List<SpecialColumnParam> specialColumnParams, List<UniqueColumn> uniqueColumns);
 
-    void delete(String schema, String table, String primaryKey, List<Object> primaryKeyValues);
+    void delete(String schema, String table, String primaryKey,
+                List<Object> primaryKeyValues,
+                List<CascadingDeleteParam> cascadingDeleteParams);
 }

@@ -47,10 +47,14 @@ public class FollowTable implements Serializable {
     @JSONField(name = "limit_size")
     private Integer limitSize;
 
+    @JSONField(name = "cascading_delete")
+    private Boolean cascadingDelete;
+
     private List<Bottom> bottoms;
 
     public FollowTable(Boolean pagination, String defaultSortColumn, String defaultOrder, Select select, String relateKey, String parentKey,
-                       String bottomName, AddForm addForm, Boolean deleteBtn, Boolean addBtn, Boolean editBtn, Integer limitSize, List<Bottom> bottoms) {
+                       String bottomName, AddForm addForm, Boolean deleteBtn, Boolean addBtn, Boolean editBtn, Integer limitSize, List<Bottom> bottoms,
+                       Boolean cascadingDelete) {
         CommonAssert.notNull(select, "select 不能为空");
         CommonAssert.notNull(relateKey, "relateKey 不能为空");
         CommonAssert.notNull(parentKey, "parentKey 不能为空");
@@ -71,6 +75,7 @@ public class FollowTable implements Serializable {
         this.deleteBtn = deleteBtn == null ? false : deleteBtn;
         this.addBtn = addBtn == null ? false : addBtn;
         this.editBtn = editBtn == null ? false : editBtn;
+        this.cascadingDelete = cascadingDelete == null ? true : cascadingDelete;
         this.columns = new ArrayList<>();
         this.columns.addAll(select.getTableColumns());
         if (select.getLeftJoins() != null) {
@@ -137,6 +142,7 @@ public class FollowTable implements Serializable {
         private Boolean addBtn;
         private Boolean editBtn;
         private Integer limitSize;
+        private Boolean cascadingDelete;
         private List<Bottom> bottoms;
 
         public FollowTableBuilder pagination(Boolean pagination) {
@@ -199,6 +205,11 @@ public class FollowTable implements Serializable {
             return this;
         }
 
+        public FollowTableBuilder cascadingDelete(Boolean cascadingDelete) {
+            this.cascadingDelete = cascadingDelete;
+            return this;
+        }
+
         public FollowTableBuilder bottom(Bottom... bottoms) {
             if (bottoms != null && bottoms.length > 0) {
                 this.bottoms = Arrays.asList(bottoms);
@@ -208,7 +219,7 @@ public class FollowTable implements Serializable {
 
         public FollowTable build() {
             return new FollowTable(pagination, defaultSortColumn, defaultOrder, select, relateKey, parentKey, bottomName,
-                    addForm, deleteBtn, addBtn, editBtn, limitSize, bottoms);
+                    addForm, deleteBtn, addBtn, editBtn, limitSize, bottoms, cascadingDelete);
         }
     }
 

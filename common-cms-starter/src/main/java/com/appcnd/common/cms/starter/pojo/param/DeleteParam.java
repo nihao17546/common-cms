@@ -11,4 +11,5 @@ import java.util.List;
 public class DeleteParam {
     private String addJson;
     private List<Object> primaryKeyValues;
+    private List<CascadingDeleteParam> cascadingDeletes;
 }

@@ -6,6 +6,7 @@ import com.appcnd.common.cms.starter.dao.IMetaConfigDao;
 import com.appcnd.common.cms.starter.dao.IWebDao;
 import com.appcnd.common.cms.starter.pojo.HttpStatus;
 import com.appcnd.common.cms.starter.pojo.db.ListParam;
+import com.appcnd.common.cms.starter.pojo.param.CascadingDeleteParam;
 import com.appcnd.common.cms.starter.pojo.param.SpecialColumnParam;
 import com.appcnd.common.cms.starter.pojo.po.MetaConfigPo;
 import com.appcnd.common.cms.starter.pojo.vo.ListVO;
@@ -148,7 +149,7 @@ public class WebServiceImpl extends BaseService implements IWebService {
     }
 
     @Override
-    public void delete(String schema, String table, String primaryKey, List<Object> primaryKeyValues) {
-        webDao.delete(schema, table, primaryKey, primaryKeyValues);
+    public void delete(String schema, String table, String primaryKey, List<Object> primaryKeyValues, List<CascadingDeleteParam> cascadingDeleteParams) {
+        webDao.delete(schema, table, primaryKey, primaryKeyValues, cascadingDeleteParams);
     }
 }

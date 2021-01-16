@@ -239,6 +239,51 @@ public class DBUtil implements ApplicationContextAware {
         }
     }
 
+    public int batchUpdate(List<DbExecute> executes) {
+        if (executes == null || executes.isEmpty()) {
+            return 0;
+        }
+        int result = 0;
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+            for (DbExecute dbExecute : executes) {
+                log.debug("Preparing: {}", dbExecute.getSql());
+                log.debug("Parameters: {}", getParamString(dbExecute.getParams()));
+                PreparedStatement st = conn.prepareStatement(dbExecute.getSql());
+                if (dbExecute.getParams() != null && !dbExecute.getParams().isEmpty()) {
+                    for (int i = 0; i < dbExecute.getParams().size(); i ++) {
+                        st.setObject(i+1, dbExecute.getParams().get(i));
+                    }
+                }
+                result = result + st.executeUpdate();
+                if (st != null) {
+                    try {
+                        st.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            conn.commit();
+            return result;
+        } catch (Exception e) {
+            try {
+                conn.rollback();
+            } catch (SQLException e1) {}
+            throw new RuntimeException(e);
+        } finally {
+            if(conn != null){
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     public int insert(String sql, List<Object> params) {
         return update(sql, params);
     }

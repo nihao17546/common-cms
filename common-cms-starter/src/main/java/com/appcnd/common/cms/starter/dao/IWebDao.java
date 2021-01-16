@@ -1,6 +1,7 @@
 package com.appcnd.common.cms.starter.dao;
 
 import com.appcnd.common.cms.starter.pojo.db.ListParam;
+import com.appcnd.common.cms.starter.pojo.param.CascadingDeleteParam;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public interface IWebDao {
 
     int update(String schema, String table, String primaryKey, Object primaryKeyValue, Map<String, Object> param);
 
-    int delete(String schema, String table, String primaryKey, List<Object> primaryKeyValues);
+    int delete(String schema, String table, String primaryKey, List<Object> primaryKeyValues, List<CascadingDeleteParam> cascadingDeleteParams);
 
     List<Map<String,Object>> selectUnique(String schema, String table, String primaryKey, Map<String, Object> uniqueParams);
 }

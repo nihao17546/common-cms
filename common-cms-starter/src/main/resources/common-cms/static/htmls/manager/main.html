@@ -1173,6 +1173,17 @@
                                                   maxlength="50"></el-input>
                                     </el-form-item>
                                 </el-col>
+                                <el-col :span="6">
+                                    <el-form-item label="跟随主表级联删除:"
+                                                  :rules="[{required: true, message: '请选择', trigger: 'change'}]"
+                                                  :prop="'follow_tables.' + followIndex + '.cascading_delete'"
+                                                  label-width="100px">
+                                        <el-select style="width: 100%" v-model="follow.cascading_delete">
+                                            <el-option :key="true" label="是" :value="true"></el-option>
+                                            <el-option :key="false" label="否" :value="false"></el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                </el-col>
                             </el-row>
                             <el-card shadow="hover" style="margin-bottom: 8px;">
                                 <div slot="header":id="'follow_' + followIndex + '_table'">

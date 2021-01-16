@@ -5,6 +5,7 @@ import com.appcnd.common.cms.starter.dao.IWebDao;
 import com.appcnd.common.cms.starter.exception.CmsRuntimeException;
 import com.appcnd.common.cms.starter.pojo.HttpStatus;
 import com.appcnd.common.cms.starter.pojo.db.ListParam;
+import com.appcnd.common.cms.starter.pojo.param.CascadingDeleteParam;
 import com.appcnd.common.cms.starter.pojo.param.SearchParam;
 import com.appcnd.common.cms.starter.util.DBUtil;
 import com.appcnd.common.cms.entity.db.*;
@@ -12,6 +13,7 @@ import com.appcnd.common.cms.starter.dao.IWebDao;
 import com.appcnd.common.cms.starter.pojo.db.ListParam;
 import com.appcnd.common.cms.starter.pojo.param.SearchParam;
 import com.appcnd.common.cms.starter.util.DBUtil;
+import com.appcnd.common.cms.starter.util.DbExecute;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -247,7 +249,7 @@ public class WebDaoImpl implements IWebDao {
     }
 
     @Override
-    public int delete(String schema, String table, String primaryKey, List<Object> primaryKeyValues) {
+    public int delete(String schema, String table, String primaryKey, List<Object> primaryKeyValues, List<CascadingDeleteParam> cascadingDeleteParams) {
         StringBuilder sb = new StringBuilder();
         sb.append("delete from `").append(schema).append("`.`").append(table).append("` where `").append(primaryKey).append("` in (");
         for (Object primaryKeyValue : primaryKeyValues) {
@@ -256,7 +258,26 @@ public class WebDaoImpl implements IWebDao {
         sb.deleteCharAt(sb.length() - 1);
         sb.append(")");
         String sql = sb.toString();
-        return dbUtil.delete(sql, primaryKeyValues);
+
+        if (cascadingDeleteParams == null || cascadingDeleteParams.isEmpty()) {
+            return dbUtil.delete(sql, primaryKeyValues);
+        }
+
+        List<DbExecute> dbExecutes = new ArrayList<>(cascadingDeleteParams.size() + 1);
+        dbExecutes.add(DbExecute.builder().sql(sql).params(primaryKeyValues).build());
+        for (CascadingDeleteParam cascadingDelete : cascadingDeleteParams) {
+            StringBuilder sbs = new StringBuilder();
+            sbs.append("delete from `").append(cascadingDelete.getSchema()).append("`.`").append(cascadingDelete.getTable())
+                    .append("` where `").append(cascadingDelete.getParentKey()).append("` in (");
+            for (Object primaryKeyValue : primaryKeyValues) {
+                sbs.append("?,");
+            }
+            sbs.deleteCharAt(sbs.length() - 1);
+            sbs.append(")");
+            String sqlF = sbs.toString();
+            dbExecutes.add(DbExecute.builder().sql(sqlF).params(primaryKeyValues).build());
+        }
+        return dbUtil.batchUpdate(dbExecutes);
     }
 
     @Override

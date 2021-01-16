@@ -161,7 +161,7 @@ public class WebController extends BaseController {
     @ResponseBody
     public String info(@RequestBody DeleteParam deleteParam) {
         AddForm addForm = JSON.parseObject(deleteParam.getAddJson(), AddForm.class);
-        webService.delete(addForm.getSchema(), addForm.getTable(), addForm.getPrimaryKey(), deleteParam.getPrimaryKeyValues());
+        webService.delete(addForm.getSchema(), addForm.getTable(), addForm.getPrimaryKey(), deleteParam.getPrimaryKeyValues(), deleteParam.getCascadingDeletes());
         return ok().json();
     }
 

@@ -555,9 +555,26 @@
                         this.selections.forEach(row => {
                             primaryKeyValues.push(row[window.config.addForm.primaryKey])
                         })
+                        let follow_tables = []
+                        if (window.followTables) {
+                            for (let key in window.followTables) {
+                                if (window.followTables[key] &&
+                                    (window.followTables[key].cascading_delete === true
+                                    || window.followTables[key].cascading_delete === 'true')) {
+                                    follow_tables.push({
+                                        relateKey: window.followTables[key].relateKey,
+                                        parentKey: window.followTables[key].parentKey,
+                                        schema: window.followTables[key].select.schema,
+                                        table: window.followTables[key].select.table,
+                                        primaryKey: window.followTables[key].select.primaryKey
+                                    })
+                                }
+                            }
+                        }
                         let form = {
                             addJson: JSON.stringify(window.config.addForm),
-                            primaryKeyValues: primaryKeyValues
+                            primaryKeyValues: primaryKeyValues,
+                            cascadingDeletes: follow_tables
                         }
                         axios.post(window.contextPath + '/web/api/delete', form, {
                             headers: {}
