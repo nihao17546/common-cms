@@ -1014,6 +1014,16 @@
                                                           autocomplete="off" size="small" maxlength="50"></el-input>
                                             </el-form-item>
                                         </el-col>
+                                        <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('cut') > -1">
+                                            <el-form-item label="是否支持裁剪:" label-width="130px"
+                                                          :prop="'add_form.elements.' + index + '.cut'"
+                                                          :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                <el-select style="width: 100%" v-model.trim="item.cut">
+                                                    <el-option :key="true" label="是" :value="true"></el-option>
+                                                    <el-option :key="false" label="否" :value="false"></el-option>
+                                                </el-select>
+                                            </el-form-item>
+                                        </el-col>
                                         <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('remoteSelect') > -1">
                                             <el-form-item label="远程下拉菜单配置:" label-width="130px">
                                                 {{item.schema}}.{{item.table}}[{{item.keyColumn}}-{{item.valueColumn}}]
@@ -1869,6 +1879,16 @@
                                                                   label-width="120px">
                                                         <el-input v-model.trim="item.limitSize"  placeholder="单位：字节"
                                                                   autocomplete="off" size="small" maxlength="50"></el-input>
+                                                    </el-form-item>
+                                                </el-col>
+                                                <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('cut') > -1">
+                                                    <el-form-item label="是否支持裁剪:" label-width="130px"
+                                                                  :prop="'follow_tables.' + followIndex + '.add_form.elements.' + index + '.cut'"
+                                                                  :rules="[{required: true, message: '请选择', trigger: 'change'}]">
+                                                        <el-select style="width: 100%" v-model.trim="item.cut">
+                                                            <el-option :key="true" label="是" :value="true"></el-option>
+                                                            <el-option :key="false" label="否" :value="false"></el-option>
+                                                        </el-select>
                                                     </el-form-item>
                                                 </el-col>
                                                 <el-col :span="6" v-if="item.className && addElementShows[item.className].indexOf('remoteSelect') > -1">
@@ -2867,6 +2887,7 @@
                 delete item.valueColumn
                 delete item.options
                 delete item.radios
+                delete item.cut
                 if (item.className) {
                     if (item.className.indexOf('.AddInputNumber') > -1) {
                         item.elType = 'INPUT_NUMBER'
@@ -2912,6 +2933,7 @@
                         item.elType = 'UPLOAD_PIC'
                         item.columnType = 'COM'
                         item.canEdit = true
+                        item.cut = true
                         this.form = JSON.parse(JSON.stringify(this.form))
                     } else if (item.className.indexOf('.AddUpdateDateTime') > -1) {
                         item.elType = 'DATETIME_PICKER'
@@ -3834,7 +3856,7 @@
             this.addElementShows[window.basePackage + 'form.add.AddDatePicker'] = ['label','to','placeholder','clearable','size','width','rule','canEdit']
             this.addElementShows[window.basePackage + 'form.add.AddDateTimePicker'] = ['label','to','placeholder','clearable','size','width','rule','canEdit']
             this.addElementShows[window.basePackage + 'form.add.AddTimePicker'] = ['label','placeholder','clearable','size','width','rule','start','end','step','canEdit']
-            this.addElementShows[window.basePackage + 'form.add.AddUploadPic'] = ['label','placeholder','acceptType','limitSize','rule','canEdit']
+            this.addElementShows[window.basePackage + 'form.add.AddUploadPic'] = ['label','placeholder','acceptType','limitSize','rule','canEdit','cut']
             this.addElementShows[window.basePackage + 'form.add.AddRich'] = ['label','maxlength','rule']
             this.addElementShows[window.basePackage + 'form.add.AddCreateDateTime'] = []
             this.addElementShows[window.basePackage + 'form.add.AddUpdateDateTime'] = []

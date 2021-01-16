@@ -15,12 +15,14 @@ import lombok.ToString;
 public class AddUploadPic extends AddElement {
     private String acceptType;
     private Long limitSize;
+    private Boolean cut;
 
     @Builder
-    public AddUploadPic(String key, String label, String placeholder, FormRule rule, Boolean canEdit, String acceptType, Long limitSize) {
+    public AddUploadPic(String key, String label, String placeholder, FormRule rule, Boolean canEdit, String acceptType, Long limitSize, Boolean cut) {
         super(key, label, placeholder, null, null, null, ElType.UPLOAD_PIC, rule, null, canEdit);
         this.acceptType = acceptType;
         this.limitSize = limitSize;
+        this.cut = cut != null ? cut : false;
     }
 
     @Override
