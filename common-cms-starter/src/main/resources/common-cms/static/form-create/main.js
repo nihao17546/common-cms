@@ -168,7 +168,7 @@ function table(systemConfig) {
                             style = style + 'height:' + column.formatter.height + 'px; '
                         }
                         let templateImg = $('<template slot-scope="props">' +
-                            '<img v-if="props.row.' + column.prop + '" :src="props.row.' + column.prop + '" ' +
+                            '<img @click="showImgInList(props.row.' + column.prop + ')" v-if="props.row.' + column.prop + '" :src="props.row.' + column.prop + '" ' +
                             'style="' + style + '">' +
                             '</template>')
                         $(col).append(templateImg)

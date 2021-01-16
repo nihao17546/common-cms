@@ -596,6 +596,10 @@
                 parent.mainTable.imgShowUrl = this.addForm[key]
                 parent.mainTable.imgShowVisible = true
             },
+            showImgInList(url) {
+                parent.mainTable.imgShowUrl = url
+                parent.mainTable.imgShowVisible = true
+            },
             tableSwitch(val,row,column) {
                 let form = {
                     selectJson: window.config.listJson,
