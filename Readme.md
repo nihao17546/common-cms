@@ -611,4 +611,5 @@ com.appcnd.common.cms.entity.table.FollowTable
   | addBtn | Boolean | 否 | false | 是否允许新增 |
   | editBtn | Boolean | 否 | false | 是否允许编辑 |
   | deleteBtn | Boolean | 否 | false | 是否允许删除 |
+  | cascadingDelete | Boolean | 否 | false | 主表删除是否级联删除该从表关联的数据 |
 
