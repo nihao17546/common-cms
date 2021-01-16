@@ -466,7 +466,7 @@ function addForm(systemConfig) {
                         let el_row_2 = $('<el-row :gutter="24" v-if="!addForm.' + element.key + '">' +
                             '<el-col :span="20">' +
                             '<label class="el_btn" for="' + id + '">选择图片</label>' +
-                            '<form><input ' + accept + limitSize + ' @change="uploadImg(\'' + id + '\',\'' + element.key + '\')" class="img_upl" type="file" id="' + id + '" style="position:absolute;clip:rect(0 0 0 0);"></form>' +
+                            '<form><input ' + accept + limitSize + ' @change="uploadImg(\'' + id + '\',\'' + element.key + '\',\'' + element.cut + '\')" class="img_upl" type="file" id="' + id + '" style="position:absolute;clip:rect(0 0 0 0);"></form>' +
                             '<span style="font-size: 11px;font-family: Arial;">' + placeholder + '</span>' +
                             '</el-col>' +
                             '</el-row>')

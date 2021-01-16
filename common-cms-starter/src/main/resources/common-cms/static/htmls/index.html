@@ -5,6 +5,7 @@
     <title>common-cms</title>
     <link rel="stylesheet" href="${contextPath}/static/element-ui/theme-chalk/index.css">
     <link href="${contextPath}/static/lightbox-dialog/dist/css/Lobibox.min.css" rel="stylesheet">
+    <link href="${contextPath}/static/cropper/cropper.css" rel="stylesheet">
     <script src="${contextPath}/static/vue.min.js"></script>
     <script src="${contextPath}/static/element-ui/index.js"></script>
     <script src="${contextPath}/static/axios.min.js"></script>
@@ -12,6 +13,7 @@
     <script src="${contextPath}/static/lightbox-dialog/dist/js/lobibox.min.js"></script>
     <script src="${contextPath}/static/qiniu.min.js"></script>
     <script src="${contextPath}/static/UEditor/vue-ueditor-wrap.min.js"></script>
+    <script src="${contextPath}/static/cropper/cropper.js"></script>
     <style>
         .competitors .is-leaf {
             padding-top: 3px;
@@ -70,6 +72,10 @@
         .follow-dialog .el-dialog__body {
             padding: 2px;
         }
+        .jcrop_dialog .el-dialog__body {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
     </style>
 </head>
 <body style="background-color: rgba(237,240,245);">
@@ -82,7 +88,7 @@
     </el-row>
 
     <el-dialog :title="tt" :width="addFormWidth" :close-on-click-modal="false" :visible.sync="addVisible" class="group-dialog" :before-close="cancelAdd" v-loading="loading">
-        <el-form :model="addForm" :rules="addRules" ref="addForm" size="small" id="add-form">
+        <el-form :model="addForm" :rules="addRules" ref="addForm" size="small" id="add-form" v-loading="loading">
         </el-form>
     </el-dialog>
 
@@ -92,6 +98,32 @@
 
     <el-dialog class="follow-dialog" :close-on-click-modal="false" :title="followDialogName" width="90%" :visible.sync="followDialogVisible" :before-close="closeFollowDialog">
         <iframe id="Ateon-SetParent-iframe" :src="followTableUrl" style="border: 0px" width="100%"></iframe>
+    </el-dialog>
+
+    <el-dialog class="jcrop_dialog" :close-on-press-escape="false" title="图片裁剪" width="70%" :visible.sync="jcrop.visible" class="group-dialog" :before-close="closeJcrop">
+        <div v-loading="loading">
+            <div>
+                <img id="jcrop_img" width="80%"/>
+            </div>
+            <el-row :gutter="24" style="margin-top: 8px;">
+                <el-col :span="6">
+                    <el-input size="mini" readonly="true" v-model="jcrop.width">
+                        <template slot="prepend">宽</template>
+                        <template slot="append">px</template>
+                    </el-input>
+                </el-col>
+                <el-col :span="6">
+                    <el-input size="mini" readonly="true" v-model="jcrop.height">
+                        <template slot="prepend">高</template>
+                        <template slot="append">px</template>
+                    </el-input>
+                </el-col>
+                <el-col :span="12" style="text-align: right;">
+                    <el-button @click="cancelJcrop" size="small">取 消</el-button>
+                    <el-button type="primary" @click="confirmJcrop" size="small">确 定</el-button>
+                </el-col>
+            </el-row>
+        </div>
     </el-dialog>
 </div>
 
@@ -172,11 +204,45 @@
                 followDialogVisible: false,
                 followTableUrl: null,
                 richConfig: window.richConfig,
+                jcrop: {
+                    visible: false
+                }
             }
         },
         mounted: function() {
         },
         methods: {
+            confirmJcrop() {
+                this.loading = true
+                $("#jcrop_img").cropper('getCroppedCanvas').toBlob((blob) => {
+                    let file = new File([blob], this.jcrop.filename, {type: this.jcrop.imageType, lastModified: Date.now()});
+                    let observable = qiniu.upload(file, this.jcrop.key, this.jcrop.token, {}, {
+                        useCdnDomain: true
+                    });
+                    observable.subscribe({
+                        next: (result) => {
+                            console.info(result);
+                        },
+                        error: () => {
+                            this.$message.error('上传图片失败');
+                            this.loading = false;
+                        },
+                        complete: (res) => {
+                            this.addForm[this.jcrop.k] = this.jcrop.host + '/' + res.key;
+                            this.loading = false;
+                            this.closeJcrop()
+                        }
+                    })
+                })
+            },
+            cancelJcrop() {
+                this.closeJcrop()
+            },
+            closeJcrop() {
+                this.jcrop = {
+                    visible: false
+                }
+            },
             jump(paramFormDb, p, url) {
                 jump({
                     paramFormDb: paramFormDb,
@@ -204,7 +270,7 @@
                 this.followTableUrl = encodeURI('follow/html?bottomName=' + bottomName + '&value=' + row[key])
                 this.followDialogVisible = true
             },
-            uploadImg(id, k) {
+            uploadImg(id, k, cut) {
                 this.loading = true;
                 let ele = $('#' + id)
                 if ($(ele).val() != '') {
@@ -238,22 +304,80 @@
                             let host = res.data.content.host;
                             let token = res.data.content.token;
                             let key = res.data.content.key;
-                            let observable = qiniu.upload(file, key, token, {}, {
-                                useCdnDomain: true
-                            });
-                            observable.subscribe({
-                                next: (result) => {
-                                    console.info(result);
-                                },
-                                error: () => {
-                                    this.$message.error('上传图片失败');
-                                    this.loading = false;
-                                },
-                                complete: (res) => {
-                                    this.addForm[k] = host + '/' + res.key;
-                                    this.loading = false;
-                                }
-                            })
+                            if (cut === true || cut === 'true') {
+                                this.loading = false;
+                                this.$confirm('裁剪图片?', '提示', {
+                                    confirmButtonText: '裁剪',
+                                    cancelButtonText: '使用原图',
+                                    type: 'warning'
+                                }).then(() => {
+                                    this.loading = true;
+                                    this.jcrop = {
+                                        visible: true,
+                                        filename: name,
+                                        host: host,
+                                        token: token,
+                                        key: key,
+                                        k: k,
+                                        imageType: file.type
+                                    }
+                                    this.$nextTick(() => {
+                                        $("#jcrop_img").cropper('destroy').attr('src', URL.createObjectURL(file))
+                                            .cropper({
+                                                viewMode: 2,        //全屏铺满，再缩小都没有空隙
+                                                dragMode: 'move',   //制动拖动方式
+                                                crop: (data) => {
+                                                    console.log(Math.round(data.x))
+                                                    console.log(Math.round(data.y))
+                                                    console.log(Math.round(data.height))
+                                                    console.log(Math.round(data.width))
+                                                    console.log(Math.round(data.rotate))
+                                                    console.log(this.jcrop)
+                                                    this.jcrop.width = Math.round(data.width)
+                                                    this.jcrop.height = Math.round(data.height)
+                                                    this.jcrop = JSON.parse(JSON.stringify(this.jcrop))
+                                                }
+                                            });
+                                        this.loading = false
+                                    })
+                                }).catch(() => {
+                                    let observable = qiniu.upload(file, key, token, {}, {
+                                        useCdnDomain: true
+                                    });
+                                    observable.subscribe({
+                                        next: (result) => {
+                                            console.info(result);
+                                        },
+                                        error: () => {
+                                            this.$message.error('上传图片失败');
+                                            this.loading = false;
+                                        },
+                                        complete: (res) => {
+                                            this.addForm[k] = host + '/' + res.key;
+                                            this.addForm = JSON.parse(JSON.stringify(this.addForm))
+                                            this.loading = false;
+                                        }
+                                    })
+                                });
+                            } else {
+                                let observable = qiniu.upload(file, key, token, {}, {
+                                    useCdnDomain: true
+                                });
+                                observable.subscribe({
+                                    next: (result) => {
+                                        console.info(result);
+                                    },
+                                    error: () => {
+                                        this.$message.error('上传图片失败');
+                                        this.loading = false;
+                                    },
+                                    complete: (res) => {
+                                        this.addForm[k] = host + '/' + res.key;
+                                        this.addForm = JSON.parse(JSON.stringify(this.addForm))
+                                        this.loading = false;
+                                    }
+                                })
+                            }
                         }
                     }).catch(res => {
                         console.error(res)
