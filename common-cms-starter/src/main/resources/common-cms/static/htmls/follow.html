@@ -217,6 +217,7 @@
                         },
                         complete: (res) => {
                             this.addForm[this.jcrop.k] = this.jcrop.host + '/' + res.key;
+                            this.addForm = JSON.parse(JSON.stringify(this.addForm))
                             this.loading = false;
                             this.closeJcrop()
                         }
