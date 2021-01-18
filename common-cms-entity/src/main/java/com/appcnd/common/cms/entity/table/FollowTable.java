@@ -1,6 +1,7 @@
 package com.appcnd.common.cms.entity.table;
 
 import com.appcnd.common.cms.entity.bottom.Bottom;
+import com.appcnd.common.cms.entity.constant.TableStyle;
 import com.appcnd.common.cms.entity.db.Select;
 import com.appcnd.common.cms.entity.db.SelectLeftJoin;
 import com.appcnd.common.cms.entity.form.add.AddElement;
@@ -52,9 +53,13 @@ public class FollowTable implements Serializable {
 
     private List<Bottom> bottoms;
 
+    private TableStyle style;
+
+    private Integer optionWidth;
+
     public FollowTable(Boolean pagination, String defaultSortColumn, String defaultOrder, Select select, String relateKey, String parentKey,
                        String bottomName, AddForm addForm, Boolean deleteBtn, Boolean addBtn, Boolean editBtn, Integer limitSize, List<Bottom> bottoms,
-                       Boolean cascadingDelete) {
+                       Boolean cascadingDelete, TableStyle style, Integer optionWidth) {
         CommonAssert.notNull(select, "select 不能为空");
         CommonAssert.notNull(relateKey, "relateKey 不能为空");
         CommonAssert.notNull(parentKey, "parentKey 不能为空");
@@ -63,6 +68,13 @@ public class FollowTable implements Serializable {
             throw new IllegalArgumentException("limitSize 须大于0");
         }
         this.limitSize = limitSize;
+        this.style = style == null ? TableStyle.A : style;
+        if (this.style == TableStyle.B) {
+            this.optionWidth = optionWidth != null ? optionWidth : 180;
+            if (this.optionWidth <= 0) {
+                throw new IllegalArgumentException("操作列宽带不能低于1");
+            }
+        }
         this.pagination = pagination == null ? false : pagination;
         this.defaultSortColumn = defaultSortColumn;
         this.defaultOrder = defaultOrder;
@@ -144,6 +156,8 @@ public class FollowTable implements Serializable {
         private Integer limitSize;
         private Boolean cascadingDelete;
         private List<Bottom> bottoms;
+        private TableStyle style;
+        private Integer optionWidth;
 
         public FollowTableBuilder pagination(Boolean pagination) {
             this.pagination = pagination;
@@ -217,9 +231,19 @@ public class FollowTable implements Serializable {
             return this;
         }
 
+        public FollowTableBuilder style(TableStyle style) {
+            this.style = style;
+            return this;
+        }
+
+        public FollowTableBuilder optionWidth(Integer optionWidth) {
+            this.optionWidth = optionWidth;
+            return this;
+        }
+
         public FollowTable build() {
             return new FollowTable(pagination, defaultSortColumn, defaultOrder, select, relateKey, parentKey, bottomName,
-                    addForm, deleteBtn, addBtn, editBtn, limitSize, bottoms, cascadingDelete);
+                    addForm, deleteBtn, addBtn, editBtn, limitSize, bottoms, cascadingDelete, style, optionWidth);
         }
     }
 

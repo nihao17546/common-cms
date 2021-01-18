@@ -130,8 +130,16 @@ function table(systemConfig) {
         let table_card = $('#table-card');
         let card = $('<el-card shadow="never" class="c-card"></el-card>')
         let table = $('<el-table :data="list" ref="mainTable" stripe @selection-change="handleSelectionChange" @sort-change="sortChange" style="width: 100%; margin-top: 3px;"></el-table>')
-        let selection = $('<el-table-column type="selection" width="55"></el-table-column>');
-        $(table).append(selection)
+        if ((typeof systemConfig.table.style == 'undefined'
+            || systemConfig.table.style == null
+            || systemConfig.table.style == ''
+            || systemConfig.table.style == 'A')
+            || (systemConfig.table.bottoms
+                && systemConfig.table.bottoms.length > 0)) {
+            let selection = $('<el-table-column type="selection" width="55"></el-table-column>');
+            $(table).append(selection)
+        }
+
         systemConfig.table.columns.forEach(column => {
             let sortable = ''
             if (column.sortable) {
@@ -200,6 +208,36 @@ function table(systemConfig) {
             }
             $(table).append(col)
         })
+
+        if (systemConfig.table.style == 'B') {
+            let btns = ''
+            if (systemConfig.edit_btn === true) {
+                btns = btns + '<el-button size="mini" icon="el-icon-edit" :disabled="loading" @click="showEdit(props.row)">修改</el-button>'
+            }
+            if (systemConfig.delete_btn === true) {
+                btns = btns + '<el-button size="mini" icon="el-icon-delete" type="danger" :disabled="loading" @click="del(props.row)">删除</el-button>'
+            }
+            if (systemConfig && systemConfig.follow_tables
+                && systemConfig.follow_tables.length > 0) {
+                systemConfig.follow_tables.forEach(follow => {
+                    btns = btns + '<el-button size="mini" type="info" :disabled="loading" ' +
+                        '@click="showFollow(\'' + follow.bottomName + '\',\'' + follow.relateKey + '\',props.row)">' + follow.bottomName + '</el-button>'
+                })
+            }
+            if (btns.length > 0) {
+                let w = systemConfig.table.optionWidth;
+                if (!w) {
+                    w = 180
+                }
+                let util = $('<el-table-column fixed="right" label="操作" width="' + w + '"></el-table-column>')
+                let template = $('<template slot-scope="props">' +
+                    btns +
+                    '</template>')
+                $(util).append(template)
+                $(table).append(util)
+            }
+        }
+
         $(card).append(table)
         window.config.pageSize = null
         window.config.curPage = null
@@ -614,19 +652,25 @@ function btn(systemConfig) {
             }
             btns = btns + '<el-button size="small" ' + vIf + ' @click="showAdd" type="info" plain icon="el-icon-plus">新增</el-button>'
         }
-        if (systemConfig.edit_btn === true) {
-            btns = btns + '<el-button size="small" icon="el-icon-edit" :disabled="loading || selections.length != 1" @click="showEdit()">修改</el-button>'
+        if (typeof systemConfig.table.style == 'undefined'
+            || systemConfig.table.style == null
+            || systemConfig.table.style == ''
+            || systemConfig.table.style == 'A') {
+            if (systemConfig.edit_btn === true) {
+                btns = btns + '<el-button size="small" icon="el-icon-edit" :disabled="loading || selections.length != 1" @click="showEdit()">修改</el-button>'
+            }
+            if (systemConfig.delete_btn === true) {
+                btns = btns + '<el-button size="small" type="danger" icon="el-icon-delete" :disabled="loading || selections.length == 0" @click="del()">删除</el-button>'
+            }
+            if (systemConfig && systemConfig.follow_tables
+                && systemConfig.follow_tables.length > 0) {
+                systemConfig.follow_tables.forEach(follow => {
+                    btns = btns + '<el-button size="small" type="info" :disabled="loading || selections.length != 1" ' +
+                        '@click="showFollow(\'' + follow.bottomName + '\',\'' + follow.relateKey + '\')">' + follow.bottomName + '</el-button>'
+                })
+            }
         }
-        if (systemConfig.delete_btn === true) {
-            btns = btns + '<el-button size="small" type="danger" icon="el-icon-delete" :disabled="loading || selections.length == 0" @click="del()">删除</el-button>'
-        }
-        if (systemConfig && systemConfig.follow_tables
-            && systemConfig.follow_tables.length > 0) {
-            systemConfig.follow_tables.forEach(follow => {
-                btns = btns + '<el-button size="small" type="info" :disabled="loading || selections.length != 1" ' +
-                    '@click="showFollow(\'' + follow.bottomName + '\',\'' + follow.relateKey + '\')">' + follow.bottomName + '</el-button>'
-            })
-        }
+
         if (systemConfig.table && systemConfig.table.bottoms && systemConfig.table.bottoms.length > 0) {
             systemConfig.table.bottoms.forEach(bottom => {
                 if (bottom.type == 'EXTERNAL_LINKS') {

@@ -403,6 +403,8 @@ com.appcnd.common.cms.entity.table.Table
   | defaultSortColumn | String | 否 |  | 默认排序字段 |
   | defaultOrder | String | 否 | asc | 正序or倒序（asc/desc） |
   | select | [[Select](#select)] | 是 |  | 数据库查询配置 |
+  | style | TableStyle | 否 | TableStyle.A | 展示样式（A-操作按钮在表格上方 B-操作按钮在表格中） |
+  | optionWidth | Integer | 否 | 180 | 展示样式B时,操作列宽度 |
   
 ---------------------------------------
 
@@ -612,4 +614,6 @@ com.appcnd.common.cms.entity.table.FollowTable
   | editBtn | Boolean | 否 | false | 是否允许编辑 |
   | deleteBtn | Boolean | 否 | false | 是否允许删除 |
   | cascadingDelete | Boolean | 否 | false | 主表删除是否级联删除该从表关联的数据 |
+  | style | TableStyle | 否 | TableStyle.A | 展示样式（A-操作按钮在表格上方 B-操作按钮在表格中） |
+  | optionWidth | Integer | 否 | 180 | 展示样式B时,操作列宽度 |
 

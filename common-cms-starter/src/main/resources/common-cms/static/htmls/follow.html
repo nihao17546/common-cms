@@ -111,7 +111,7 @@
                     </el-input>
                 </el-col>
                 <el-col :span="12" style="text-align: right;">
-                    <el-button @click="cancelJcrop" size="small">取 消</el-button>
+                    <el-button @click="closeJcrop" size="small">取 消</el-button>
                     <el-button type="primary" @click="confirmJcrop" size="small">确 定</el-button>
                 </el-col>
             </el-row>
@@ -224,10 +224,11 @@
                     })
                 })
             },
-            cancelJcrop() {
-                this.closeJcrop()
-            },
             closeJcrop() {
+                if (this.jcrop.id) {
+                    let ele = $('#' + this.jcrop.id)
+                    $(ele).val('')
+                }
                 this.jcrop = {
                     visible: false
                 }
@@ -309,8 +310,15 @@
                 this.curPage = 1;
                 this.getList()
             },
-            del() {
-                if (this.selections && this.selections.length > 0) {
+            del(rowDb) {
+                let rows = [];
+                if (typeof rowDb == 'object') {
+                    rows.push(rowDb)
+                } else if (this.selections && this.selections.length > 0) {
+                    rows = this.selections
+                }
+
+                if (rows.length > 0) {
                     this.$confirm('确定要删除?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
@@ -318,7 +326,7 @@
                     }).then(() => {
                         this.loading = true;
                         let primaryKeyValues = []
-                        this.selections.forEach(row => {
+                        rows.forEach(row => {
                             primaryKeyValues.push(row[window.config.addForm.primaryKey])
                         })
                         let form = {
@@ -402,9 +410,11 @@
                 this.$refs.mainTable.clearSelection();
                 $('.img_upl').val('')
             },
-            showEdit() {
+            showEdit(rowDb) {
                 let row = null;
-                if (this.selections && this.selections.length == 1) {
+                if (typeof rowDb == 'object') {
+                    row = rowDb;
+                } else if (this.selections && this.selections.length == 1) {
                     row = this.selections[0]
                 }
                 if (!row) {
@@ -477,6 +487,7 @@
                                 this.$confirm('裁剪图片?', '提示', {
                                     confirmButtonText: '裁剪',
                                     cancelButtonText: '使用原图',
+                                    showClose: false,
                                     type: 'warning'
                                 }).then(() => {
                                     this.loading = true;
@@ -487,6 +498,7 @@
                                         token: token,
                                         key: key,
                                         k: k,
+                                        id: id,
                                         imageType: file.type
                                     }
                                     this.$nextTick(() => {

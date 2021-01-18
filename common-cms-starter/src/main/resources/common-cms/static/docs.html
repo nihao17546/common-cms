@@ -515,6 +515,8 @@
                 '  | defaultSortColumn | String | 否 |  | 默认排序字段 |\n' +
                 '  | defaultOrder | String | 否 | asc | 正序or倒序（asc/desc） |\n' +
                 '  | select | [[Select](#select)] | 是 |  | 数据库查询配置 |\n' +
+                '  | style | TableStyle | 否 | TableStyle.A | 展示样式（A-操作按钮在表格上方 B-操作按钮在表格中） |\n' +
+                '  | optionWidth | Integer | 否 | 180 | 展示样式B时,操作列宽度 |\n' +
                 '  \n' +
                 '---------------------------------------\n' +
                 '\n' +
@@ -724,6 +726,8 @@
                 '  | editBtn | Boolean | 否 | false | 是否允许编辑 |\n' +
                 '  | deleteBtn | Boolean | 否 | false | 是否允许删除 |\n' +
                 '  | cascadingDelete | Boolean | 否 | false | 主表删除是否级联删除该从表关联的数据 |\n' +
+                '  | style | TableStyle | 否 | TableStyle.A | 展示样式（A-操作按钮在表格上方 B-操作按钮在表格中） |\n' +
+                '  | optionWidth | Integer | 否 | 180 | 展示样式B时,操作列宽度 |\n' +
                 '\n')
         },
         created() {

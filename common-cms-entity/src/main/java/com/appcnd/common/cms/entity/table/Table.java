@@ -1,6 +1,7 @@
 package com.appcnd.common.cms.entity.table;
 
 import com.appcnd.common.cms.entity.bottom.Bottom;
+import com.appcnd.common.cms.entity.constant.TableStyle;
 import com.appcnd.common.cms.entity.db.Select;
 import com.appcnd.common.cms.entity.db.SelectLeftJoin;
 import com.appcnd.common.cms.entity.util.CommonAssert;
@@ -22,9 +23,18 @@ public class Table implements Serializable {
     private Select select;
     private List<TableColumn> columns;
     private List<Bottom> bottoms;
+    private TableStyle style;
+    private Integer optionWidth;
 
-    public Table(Boolean pagination, String defaultSortColumn, String defaultOrder, Select select, List<Bottom> bottoms) {
+    public Table(Boolean pagination, String defaultSortColumn, String defaultOrder, Select select, List<Bottom> bottoms, TableStyle style, Integer optionWidth) {
         CommonAssert.notNull(select, "select 不能为空");
+        this.style = style == null ? TableStyle.A : style;
+        if (this.style == TableStyle.B) {
+            this.optionWidth = optionWidth != null ? optionWidth : 180;
+            if (this.optionWidth <= 0) {
+                throw new IllegalArgumentException("操作列宽带不能低于1");
+            }
+        }
         this.pagination = pagination == null ? false : pagination;
         this.defaultSortColumn = defaultSortColumn;
         this.defaultOrder = defaultOrder;
@@ -55,6 +65,8 @@ public class Table implements Serializable {
         private String defaultOrder;
         private Select select;
         private List<Bottom> bottoms;
+        private TableStyle style;
+        private Integer optionWidth;
 
         public TableBuilder pagination(Boolean pagination) {
             this.pagination = pagination;
@@ -83,8 +95,18 @@ public class Table implements Serializable {
             return this;
         }
 
+        public TableBuilder style(TableStyle style) {
+            this.style = style;
+            return this;
+        }
+
+        public TableBuilder optionWidth(Integer optionWidth) {
+            this.optionWidth = optionWidth;
+            return this;
+        }
+
         public Table build() {
-            return new Table(pagination, defaultSortColumn, defaultOrder, select, bottoms);
+            return new Table(pagination, defaultSortColumn, defaultOrder, select, bottoms, style, optionWidth);
         }
     }
 }

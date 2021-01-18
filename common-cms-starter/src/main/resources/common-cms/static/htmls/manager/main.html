@@ -314,6 +314,25 @@
                         </div>
                         <el-row :gutter="24" id="main_table_basic">
                             <el-col :span="6">
+                                <el-form-item label="展示样式:"
+                                              :prop="'table.style'"
+                                              :rules="[{required: true, message: '请选择', trigger: 'change'}]"
+                                              label-width="100px">
+                                    <el-select style="width: 100%" v-model="form.table.style">
+                                        <el-option key="A" label="样式A" value="A"></el-option>
+                                        <el-option key="B" label="样式B" value="B"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="6"v-if="form.table.style == 'B'">
+                                <el-form-item label="操作列宽度:" label-width="120px"
+                                              :prop="'table.optionWidth'"
+                                              :rules="rules.zNumber">
+                                    <el-input v-model.trim="form.table.optionWidth" placeholder="单位px" maxlength="50"
+                                              autocomplete="off" size="small"></el-input>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="6">
                                 <el-form-item label="是否分页:"
                                               :prop="'table.pagination'"
                                               :rules="[{required: true, message: '请选择', trigger: 'change'}]"
@@ -1199,6 +1218,25 @@
                                                 <el-option :key="true" label="是" :value="true"></el-option>
                                                 <el-option :key="false" label="否" :value="false"></el-option>
                                             </el-select>
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="6">
+                                        <el-form-item label="展示样式:"
+                                                      :prop="'follow_tables.' + followIndex + '.style'"
+                                                      :rules="[{required: true, message: '请选择', trigger: 'change'}]"
+                                                      label-width="100px">
+                                            <el-select style="width: 100%" v-model="follow.style">
+                                                <el-option key="A" label="样式A" value="A"></el-option>
+                                                <el-option key="B" label="样式B" value="B"></el-option>
+                                            </el-select>
+                                        </el-form-item>
+                                    </el-col>
+                                    <el-col :span="6" v-if="follow.style == 'B'">
+                                        <el-form-item label="操作列宽度:" label-width="120px"
+                                                      :prop="'follow_tables.' + followIndex + '.optionWidth'"
+                                                      :rules="rules.zNumber">
+                                            <el-input v-model.trim="follow.optionWidth" placeholder="单位px" maxlength="50"
+                                                      autocomplete="off" size="small"></el-input>
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="6">
@@ -2729,13 +2767,15 @@
                             options: []
                         }
                         for (let j = 0; j < this.followDbs[i].columns.length; j ++) {
-                            column.options.push({
-                                key: this.followDbs[i].columns[j].name,
-                                dataType: this.followDbs[i].columns[j].type,
-                                schema: this.followDbs[i].schema,
-                                table: this.followDbs[i].table,
-                                alias: alias
-                            })
+                            if (this.followDbs[i].columns[j].name != this.followDbs[i].parentKey) {
+                                column.options.push({
+                                    key: this.followDbs[i].columns[j].name,
+                                    dataType: this.followDbs[i].columns[j].type,
+                                    schema: this.followDbs[i].schema,
+                                    table: this.followDbs[i].table,
+                                    alias: alias
+                                })
+                            }
                             followKpTable[this.followDbs[i].columns[j].name + ' as ' + alias + '_' + this.followDbs[i].columns[j].name] = {
                                 schema: this.followDbs[i].schema,
                                 table: this.followDbs[i].table
