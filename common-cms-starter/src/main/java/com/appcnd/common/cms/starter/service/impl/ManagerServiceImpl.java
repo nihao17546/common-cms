@@ -88,9 +88,9 @@ public class ManagerServiceImpl extends BaseService implements IManagerService {
                 Matcher matcherPriExtra = patternPriExtra.matcher(sql);
                 if (matcherPriExtra.find()) {
                     String aa = sql.substring(matcherPriExtra.start(), matcherPriExtra.end() - 1);
-                    if (aa.lastIndexOf(" ") > 0) {
-                        String extra = aa.substring(aa.lastIndexOf(" ") + 1);
-                        tableVo.setPrimaryKeyExtra(extra);
+                    if (aa.contains("AUTO_INCREMENT")
+                            || aa.contains("AUTO_INCREMENT".toLowerCase())) {
+                        tableVo.setPrimaryKeyExtra("AUTO_INCREMENT");
                     }
                 }
             }

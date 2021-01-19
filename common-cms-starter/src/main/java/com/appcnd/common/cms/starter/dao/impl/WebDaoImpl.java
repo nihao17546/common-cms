@@ -174,7 +174,7 @@ public class WebDaoImpl implements IWebDao {
         sb.append(" from `").append(param.getSchema()).append("`.`").append(param.getTable()).append("` ").append(param.getAlias());
         fillOneToOne(params, sb, param);
         if (param.getSortColumn() != null) {
-            sb.append(" order by `").append(param.getSortColumn()).append("`");
+            sb.append(" order by ").append(param.getAlias()).append(".`").append(param.getSortColumn()).append("`");
             if (param.getOrder() != null) {
                 sb.append(" ").append(param.getOrder());
             }
