@@ -69,7 +69,7 @@ function searchForm(systemConfig) {
                     $(item).append(input)
                     break;
                 case 'SELECT':
-                    let select = $('<el-select v-model.trim="searchForm.' + element.key + '" ' +
+                    let select = $('<el-select filterable v-model.trim="searchForm.' + element.key + '" ' +
                         'placeholder="' + element.placeholder + '"' + ' ' + clearable + ' @change="search" ' +
                         'size="' + element.size + '">')
                     if (element.options && element.options.length > 0) {
@@ -220,8 +220,14 @@ function table(systemConfig) {
             if (systemConfig && systemConfig.follow_tables
                 && systemConfig.follow_tables.length > 0) {
                 systemConfig.follow_tables.forEach(follow => {
+                    let key = follow.relateKey
+                    if (systemConfig.table && systemConfig.table.select && systemConfig.table.select.primaryKey) {
+                        if (key != systemConfig.table.select.primaryKey) {
+                            key = systemConfig.table.select.alias + '_' + key
+                        }
+                    }
                     btns = btns + '<el-button size="mini" type="info" :disabled="loading" ' +
-                        '@click="showFollow(\'' + follow.bottomName + '\',\'' + follow.relateKey + '\',props.row)">' + follow.bottomName + '</el-button>'
+                        '@click="showFollow(\'' + follow.bottomName + '\',\'' + key + '\',props.row)">' + follow.bottomName + '</el-button>'
                 })
             }
             if (btns.length > 0) {
@@ -337,7 +343,7 @@ function addForm(systemConfig) {
                         $(form_item).append(input_edit)
                         break;
                     case 'SELECT':
-                        let select = $('<el-select v-if="!edit" v-model.trim="addForm.' + element.key + '"' + clearable +
+                        let select = $('<el-select filterable v-if="!edit" v-model.trim="addForm.' + element.key + '"' + clearable +
                             'size="' + element.size + '" style="' + style + '"' +
                             'placeholder="' + element.placeholder + '"></el-select>')
                         if (element.options && element.options.length > 0) {
@@ -347,7 +353,7 @@ function addForm(systemConfig) {
                             })
                         }
                         $(form_item).append(select)
-                        let select_edit = $('<el-select v-if="edit" v-model.trim="addForm.' + element.key + '"' + clearable +
+                        let select_edit = $('<el-select filterable v-if="edit" v-model.trim="addForm.' + element.key + '"' + clearable +
                             'size="' + element.size + '" style="' + style + '"' + canNotEdit +
                             'placeholder="' + element.placeholder + '"></el-select>')
                         if (element.options && element.options.length > 0) {
@@ -665,8 +671,14 @@ function btn(systemConfig) {
             if (systemConfig && systemConfig.follow_tables
                 && systemConfig.follow_tables.length > 0) {
                 systemConfig.follow_tables.forEach(follow => {
+                    let key = follow.relateKey
+                    if (systemConfig.table && systemConfig.table.select && systemConfig.table.select.primaryKey) {
+                        if (key != systemConfig.table.select.primaryKey) {
+                            key = systemConfig.table.select.alias + '_' + key
+                        }
+                    }
                     btns = btns + '<el-button size="small" type="info" :disabled="loading || selections.length != 1" ' +
-                        '@click="showFollow(\'' + follow.bottomName + '\',\'' + follow.relateKey + '\')">' + follow.bottomName + '</el-button>'
+                        '@click="showFollow(\'' + follow.bottomName + '\',\'' + key + '\')">' + follow.bottomName + '</el-button>'
                 })
             }
         }

@@ -2016,7 +2016,7 @@
                                                               label-width="130px">
                                                     <el-select size="small" v-model="item.columns" multiple placeholder="请选择唯一键组合"
                                                                style="width: 100%;">
-                                                        <el-option v-for="uniqueColumn in followColumns[followIndex][0].options"
+                                                        <el-option v-for="uniqueColumn in allFollowColumns[followIndex][0].options"
                                                                    :key="uniqueColumn.key"
                                                                    :label="'列名:' + uniqueColumn.key + '   类型:' + uniqueColumn.dataType"
                                                                    :value="uniqueColumn.key"></el-option>
@@ -2351,6 +2351,7 @@
                 },
                 mainColumns: [],
                 followColumns: [],
+                allFollowColumns: [],
                 aliasTable: {},
                 followAliasTable: [],
                 kpTable: {},
@@ -2552,6 +2553,7 @@
                 this.$refs.followDbs.resetFields()
                 this.mainColumns = []
                 this.followColumns = []
+                this.allFollowColumns = []
                 this.aliasTable = {}
                 this.followAliasTable = []
                 this.kpTable = {}
@@ -2760,7 +2762,14 @@
                             }
                         }
                         let followColumns = []
+                        let allFollowColumns = []
                         let column = {
+                            schema: this.followDbs[i].schema,
+                            table: this.followDbs[i].table,
+                            primaryKey: this.followDbs[i].primaryKey,
+                            options: []
+                        }
+                        let allColumn = {
                             schema: this.followDbs[i].schema,
                             table: this.followDbs[i].table,
                             primaryKey: this.followDbs[i].primaryKey,
@@ -2776,12 +2785,20 @@
                                     alias: alias
                                 })
                             }
+                            allColumn.options.push({
+                                key: this.followDbs[i].columns[j].name,
+                                dataType: this.followDbs[i].columns[j].type,
+                                schema: this.followDbs[i].schema,
+                                table: this.followDbs[i].table,
+                                alias: alias
+                            })
                             followKpTable[this.followDbs[i].columns[j].name + ' as ' + alias + '_' + this.followDbs[i].columns[j].name] = {
                                 schema: this.followDbs[i].schema,
                                 table: this.followDbs[i].table
                             }
                         }
                         followColumns.push(column)
+                        allFollowColumns.push(allColumn)
                         let followDb = this.followDbs[i]
                         if (followDb.follows && followDb.follows.length > 0) {
                             follow.select.leftJoins = []
@@ -2819,10 +2836,12 @@
                                     }
                                 }
                                 followColumns.push(followColumn)
+                                allFollowColumns.push(JSON.parse(JSON.stringify(followColumn)))
                             }
                         }
                         this.form.follow_tables.push(follow)
                         this.followColumns.push(followColumns)
+                        this.allFollowColumns.push(allFollowColumns)
                         this.followAliasTable.push(followAliasTable)
                         this.followKpTable.push(followKpTable)
                     }

@@ -130,7 +130,7 @@
 <script>
     window.contextPath = '${contextPath}'
 </script>
-<script src="${contextPath}/static/form-create/main.js?v=999999"></script>
+<script src="${contextPath}/static/form-create/main.js?v=79879789890"></script>
 <script src="${contextPath}/static/form-create/method.js?v=888"></script>
 <script>
     $.ajax({
@@ -662,6 +662,25 @@
                     sortColumn: this.sortColumn,
                     order: order,
                     params: params
+                }
+                if (window.followTables) {
+                    let select = null
+                    for (let key in window.followTables) {
+                        if (select == null) {
+                            select = JSON.parse(window.config.listJson)
+                        }
+                        let follow = window.followTables[key]
+                        let relateKey = follow.relateKey
+                        if (relateKey != select.primaryKey) {
+                            let col = relateKey + ' as ' + select.alias + '_' + relateKey
+                            if (select.columns.indexOf(col) == -1) {
+                                select.columns.push(col)
+                            }
+                        }
+                    }
+                    if (select != null) {
+                        listForm.listJson = JSON.stringify(select)
+                    }
                 }
                 axios.post(window.contextPath + '/web/api/table/list', listForm, {
                     headers: {}

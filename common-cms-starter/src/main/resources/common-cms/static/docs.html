@@ -22,6 +22,9 @@
 
 <div id="app">
     <el-tabs tab-position="left" v-model="active">
+        <el-tab-pane label="介绍" name="intro">
+            <div v-html="intro"></div>
+        </el-tab-pane>
         <el-tab-pane label="快速开始" name="start">
             <div v-html="start"></div>
         </el-tab-pane>
@@ -39,20 +42,31 @@
             return {
                 active: null,
                 start: '',
-                code: ''
+                code: '',
+                intro: ''
             }
         },
         methods: {
 
         },
         mounted() {
-            let actives = ['start','code','show']
+            let actives = ['start','code','intro']
             let active = getParam('active')
             if (active && actives.indexOf(active) > -1) {
                 this.active = active
             } else {
-                this.active = 'start'
+                this.active = 'intro'
             }
+            this.intro = marked('# 介绍\n' +
+                '### Codeless是什么\n' +
+                'Codeless是一个Springboot starter插件，通过该插件可以不用写任何前后端代码实现常规后台管理系统的开发。  \n' +
+                '目前支持对单表、一对一、一对多从表的操作，支持图片上传、图片裁剪、富文本内容、时间日期选择等表单组件。\n' +
+                '### 技术选型\n' +
+                '* Springboot\n' +
+                '* alibaba-druid\n' +
+                '* Vue\n' +
+                '* element-ui\n' +
+                '* ueditor')
             this.start = marked('# 快速开始\n' +
                 '#### 添加配置表\n' +
                 '~~~sql\n' +
@@ -73,7 +87,7 @@
                 '<dependency>\n' +
                 '  <groupId>com.appcnd</groupId>\n' +
                 '  <artifactId>common-cms-starter</artifactId>\n' +
-                '  <version>1.0.0-SNAPSHOT</version>\n' +
+                '  <version>1.0.1-SNAPSHOT</version>\n' +
                 '</dependency>\n' +
                 '~~~\n' +
                 '#### Springboot配置\n' +
