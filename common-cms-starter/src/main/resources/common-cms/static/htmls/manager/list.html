@@ -19,14 +19,25 @@
             bottom:0;
             left:0;
             right: 0;
+            background-color: #d3d4d6;
+        }
+        .el-link.el-link--default {
+            color: white;
+            font-size: larger;
         }
     </style>
 </head>
 <body>
 <div id="app">
-    <div style="position: absolute; left: 10%; top: 10%;width: 80%;">
-        <el-button type="primary" icon="el-icon-arrow-left" size="mini" @click="back" style="margin-bottom: 8px;">退出</el-button>
-        <el-button type="primary" size="mini" @click="add" style="margin-bottom: 8px;">新增</el-button>
+    <div style="border: 0;margin: 0px;padding: 0px;position: absolute;color: white;left: 70px;top: 20px;">
+        <el-link :underline="false" target="_blank" href="${contextPath}/static/docs.html">使用文档</el-link>
+    </div>
+
+    <div style="position: absolute; left: 10%; top: 25%;width: 80%;">
+        <div style="padding-top: 5px;padding-left: 8px;background-color: white">
+            <el-button icon="el-icon-arrow-left" size="mini" @click="back" style="margin-bottom: 8px;">退出</el-button>
+            <el-button size="mini" @click="add" style="margin-bottom: 8px;">新增</el-button>
+        </div>
         <el-table
                 v-loading="loading"
                 :data="tableData"
@@ -55,8 +66,8 @@
                     width="250">
                 <template slot-scope="props">
                     <el-button-group>
-                        <el-button type="success" size="mini"  @click="preview(props.row)">预览</el-button>
-                        <el-button type="info" size="mini" @click="showJson(props.row)">查看</el-button>
+                        <el-button type="success" size="mini"  @click="preview(props.row)">查看</el-button>
+                        <el-button type="info" size="mini" @click="showJson(props.row)">数据</el-button>
                         <el-button type="primary" size="mini" @click="edit(props.row)">编辑</el-button>
                         <el-button type="danger" size="mini" @click="del(props.row.id)">删除</el-button>
                     </el-button-group>
@@ -64,7 +75,10 @@
             </el-table-column>
         </el-table>
     </div>
-    <iframe src="${contextPath}/static/${random}.html" style="border: 0;margin: 0px;padding: 0px;width: 100%;height: 100%;"></iframe>
+    <iframe src="${contextPath}/static/${random}.html" style="border: 0;margin: 0px;padding: 0px;width: 100%;height: 30%;"></iframe>
+    <div style="position: absolute; left: 10%; top: 10%;width: 80%;text-align: center; color: white; font-weight: bolder; font-size: 45px;font-family: Arial,Helvetica,sans-serif">
+        Codeless Plugin
+    </div>
 
     <el-dialog
             title="JSON"
@@ -72,9 +86,9 @@
             width="70%"
             :before-close="closeJson">
         <el-input :readonly="true" :autosize="true"
-                type="textarea"
-                placeholder=""
-                v-model="jsonDialog.data">
+                  type="textarea"
+                  placeholder=""
+                  v-model="jsonDialog.data">
         </el-input>
         <span slot="footer" class="dialog-footer">
             <el-button @click="closeJson">关闭</el-button>
@@ -89,7 +103,7 @@
         data() {
             return {
                 loading: false,
-                height: window.innerHeight * 0.7,
+                height: window.innerHeight * 0.65,
                 tableData: [],
                 jsonDialog: {
                     visible: false

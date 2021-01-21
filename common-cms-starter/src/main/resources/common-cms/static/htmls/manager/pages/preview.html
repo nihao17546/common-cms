@@ -106,15 +106,17 @@
             </el-card>
         </el-col>
         <el-col :span="24" id="btn-card">
-            <el-card shadow="never" class="c-card" v-if="config.add_btn || config.edit_btn || config.delete_btn">
+            <el-card shadow="never" class="c-card" v-if="config.add_btn || (config.table && config.table.style && config.table.style == 'A' && (config.edit_btn || config.delete_btn || (config.follow_tables && config.follow_tables.length > 0)))">
                 <el-row :gutter="12">
                     <el-col :span="12">
                         <el-button v-if="config.add_btn" size="small" @click="showAdd" type="info" plain icon="el-icon-plus">新增</el-button>
-                        <el-button v-if="config.edit_btn" size="small" @click="showAdd" icon="el-icon-edit">修改</el-button>
-                        <el-button v-if="config.delete_btn" size="small" type="danger" icon="el-icon-delete">删除</el-button>
-                        <template v-if="config.follow_tables && config.follow_tables.length > 0">
-                            <el-button v-for="(followTable,followTableIndex) in config.follow_tables"
-                                       size="small" type="info" @click="showFollow">{{followTable.bottomName}}</el-button>
+                        <template v-if="config.table && config.table.style && config.table.style == 'A'">
+                            <el-button v-if="config.edit_btn" size="small" @click="showEdit" icon="el-icon-edit">修改</el-button>
+                            <el-button v-if="config.delete_btn" size="small" type="danger" icon="el-icon-delete">删除</el-button>
+                            <template v-if="config.follow_tables && config.follow_tables.length > 0">
+                                <el-button v-for="(followTable,followTableIndex) in config.follow_tables"
+                                           size="small" type="info" @click="showFollow">{{followTable.bottomName}}</el-button>
+                            </template>
                         </template>
                     </el-col>
                 </el-row>
@@ -122,23 +124,94 @@
         </el-col>
         <el-col :span="24" id="table-card">
             <el-card shadow="never" class="c-card" v-if="config.table && config.table.columns && config.table.columns.length > 0">
-                <el-table stripe style="width: 100%; margin-top: 3px;">
-                    <el-table-column type="selection" width="55"></el-table-column>
+                <el-table stripe style="width: 100%; margin-top: 3px;" :data="list">
+                    <template v-if="config.table && ((config.table.style && config.table.style == 'A') || (config.table.bottoms && config.table.bottoms.length > 0))">
+                        <el-table-column type="selection" width="55"></el-table-column>
+                    </template>
                     <template v-for="(co,index) in config.table.columns">
-                        <el-table-column v-if="co.label" :prop="co.key" :width="co.width" :sortable="co.sortable" :label="co.label"></el-table-column>
+                        <template v-if="co.label">
+                            <template v-if="co.formatter && co.formatter.type">
+                                <el-table-column v-if="co.formatter.type == 'PIC' && co.formatter.width && co.formatter.height"
+                                                 :prop="co.prop" :width="co.width" :sortable="co.sortable" :label="co.label">
+                                    <template slot-scope="props">
+                                        <img @click="showImg(props.row[co.prop])" :src="props.row[co.prop]" :style="'width:' + co.formatter.width + 'px;height:' + co.formatter.height + 'px;'"/>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column v-if="co.formatter.type == 'TEXT' && co.formatter.map"
+                                                 :prop="co.prop" :width="co.width" :sortable="co.sortable" :label="co.label">
+                                    <template slot-scope="props">
+                                        <span>{{props.row[co.prop]}}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column v-if="co.formatter.type == 'URL' && co.formatter.target"
+                                                 :prop="co.prop" :width="co.width" :sortable="co.sortable" :label="co.label">
+                                    <template slot-scope="props">
+                                        <a :href="props.row[co.prop]" :target="co.formatter.target">
+                                            {{co.formatter.text ? co.formatter.text : props.row[co.prop]}}
+                                        </a>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column v-if="co.formatter.type == 'SWITCH' && co.formatter.active.label && co.formatter.inactive.label"
+                                                 :prop="co.prop" :width="co.width" :sortable="co.sortable" :label="co.label">
+                                    <template slot-scope="props">
+                                        <el-switch v-model="props.row[co.prop]" :active-text="co.formatter.active.label"
+                                                   :inactive-text="co.formatter.inactive.label"
+                                                   :active-value="1"
+                                                   :inactive-value="0"></el-switch>
+                                    </template>
+                                </el-table-column>
+                            </template>
+                            <template v-if="!co.formatter || !co.formatter.type">
+                                <el-table-column v-if="co.label" :prop="co.prop" :width="co.width" :sortable="co.sortable" :label="co.label"></el-table-column>
+                            </template>
+                        </template>
+                    </template>
+                    <template v-if="config.table && config.table.style && config.table.style == 'B' && (config.edit_btn || config.delete_btn || (config.follow_tables && config.follow_tables.length > 0))">
+                        <el-table-column fixed="right" label="操作" :width="config.table.optionWidth ? config.table.optionWidth : 180">
+                            <template slot-scope="props">
+                                <el-button size="mini" v-if="config.edit_btn" icon="el-icon-edit" @click="showEdit">修改</el-button>
+                                <el-button size="mini" v-if="config.delete_btn" icon="el-icon-delete" type="danger">删除</el-button>
+                                <template v-if="config.follow_tables && config.follow_tables.length > 0">
+                                    <el-button v-for="(followTable,followTableIndex) in config.follow_tables"
+                                               size="mini" type="info" @click="showFollow">{{followTable.bottomName}}</el-button>
+                                </template>
+                            </template>
+                        </el-table-column>
                     </template>
                 </el-table>
                 <div style="text-align: right;" v-if="config.table.pagination">
                     <el-pagination small background
-                               layout="total, sizes, prev, pager, next, jumper"
-                               :total="0"
-                               :page-size="0"
-                               :page-sizes="[10, 20, 50, 100]">
+                                   layout="total, sizes, prev, pager, next, jumper"
+                                   :total="list.length"
+                                   :page-size="1"
+                                   :page-sizes="[10, 20, 50, 100]">
                     </el-pagination>
-                </div>'
+                </div>
             </el-card>
         </el-col>
     </el-row>
+
+    <el-dialog :visible.sync="imgShowVisible" :before-close="closeImgShow">
+        <img width="100%" :src="imgShowUrl" alt="">
+    </el-dialog>
+
+    <el-dialog v-if="config.add_form && config.add_form.width && config.add_form.elements && config.add_form.elements.length > 0"
+               :title="tt" :width="config.add_form.width + '%'" :close-on-click-modal="false"
+               :visible.sync="addVisible" class="group-dialog" :before-close="cancelAdd" v-loading="loading">
+        <el-form :model="addForm" :rules="addRules" ref="addForm" size="small" id="add-form" v-loading="loading">
+            <template v-if="config.add_form && config.add_form.elements && config.add_form.elements.length > 0">
+                <template v-for="(element,index) in config.add_form.elements">
+                    <template v-if="element.show && element.columnType === 'COM' && element.label">
+                        <el-form-item :label="element.label + ':'" :prop="element.key" :label-width="formLabelWidth">
+                            <template v-if="element.elType && element.elType == 'INPUT'">
+                                <el-input :type="element.type" ></el-input>
+                            </template>
+                        </el-form-item>
+                    </template>
+                </template>
+            </template>
+        </el-form>
+    </el-dialog>
 </div>
 <script>
     window.contextPath = '${contextPath}'
@@ -152,29 +225,100 @@
                 uuid: null,
                 loading: false,
                 height: window.innerHeight - 78,
-                formLabelWidth: '150px',
+                formLabelWidth: '100px',
                 config: {
                     table: {
-                        columns: []
+                        columns: [],
+                        style: 'A'
                     }
                 },
-                timer: ''
+                timer: '',
+                list: [],
+                running: false,
+                imgShowVisible: false,
+                imgShowUrl: '',
+                oldStyle: '',
+                addVisible: false,
+                addForm: {},
+                addRules: {},
+                tt: ''
             }
         },
         watch: {
         },
         methods: {
+            cancelAdd() {
+                this.addForm = {}
+                this.$refs.addForm.resetFields()
+                this.addVisible = false
+            },
+            closeImgShow() {
+                this.imgShowUrl = ''
+                this.imgShowVisible = false
+            },
+            showImg(key) {
+                this.imgShowUrl = key
+                this.imgShowVisible = true
+            },
+            showEdit() {
+
+            },
             showFollow() {
 
             },
-            showAdd() {},
+            showAdd() {
+                // this.tt = '新增'
+                // this.addForm = {}
+                // this.addVisible = true
+            },
             get() {
+                if (this.running) {
+                    return
+                }
+                this.running = true
                 let config = localStorage.getItem(this.uuid)
                 if (config) {
-                    this.config = JSON.parse(config)
-                    document.title = this.config.title ? this.config.title : '预览'
-                    console.log(JSON.stringify(this.config))
+                    let conf = JSON.parse(config)
+                    if (this.oldStyle != '' && conf.table && conf.table.style) {
+                        if (this.oldStyle != conf.table.style) {
+                            this.running = false
+                            location.reload();
+                            return
+                        }
+                    }
+                    let data = {}
+                    if (conf.table && conf.table.columns && conf.table.columns.length > 0) {
+                        for (let i = 0; i < conf.table.columns.length; i ++) {
+                            let column = conf.table.columns[i]
+                            if (column.formatter && column.formatter.type) {
+                                if (column.formatter.type == 'PIC') {
+                                    data[column.prop] = 'https://demoimg.thecover.cn/common-cms/img/05b5e7ec22db4701a4d5f7904e55b8e7.jpg'
+                                } else if (column.formatter.type == 'URL') {
+                                    data[column.prop] = 'http://www.thecover.cn'
+                                } else if (column.formatter.type == 'SWITCH') {
+                                    data[column.prop] = 1
+                                } else if (column.formatter.type == 'TEXT') {
+                                    if (column.formatter.map) {
+                                        for (let key in column.formatter.map) {
+                                            if (typeof column.formatter.map[key] != 'undefined'
+                                                && column.formatter.map[key] != null) {
+                                                data[column.prop] = column.formatter.map[key]
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                data[column.prop] = 'XXX'
+                            }
+                        }
+                    }
+                    this.list = [data]
+                    document.title = conf.title ? conf.title : '预览'
+                    this.config = conf
+                    this.oldStyle = conf.table.style
                 }
+                this.running = false
             },
         },
         beforeDestroy() {
@@ -185,7 +329,7 @@
             if (!this.uuid) {
                 this.$message.error('预览异常');
             }
-            this.timer = setInterval(this.get, 100);
+            this.timer = setInterval(this.get, 500);
         },
         created: function () {
         }
