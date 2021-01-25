@@ -13,6 +13,7 @@ public class TableListParam {
     private Integer curPage;
     private Integer pageSize;
     private String sortColumn;
+    private String orderAlias;
     private String order;
     private List<SearchParam> params;
 }

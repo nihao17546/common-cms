@@ -37,7 +37,6 @@ import java.util.Map;
 /**
  * @author nihao 2019/10/20
  */
-@RequestMapping("/web")
 public class WebController extends BaseController {
     @Autowired
     private IWebService webService;
@@ -58,8 +57,8 @@ public class WebController extends BaseController {
 
     @RequestMapping("/{key}.html")
     public void index(@PathVariable String key,
-                        HttpServletResponse response,
-                        HttpServletRequest request) throws IOException {
+                      HttpServletResponse response,
+                      HttpServletRequest request) throws IOException {
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html; charset=utf-8");
         Cookie cookie = new Cookie("config_key", key);
@@ -87,6 +86,7 @@ public class WebController extends BaseController {
         }
         listParam.setOrder(tableListParam.getOrder());
         listParam.setSortColumn(tableListParam.getSortColumn());
+        listParam.setOrderAlias(tableListParam.getOrderAlias());
         if (tableListParam.getCurPage() != null && tableListParam.getPageSize() != null) {
             ListVO<Map<String,Object>> listVO = webService.getPagination(listParam, tableListParam.getCurPage(), tableListParam.getPageSize());
             return ok().pull(listVO).json();

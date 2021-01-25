@@ -14,4 +14,5 @@ public class ListParam extends Select {
     private List<SearchParam> params;
     private String sortColumn;
     private String order;
+    private String orderAlias;
 }

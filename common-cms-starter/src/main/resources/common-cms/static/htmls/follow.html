@@ -181,6 +181,7 @@
                 list: [],
                 sortColumn: window.config.sortColumn,
                 order: window.config.order,
+                orderAlias: null,
                 totalCount: 0,
                 pageSize: window.config.pageSize,
                 curPage: window.config.curPage,
@@ -245,8 +246,15 @@
                 this.selections = val
             },
             sortChange(column) {
-                this.sortColumn = column.prop
-                this.order = column.order
+                if (column.order == null) {
+                    this.sortColumn = window.config.sortColumn
+                    this.order = window.config.order
+                    this.orderAlias = 'a'
+                } else {
+                    this.sortColumn = column.prop
+                    this.order = column.order
+                    this.orderAlias = null
+                }
                 this.getList()
             },
             getList() {
@@ -278,6 +286,7 @@
                     listJson: window.config.listJson,
                     sortColumn: this.sortColumn,
                     order: order,
+                    orderAlias: this.orderAlias,
                     params: params
                 }
                 axios.post(window.contextPath + '/web/api/table/list', listForm, {
