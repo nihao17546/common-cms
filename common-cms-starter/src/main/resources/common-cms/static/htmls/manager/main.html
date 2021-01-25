@@ -541,7 +541,7 @@
                                                         <el-select style="width: 100%" clearable
                                                                    v-model.trim="item.className"
                                                                    @change="whereTypeChange(item)">
-                                                            <el-option v-for="(type,whereTypeIndex) in whereTypes"
+                                                            <el-option v-for="(type,whereTypeIndex) in whereTypesAll"
                                                                        :key="type.value" :value="type.value" :label="type.label" >
                                                             </el-option>
                                                         </el-select>
@@ -1443,7 +1443,7 @@
                                                         <el-select style="width: 100%" clearable
                                                                    v-model.trim="item.className"
                                                                    @change="whereTypeChange(item)">
-                                                            <el-option v-for="(type,whereTypeIndex) in whereTypes"
+                                                            <el-option v-for="(type,whereTypeIndex) in whereTypesAll"
                                                                        :key="type.value" :value="type.value" :label="type.label" >
                                                             </el-option>
                                                         </el-select>
@@ -2447,6 +2447,37 @@
                 },{
                     label: '集合',
                     value: window.basePackage + 'db.WhereIn'
+                }],
+                whereTypesAll: [{
+                    label: '完全匹配',
+                    value: window.basePackage + 'db.WhereEq'
+                },{
+                    label: '区间',
+                    value: window.basePackage + 'db.WhereBt'
+                },{
+                    label: '大于',
+                    value: window.basePackage + 'db.WhereGt'
+                },{
+                    label: '大于等于',
+                    value: window.basePackage + 'db.WhereGteq'
+                },{
+                    label: '小于',
+                    value: window.basePackage + 'db.WhereLt'
+                },{
+                    label: '大于等于',
+                    value: window.basePackage + 'db.WhereLteq'
+                },{
+                    label: '模糊匹配',
+                    value: window.basePackage + 'db.WhereLike'
+                },{
+                    label: '集合',
+                    value: window.basePackage + 'db.WhereIn'
+                },{
+                    label: '为空',
+                    value: window.basePackage + 'db.WhereIsnull'
+                },{
+                    label: '不为空',
+                    value: window.basePackage + 'db.WhereIsnotnull'
                 }],
                 searchTypes: [{
                     label: '完全匹配文本输入框',
@@ -3486,7 +3517,13 @@
                 delete item.begin
                 delete item.end
                 if (item.className) {
-                    if (item.className.indexOf('.WhereEq') > -1) {
+                    if (item.className.indexOf('.WhereIsnull') > -1) {
+                        item.type = 'isnull'
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.WhereIsnotnull') > -1) {
+                        item.type = 'isnotnull'
+                        this.form = JSON.parse(JSON.stringify(this.form))
+                    } else if (item.className.indexOf('.WhereEq') > -1) {
                         item.type = 'eq'
                         item.value = ''
                         this.form = JSON.parse(JSON.stringify(this.form))

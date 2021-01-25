@@ -87,6 +87,10 @@ public class WebDaoImpl implements IWebDao {
                     List list = (List) searchParam.getValue();
                     params.add(list.get(0));
                     params.add(list.get(list.size() - 1));
+                } else if (searchParam.getType().equals(JudgeType.isnull.name())) {
+                    sb.append(" is null ");
+                } else if (searchParam.getType().equals(JudgeType.isnotnull.name())) {
+                    sb.append(" is not null ");
                 }
             }
         }
@@ -134,6 +138,10 @@ public class WebDaoImpl implements IWebDao {
             WhereBt whereBt = (WhereBt) where;
             params.add(whereBt.getBegin());
             params.add(whereBt.getEnd());
+        } else if (where.getType() == JudgeType.isnull) {
+            sb.append(" is null ");
+        } else if (where.getType() == JudgeType.isnotnull) {
+            sb.append(" is not null ");
         }
     }
 

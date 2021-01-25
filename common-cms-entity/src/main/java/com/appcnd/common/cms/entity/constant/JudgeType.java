@@ -43,5 +43,15 @@ public enum JudgeType {
     /*
     在...区间
      */
-    bt
+    bt,
+
+    /*
+    为空
+     */
+    isnull,
+
+    /*
+    不为空
+     */
+    isnotnull
 }
