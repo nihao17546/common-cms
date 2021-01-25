@@ -37,6 +37,7 @@ import java.util.Map;
 /**
  * @author nihao 2019/10/20
  */
+@RequestMapping("/web")
 public class WebController extends BaseController {
     @Autowired
     private IWebService webService;
