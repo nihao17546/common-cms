@@ -1,5 +1,6 @@
 package com.appcnd.common.cms.entity;
 
+import com.appcnd.common.cms.entity.constant.ObjectStorageType;
 import com.appcnd.common.cms.entity.form.add.AddForm;
 import com.appcnd.common.cms.entity.table.FollowTable;
 import com.appcnd.common.cms.entity.table.Table;
@@ -40,7 +41,9 @@ public class ConfigEntity implements Serializable {
     @JSONField(name = "delete_btn")
     private Boolean deleteBtn;
 
-    public ConfigEntity(String title, Table table, AddForm addForm, Boolean addBtn, Boolean editBtn, Boolean deleteBtn, List<FollowTable> followTables) {
+    private ObjectStorageType storage;
+
+    public ConfigEntity(String title, Table table, AddForm addForm, Boolean addBtn, Boolean editBtn, Boolean deleteBtn, List<FollowTable> followTables, ObjectStorageType storage) {
         CommonAssert.hasText(title, "title 不能为空");
         CommonAssert.notNull(table, "table 不能为空");
         this.title = title;
@@ -50,6 +53,7 @@ public class ConfigEntity implements Serializable {
         this.addBtn = addBtn == null ? false : addBtn;
         this.editBtn = editBtn == null ? false : editBtn;
         this.deleteBtn = deleteBtn == null ? false : deleteBtn;
+        this.storage = storage;
         if (this.addBtn || this.editBtn || this.deleteBtn) {
             if (this.addForm == null) {
                 throw new IllegalArgumentException("配置了操作按钮必须要配置AddForm");
@@ -69,6 +73,12 @@ public class ConfigEntity implements Serializable {
         private Boolean addBtn;
         private Boolean editBtn;
         private Boolean deleteBtn;
+        private ObjectStorageType storage;
+
+        public ConfigEntityBuilder storage(ObjectStorageType storage) {
+            this.storage = storage;
+            return this;
+        }
 
         public ConfigEntityBuilder title(String title) {
             this.title = title;
@@ -111,7 +121,7 @@ public class ConfigEntity implements Serializable {
         }
 
         public ConfigEntity build() {
-            return new ConfigEntity(title, table, addForm, addBtn, editBtn, deleteBtn, followTables);
+            return new ConfigEntity(title, table, addForm, addBtn, editBtn, deleteBtn, followTables, storage);
         }
     }
 

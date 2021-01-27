@@ -306,6 +306,14 @@
                                     </el-select>
                                 </el-form-item>
                             </el-col>
+                            <el-col :span="6">
+                                <el-form-item label="对象存储:" prop="delete_btn" label-width="100px">
+                                    <el-select style="width: 100%" v-model="form.storage" clearable>
+                                        <el-option key="QN" label="七牛" value="QN"></el-option>
+                                        <el-option key="HW" label="华为" value="HW"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
                         </el-row>
                     </el-card>
                 </div>

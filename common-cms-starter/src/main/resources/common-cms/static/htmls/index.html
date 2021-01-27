@@ -12,6 +12,7 @@
     <script src="${contextPath}/static/jquery.min.js" type="text/javascript"></script>
     <script src="${contextPath}/static/lightbox-dialog/dist/js/lobibox.min.js"></script>
     <script src="${contextPath}/static/qiniu.min.js"></script>
+    <script src="${contextPath}/static/esdk-obs-browserjs-without-polyfill-3.19.9.min.js"></script>
     <script src="${contextPath}/static/UEditor/vue-ueditor-wrap.min.js"></script>
     <script src="${contextPath}/static/cropper/cropper.js"></script>
     <style>
@@ -216,25 +217,9 @@
             confirmJcrop() {
                 this.loading = true
                 $("#jcrop_img").cropper('getCroppedCanvas').toBlob((blob) => {
+                    this.loading = false
                     let file = new File([blob], this.jcrop.filename, {type: this.jcrop.imageType, lastModified: Date.now()});
-                    let observable = qiniu.upload(file, this.jcrop.key, this.jcrop.token, {}, {
-                        useCdnDomain: true
-                    });
-                    observable.subscribe({
-                        next: (result) => {
-                            console.info(result);
-                        },
-                        error: () => {
-                            this.$message.error('上传图片失败');
-                            this.loading = false;
-                        },
-                        complete: (res) => {
-                            this.addForm[this.jcrop.k] = this.jcrop.host + '/' + res.key;
-                            this.addForm = JSON.parse(JSON.stringify(this.addForm))
-                            this.loading = false;
-                            this.closeJcrop()
-                        }
-                    })
+                    this.upload(this.jcrop.res, file, this.jcrop.k, this.closeJcrop)
                 })
             },
             closeJcrop() {
@@ -275,6 +260,59 @@
                 this.followTableUrl = encodeURI('follow/html?bottomName=' + bottomName + '&value=' + row[key])
                 this.followDialogVisible = true
             },
+            upload(conf, file, k, successFun) {
+                if (conf.provider == 'QN') {
+                    this.loading = true
+                    let observable = qiniu.upload(file, conf.key, conf.token, {}, {
+                        useCdnDomain: true
+                    });
+                    observable.subscribe({
+                        next: (result) => {
+                            console.info(result);
+                        },
+                        error: () => {
+                            this.$message.error('上传图片失败');
+                            this.loading = false;
+                        },
+                        complete: (res) => {
+                            this.addForm[k] = conf.host + '/' + res.key;
+                            this.addForm = JSON.parse(JSON.stringify(this.addForm))
+                            this.loading = false;
+                            if (successFun) {
+                                successFun()
+                            }
+                        }
+                    })
+                } else if (conf.provider == 'HW') {
+                    this.loading = true
+                    let obsClient = new ObsClient({
+                        access_key_id: conf.access,
+                        secret_access_key: conf.secret,
+                        server : conf.endpoint,
+                        security_token: conf.token,
+                        timeout: 24 * 60 * 60
+                    });
+                    obsClient.putObject({
+                        Bucket : conf.bucket,
+                        Key : conf.key,
+                        SourceFile : file
+                    }, (err, result) => {
+                        console.log(result)
+                        if (result && result.CommonMsg && result.CommonMsg.Status == 200) {
+                            this.addForm[k] = conf.host + '/' + conf.key;
+                            this.addForm = JSON.parse(JSON.stringify(this.addForm))
+                            this.loading = false;
+                            if (successFun) {
+                                successFun()
+                            }
+                        } else {
+                            console.error(err);
+                            this.$message.error('上传图片失败');
+                            this.loading = false;
+                        }
+                    });
+                }
+            },
             uploadImg(id, k, cut) {
                 this.loading = true;
                 let ele = $('#' + id)
@@ -306,9 +344,6 @@
                             this.$message.error(res.data.msg);
                         }
                         else {
-                            let host = res.data.content.host;
-                            let token = res.data.content.token;
-                            let key = res.data.content.key;
                             if (cut === true || cut === 'true') {
                                 this.loading = false;
                                 this.$confirm('裁剪图片?', '提示', {
@@ -321,9 +356,7 @@
                                     this.jcrop = {
                                         visible: true,
                                         filename: name,
-                                        host: host,
-                                        token: token,
-                                        key: key,
+                                        res: res.data.content,
                                         k: k,
                                         id: id,
                                         imageType: file.type
@@ -348,42 +381,12 @@
                                         this.loading = false
                                     })
                                 }).catch(() => {
-                                    let observable = qiniu.upload(file, key, token, {}, {
-                                        useCdnDomain: true
-                                    });
-                                    observable.subscribe({
-                                        next: (result) => {
-                                            console.info(result);
-                                        },
-                                        error: () => {
-                                            this.$message.error('上传图片失败');
-                                            this.loading = false;
-                                        },
-                                        complete: (res) => {
-                                            this.addForm[k] = host + '/' + res.key;
-                                            this.addForm = JSON.parse(JSON.stringify(this.addForm))
-                                            this.loading = false;
-                                        }
-                                    })
+                                    this.loading = false
+                                    this.upload(res.data.content, file, k)
                                 });
                             } else {
-                                let observable = qiniu.upload(file, key, token, {}, {
-                                    useCdnDomain: true
-                                });
-                                observable.subscribe({
-                                    next: (result) => {
-                                        console.info(result);
-                                    },
-                                    error: () => {
-                                        this.$message.error('上传图片失败');
-                                        this.loading = false;
-                                    },
-                                    complete: (res) => {
-                                        this.addForm[k] = host + '/' + res.key;
-                                        this.addForm = JSON.parse(JSON.stringify(this.addForm))
-                                        this.loading = false;
-                                    }
-                                })
+                                this.loading = false
+                                this.upload(res.data.content, file, k)
                             }
                         }
                     }).catch(res => {
@@ -391,34 +394,6 @@
                         this.$message.error('获取token失败');
                         this.loading = false;
                     })
-
-                    // var formData = new FormData();
-                    // var name = $(ele).val();
-                    // formData.append("file", file);
-                    // formData.append("name", name);
-                    // $.ajax({
-                    //     url: window.contextPath + '/upload/file',
-                    //     type: 'POST',
-                    //     data: formData,
-                    //     processData: false,// ⑧告诉jQuery不要去处理发送的数据
-                    //     contentType: false, // ⑨告诉jQuery不要去设置Content-Type请求头
-                    //     beforeSend: () => {
-                    //         //⑩发送之前的动作
-                    //     },
-                    //     success: (data) => {
-                    //         if (data.status != 0) {
-                    //             this.$message.error(data.msg);
-                    //         } else {
-                    //             this.addForm[key] = data.content.data;
-                    //         }
-                    //         this.loading = false;
-                    //     },
-                    //     error : (responseStr) => {
-                    //         console.error(responseStr)
-                    //         this.$message.error('导入失败');
-                    //         this.loading = false;
-                    //     }
-                    // });
                 }
             },
             removeImg(id, key) {

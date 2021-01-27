@@ -631,38 +631,42 @@ function exec(scrawlObj) {
         addMaskLayer(lang.scrawlUpLoading);
         var base64 = scrawlObj.getCanvasData();
         if (!!base64) {
-            var options = {
-                timeout:100000,
+            let url = editor.getActionUrl('token') + '?file_name=x.jpg&type=image'
+            let opts = {
                 onsuccess:function (xhr) {
                     if (!scrawlObj.isCancelScrawl) {
-                        var responseObj;
+                        let responseObj;
                         responseObj = eval("(" + xhr.responseText + ")");
-                        if (responseObj.state == "SUCCESS") {
-                            var imgObj = {},
-                                url = editor.options.scrawlUrlPrefix + responseObj.url;
-                            imgObj.src = url;
-                            imgObj._src = url;
-                            imgObj.alt = responseObj.original || '';
-                            imgObj.title = responseObj.title || '';
-                            editor.execCommand("insertImage", imgObj);
-                            dialog.close();
+                        if (responseObj.status == 0) {
+                            let file = editor.dataURLtoFile('data:image/jpg;base64,' + base64, 'x.jpeg')
+                            editor.codelessUploadFile(responseObj, file, {
+                                onerror: function () {
+                                    alert(lang.imageError);
+                                    dialog.close();
+                                },
+                                onsuccess: function (url) {
+                                    let imgObj = {};
+                                    imgObj.src = url;
+                                    imgObj._src = url;
+                                    imgObj.alt = responseObj.original || '';
+                                    imgObj.title = responseObj.title || '';
+                                    editor.execCommand("insertImage", imgObj);
+                                    dialog.close();
+                                }
+                            })
                         } else {
-                            alert(responseObj.state);
+                            console.error(xhr.responseText)
+                            alert(lang.imageError);
+                            dialog.close();
                         }
-
                     }
                 },
                 onerror:function () {
                     alert(lang.imageError);
                     dialog.close();
                 }
-            };
-            options[editor.getOpt('scrawlFieldName')] = base64;
-
-            var actionUrl = editor.getActionUrl(editor.getOpt('scrawlActionName')),
-                params = utils.serializeParam(editor.queryCommandValue('serverparam')) || '',
-                url = utils.formatUrl(actionUrl + (actionUrl.indexOf('?') == -1 ? '?':'&') + params);
-            ajax.request(url, options);
+            }
+            ajax.request(url, opts);
         }
     } else {
         addMaskLayer(lang.noScarwl + "&nbsp;&nbsp;&nbsp;<input type='button' value='" + lang.continueBtn + "'  onclick='removeMaskLayer()'/>");

@@ -174,6 +174,7 @@ com.appcnd.common.cms.entity.ConfigEntity
 | addForm | [AddForm](#h2) | 否 |  | 新增/编辑表单 |
 | table | [Table](#h3) | 否 |  | 主表配置 |
 | followTables | [[FollowTable](#h4)] | 否 |  | 从表配置 |
+| storage | [ObjectStorageType] | 否 |  | 对象存储类型（QN/HW） |
 
 ### <a name="h2">2 新增/编辑表单</a>
 com.appcnd.common.cms.entity.form.add.AddForm

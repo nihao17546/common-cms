@@ -37,7 +37,7 @@ common.cms.db.url=jdbc:mysql://127.0.0.1:3306/test?allowMultiQueries=true&useUni
 common.cms.db.username=root
 common.cms.db.password=123456
 
-# 如涉及文件上传需设置七牛相关配置，目前暂支持七牛
+# 如涉及文件上传需设置七牛相关配置或华为相关配置
 # 七牛ak
 common.cms.qi.niu.ak=ak
 # 七牛sk
@@ -46,6 +46,17 @@ common.cms.qi.niu.sk=sk
 common.cms.qi.niu.bucket=bucket
 # 七牛桶绑定的域名
 common.cms.qi.niu.host=host
+
+# 华为ak
+common.cms.huawei.ak=ak
+# 华为sk
+common.cms.huawei.sk=sk
+# 华为桶名称
+common.cms.huawei.bucket=bucket
+# 华为桶绑定的域名
+common.cms.huawei.host=host
+# 区
+common.cms.huawei.region=cn-north-4
 
 ~~~
 #### 项目配置

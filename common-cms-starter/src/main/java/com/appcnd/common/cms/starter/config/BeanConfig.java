@@ -10,13 +10,13 @@ import com.appcnd.common.cms.starter.dao.IWebDao;
 import com.appcnd.common.cms.starter.dao.impl.MetaConfigDaoImpl;
 import com.appcnd.common.cms.starter.dao.impl.WebDaoImpl;
 import com.appcnd.common.cms.starter.pojo.constant.BasicConstant;
-import com.appcnd.common.cms.starter.properties.DbProperties;
-import com.appcnd.common.cms.starter.properties.ManagerProperties;
-import com.appcnd.common.cms.starter.properties.QiniuProperties;
-import com.appcnd.common.cms.starter.properties.ServletProperties;
+import com.appcnd.common.cms.starter.properties.*;
 import com.appcnd.common.cms.starter.service.IManagerService;
+import com.appcnd.common.cms.starter.service.IUploadService;
 import com.appcnd.common.cms.starter.service.IWebService;
+import com.appcnd.common.cms.starter.service.impl.HwUploadServiceImpl;
 import com.appcnd.common.cms.starter.service.impl.ManagerServiceImpl;
+import com.appcnd.common.cms.starter.service.impl.QnUploadServiceImpl;
 import com.appcnd.common.cms.starter.service.impl.WebServiceImpl;
 import com.appcnd.common.cms.starter.servlet.ResourceServlet;
 import com.appcnd.common.cms.starter.util.ConfigJsonUtil;
@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * created by nihao 2020/07/07
  */
-@EnableConfigurationProperties({ServletProperties.class, QiniuProperties.class, DbProperties.class, ManagerProperties.class})
+@EnableConfigurationProperties({ServletProperties.class, QiniuProperties.class, HuaweiProperties.class, DbProperties.class, ManagerProperties.class})
 @Import({SpringContextUtil.class, ExceptionHandlerAop.class})
 public class BeanConfig {
     @Autowired
@@ -75,9 +75,20 @@ public class BeanConfig {
     public IWebService webService() {
         return new WebServiceImpl();
     }
+
     @Bean(name = BasicConstant.beanNamePrefix + "managerService")
     public IManagerService managerService() {
         return new ManagerServiceImpl();
+    }
+
+    @Bean(name = BasicConstant.beanNamePrefix + "hwUploadService")
+    public IUploadService hwUploadService() {
+        return new HwUploadServiceImpl();
+    }
+
+    @Bean(name = BasicConstant.beanNamePrefix + "qnUploadService")
+    public IUploadService qnUploadService() {
+        return new QnUploadServiceImpl();
     }
 
     @PostConstruct
