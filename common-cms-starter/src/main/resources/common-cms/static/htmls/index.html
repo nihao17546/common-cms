@@ -342,6 +342,8 @@
                     }).then(res => {
                         if (res.data.status != 0) {
                             this.$message.error(res.data.msg);
+                            $(ele).val('')
+                            this.loading = false;
                         }
                         else {
                             if (cut === true || cut === 'true') {
@@ -392,6 +394,7 @@
                     }).catch(res => {
                         console.error(res)
                         this.$message.error('获取token失败');
+                        $(ele).val('')
                         this.loading = false;
                     })
                 }
