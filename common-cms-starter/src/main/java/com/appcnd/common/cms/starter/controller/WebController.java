@@ -16,13 +16,11 @@ import com.appcnd.common.cms.starter.util.ConfigJsonUtil;
 import com.appcnd.common.cms.starter.util.PageUtil;
 import com.alibaba.fastjson.JSON;
 import com.appcnd.common.cms.starter.pojo.param.TableListParam;
-import com.appcnd.common.cms.starter.util.ConfigJsonUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -62,10 +60,9 @@ public class WebController extends BaseController {
                       HttpServletRequest request) throws IOException {
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html; charset=utf-8");
-        Cookie cookie = new Cookie("config_key", key);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        String text = PageUtil.getPage(request, servletProperties.getUrl(), "index");
+        Map<String,String> map = new HashMap<>();
+        map.put("key", key);
+        String text = PageUtil.getPage(request, servletProperties.getUrl(), "index", map);
         response.getWriter().write(text);
     }
 

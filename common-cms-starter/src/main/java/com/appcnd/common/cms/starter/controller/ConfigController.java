@@ -1,14 +1,12 @@
 package com.appcnd.common.cms.starter.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.appcnd.common.cms.entity.ConfigEntity;
+import com.appcnd.common.cms.entity.constant.ObjectStorageType;
 import com.appcnd.common.cms.starter.exception.CmsRuntimeException;
 import com.appcnd.common.cms.starter.pojo.HttpStatus;
-import com.appcnd.common.cms.starter.pojo.constant.BasicConstant;
 import com.appcnd.common.cms.starter.pojo.po.MetaConfigPo;
 import com.appcnd.common.cms.starter.properties.ServletProperties;
 import com.appcnd.common.cms.starter.service.IWebService;
-import com.appcnd.common.cms.starter.util.CommonUtils;
 import com.appcnd.common.cms.starter.util.ConfigJsonUtil;
 import com.appcnd.common.cms.entity.util.DesUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,8 +94,7 @@ public class ConfigController extends BaseController {
 
     @RequestMapping(value = "/api/query", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String query(HttpServletResponse response) throws UnsupportedEncodingException {
-        String key = CommonUtils.getCookieValue("config_key");
+    public String query(@RequestParam String key) {
         if (key == null) {
             throw  new CmsRuntimeException(HttpStatus.SYSTEM_ERROR.getCode(), "地址错误");
         }
@@ -127,12 +122,8 @@ public class ConfigController extends BaseController {
                 throw  new CmsRuntimeException(HttpStatus.SYSTEM_ERROR.getCode(), "配置解析异常");
             }
         }
-        if (configEntity.getStorage() != null) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("storage", configEntity.getStorage().name());
-            Cookie cookie = new Cookie(BasicConstant.configKey, URLEncoder.encode(jsonObject.toJSONString(), "UTF-8"));
-            cookie.setPath("/");
-            response.addCookie(cookie);
+        if (configEntity.getStorage() == null) {
+            configEntity.setStorage(ObjectStorageType.QN);
         }
         return ok().pull(configEntity).json();
     }

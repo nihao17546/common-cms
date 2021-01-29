@@ -13,9 +13,4 @@ public interface BasicConstant {
      * 类前缀
      */
     String beanNamePrefix = "common_cms$";
-
-    /**
-     * cookie配置key
-     */
-    String configKey = "codelessconfig";
 }

@@ -139,12 +139,15 @@
         url: window.contextPath + '/config/api/query',
         async: false,
         contentType: 'application/json',
-        data: {},
+        data: {
+            key: '${key}'
+        },
         dataType:'json',
         success:function (data) {
             if (data.status != 0) {
                 alert(data.msg)
             } else {
+                window.storage = data.content.storage
                 window.config = {}
                 document.title = data.content.title
                 searchForm(data.content)
@@ -334,7 +337,7 @@
                         }
                     }
                     let name = $(ele).val();
-                    axios.get(window.contextPath + '/upload/api/token',{
+                    axios.get(window.contextPath + '/upload/api/token/' + window.storage,{
                         params: {
                             file_name: name,
                             type: 'img'
@@ -342,8 +345,6 @@
                     }).then(res => {
                         if (res.data.status != 0) {
                             this.$message.error(res.data.msg);
-                            $(ele).val('')
-                            this.loading = false;
                         }
                         else {
                             if (cut === true || cut === 'true') {
@@ -394,7 +395,6 @@
                     }).catch(res => {
                         console.error(res)
                         this.$message.error('获取token失败');
-                        $(ele).val('')
                         this.loading = false;
                     })
                 }

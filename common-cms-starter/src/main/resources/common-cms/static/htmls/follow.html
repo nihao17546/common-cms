@@ -122,6 +122,7 @@
 <script>
     window.contextPath = '${contextPath}'
     window.config = {}
+    window.storage = window.parent.storage
 </script>
 <script>
     function getParam(name) {
@@ -516,7 +517,7 @@
                         }
                     }
                     let name = $(ele).val();
-                    axios.get(window.contextPath + '/upload/api/token',{
+                    axios.get(window.contextPath + '/upload/api/token/' + window.storage,{
                         params: {
                             file_name: name,
                             type: 'img'
@@ -524,8 +525,6 @@
                     }).then(res => {
                         if (res.data.status != 0) {
                             this.$message.error(res.data.msg);
-                            $(ele).val('')
-                            this.loading = false;
                         }
                         else {
                             if (cut === true || cut === 'true') {
@@ -576,7 +575,6 @@
                     }).catch(res => {
                         console.error(res)
                         this.$message.error('获取token失败');
-                        $(ele).val('')
                         this.loading = false;
                     })
                 }

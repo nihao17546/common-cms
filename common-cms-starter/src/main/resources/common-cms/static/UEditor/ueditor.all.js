@@ -8082,13 +8082,13 @@
             getActionUrl: function(action){
                 console.log(action)
                 if (action == 'uploadimage') {
-                    return window.contextPath + "/upload/api/image";
+                    return window.contextPath + "/upload/api/image/" + window.storage;
                 } else if (action == 'uploadvideo') {
-                    return window.contextPath + "/upload/api/video";
+                    return window.contextPath + "/upload/api/video/" + window.storage;
                 } else if (action == 'uploadscrawl') {
-                    return window.contextPath  + "/upload/api/scrawl";
+                    return window.contextPath  + "/upload/api/scrawl/" + window.storage;
                 } else if (action == 'token') {
-                    return window.contextPath  + "/upload/api/token";
+                    return window.contextPath  + "/upload/api/token/" + window.storage;
                 }
                 var actionName = this.getOpt(action) || action,
                     imageUrl = this.getOpt('imageUrl'),
