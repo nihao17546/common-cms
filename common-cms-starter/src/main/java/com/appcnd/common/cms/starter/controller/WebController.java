@@ -85,6 +85,9 @@ public class WebController extends BaseController {
         listParam.setOrder(tableListParam.getOrder());
         listParam.setSortColumn(tableListParam.getSortColumn());
         listParam.setOrderAlias(tableListParam.getOrderAlias());
+        if (listParam.getSortColumn() != null && listParam.getOrderAlias() == null) {
+            listParam.setOrderAlias("a");
+        }
         if (tableListParam.getCurPage() != null && tableListParam.getPageSize() != null) {
             ListVO<Map<String,Object>> listVO = webService.getPagination(listParam, tableListParam.getCurPage(), tableListParam.getPageSize());
             return ok().pull(listVO).json();
