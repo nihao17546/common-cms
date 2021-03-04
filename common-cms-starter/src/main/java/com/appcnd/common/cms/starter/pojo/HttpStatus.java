@@ -10,6 +10,7 @@ public class HttpStatus {
     public static final Status OK = new Status(0, "ok");
     public static final Status SYSTEM_ERROR = new Status(1, "系统异常");
     public static final Status NEED_LOGIN = new Status(403, "未登录");
+    public static final Status NOT_FOUND = new Status(404, "未找到");
     public static final Status SYSTEM_EXCEPTION = new Status(500, "系统异常");
 
     @Data

@@ -45,6 +45,8 @@ public class BeanConfig {
     private SpringContextUtil springContextUtil;
     @Autowired
     private ServletProperties servletProperties;
+    @Autowired
+    private ManagerProperties managerProperties;
 
     @Bean(BasicConstant.beanNamePrefix + "servletRegistrationBean")
     public ServletRegistrationBean registrationBean(@Autowired ServletProperties servletProperties) {
@@ -105,9 +107,12 @@ public class BeanConfig {
         springContextUtil.addBean(WebController.class, BasicConstant.beanNamePrefix + "webController");
         springContextUtil.registerController(BasicConstant.beanNamePrefix + "webController");
 
-        modify(ManagerController.class);
-        springContextUtil.addBean(ManagerController.class, BasicConstant.beanNamePrefix + "managerController");
-        springContextUtil.registerController(BasicConstant.beanNamePrefix + "managerController");
+        if (managerProperties.getLoginname() != null && !managerProperties.getLoginname().isEmpty()
+                && managerProperties.getPassword() != null && !managerProperties.getPassword().isEmpty()) {
+            modify(ManagerController.class);
+            springContextUtil.addBean(ManagerController.class, BasicConstant.beanNamePrefix + "managerController");
+            springContextUtil.registerController(BasicConstant.beanNamePrefix + "managerController");
+        }
 
         System.out.println("  / __\\___   __| | ___| | ___  ___ ___ \n" +
                 " / /  / _ \\ / _` |/ _ \\ |/ _ \\/ __/ __|\n" +

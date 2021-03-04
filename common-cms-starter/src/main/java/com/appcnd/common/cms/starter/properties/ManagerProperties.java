@@ -7,8 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("common.cms.manager")
 public class ManagerProperties {
-    private String loginname = "root";
-    private String password = "123456";
+    private String loginname;
+    private String password;
 
     public String getLoginname() {
         return loginname;

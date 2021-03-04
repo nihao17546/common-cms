@@ -26,9 +26,8 @@ CREATE TABLE `tb_meta_config` (
 # 指定访问路径前缀（必须配置）
 common.cms.web.url=/cms
 
-# 配置管理后台登录账号，默认root
+# 可视化配置管理后台登录账号/密码
 common.cms.manager.loginname=root
-# 配置管理后台登录密码，默认123456
 common.cms.manager.password=123456
 
 # 数据源相关配置，不配默认使用Spring上下文中的数据源

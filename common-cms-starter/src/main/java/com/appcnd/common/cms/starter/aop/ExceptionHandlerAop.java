@@ -4,6 +4,7 @@ import com.appcnd.common.cms.entity.util.DesUtil;
 import com.appcnd.common.cms.starter.exception.CmsRuntimeException;
 import com.appcnd.common.cms.starter.pojo.HttpResult;
 import com.appcnd.common.cms.starter.pojo.HttpStatus;
+import com.appcnd.common.cms.starter.properties.ManagerProperties;
 import com.appcnd.common.cms.starter.properties.ServletProperties;
 import com.appcnd.common.cms.starter.util.CommonUtils;
 import com.appcnd.common.cms.starter.exception.CmsRuntimeException;
@@ -32,6 +33,8 @@ public class ExceptionHandlerAop {
 
     @Autowired
     private ServletProperties servletProperties;
+    @Autowired
+    private ManagerProperties managerProperties;
 
     @Pointcut("execution(public * com.appcnd.common.cms.starter.controller.*.*(..))")
     public void pointcut() {
@@ -44,6 +47,16 @@ public class ExceptionHandlerAop {
         // 管理相关判断登录
         String servletPath = request.getServletPath();
         if (servletPath.startsWith(servletProperties.getUrl() + "/manager")) {
+            if (managerProperties.getLoginname() == null || managerProperties.getPassword() == null
+                    || managerProperties.getLoginname().isEmpty() || managerProperties.getPassword().isEmpty()) {
+                if (servletPath.endsWith(".html")) {
+                    CommonUtils.buildErrorTip(request, 404, "not found");
+                    request.getRequestDispatcher(servletProperties.getUrl() + "/static/htmls/error.html").forward(request, response);
+                    return null;
+                } else {
+                    return HttpResult.build(HttpStatus.NOT_FOUND);
+                }
+            }
             if (!servletPath.equals(servletProperties.getUrl() + "/manager/index.html")
                     && !servletPath.equals(servletProperties.getUrl() + "/manager/login")) {
                 // 是否拦截
