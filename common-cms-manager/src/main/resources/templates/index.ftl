@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Codeless Plugin</title>
+    <title>Codeless Platform</title>
     <link rel="stylesheet" href="${contextPath}/element-ui/theme-chalk/index.css">
     <script src="${contextPath}/vue.min.js"></script>
     <script src="${contextPath}/element-ui/index.js"></script>
@@ -35,7 +35,7 @@
             <el-link :underline="false" href="#">使用文档</el-link>
         </div>
         <div style="margin-top: 150px;width: 330px;">
-            <p style="font-size: xx-large;">Codeless Plugin</p>
+            <p style="font-size: xx-large;">Codeless Platform</p>
             <p style="font-size: medium;">低代码插件配置</p>
         </div>
         <div style="margin-top: 60px;">
