@@ -47,10 +47,10 @@ public class CommonUtils {
 
     public static boolean isAjax(HttpServletRequest request) {
         String servletPath = request.getServletPath();
-        if (servletPath.contains("/api")) {
-            return true;
+        if (servletPath.endsWith("/html") || servletPath.endsWith(".html")) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public static void buildErrorTip(HttpServletRequest request,
