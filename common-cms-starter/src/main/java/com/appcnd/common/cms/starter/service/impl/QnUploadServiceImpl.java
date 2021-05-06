@@ -38,10 +38,15 @@ public class QnUploadServiceImpl extends IUploadService {
 
     @Override
     public HttpResult token(String fileName, String type) {
-        String saveKey = getFileName(fileName, type);
-        String token = getAuth().uploadToken(qiniuProperties.getBucket(), null, 3600, new StringMap().putNotEmpty("saveKey", saveKey));
-        return HttpResult.success().pull("token", token).pull("host", qiniuProperties.getHost())
-                .pull("key", saveKey).pull("provider", ObjectStorageType.QN.name());
+        try {
+            String saveKey = getFileName(fileName, type);
+            String token = getAuth().uploadToken(qiniuProperties.getBucket(), null, 3600, new StringMap().putNotEmpty("saveKey", saveKey));
+            return HttpResult.success().pull("token", token).pull("host", qiniuProperties.getHost())
+                    .pull("key", saveKey).pull("provider", ObjectStorageType.QN.name());
+        } catch (RuntimeException e) {
+            log.error("{}", e);
+            return HttpResult.fail(e.getMessage());
+        }
     }
 
     @Override

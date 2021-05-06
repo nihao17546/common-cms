@@ -126,6 +126,9 @@ public class HwUploadServiceImpl extends IUploadService {
                     .pull("token", credential.getSecuritytoken())
                     .pull("key", saveKey)
                     .pull("provider", ObjectStorageType.HW.name());
+        } catch (RuntimeException e) {
+            log.error("{}", e);
+            return HttpResult.fail(e.getMessage());
         } catch (Exception e) {
             log.error("{}", e);
             return HttpResult.fail("服务异常");

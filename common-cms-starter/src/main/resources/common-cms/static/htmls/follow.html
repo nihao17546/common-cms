@@ -525,6 +525,7 @@
                     }).then(res => {
                         if (res.data.status != 0) {
                             this.$message.error(res.data.msg);
+                            this.loading = false;
                         }
                         else {
                             if (cut === true || cut === 'true') {
